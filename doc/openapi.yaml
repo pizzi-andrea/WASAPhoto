@@ -53,11 +53,8 @@ components:
         this object rappresent a photo
       type: object
       properties:
-      
         photoId:
           $ref: "#/components/schemas/Id"
-        
-          
         timeUpdate:
           type: string
           format: data-time
@@ -102,12 +99,12 @@ paths:
   /users/:
     summary: users
     description: >
-      this resource rappresent all WASAPhoto users
+      this resource rappresent collection of users
     
     post:
       summary: add new user
       description: >
-        create new user gived a username
+        create new user registred in login phase
       
       tags:
         - user
@@ -127,10 +124,25 @@ paths:
     get:
       tags:
         - user
-      summary: list all users
+      summary: list registred users
       description: >
-        this method return the list of users currently registered with WASAPhoto
-      
+        this method return the list of users currently registered
+      parameters: 
+        - name: limit
+          description: limit elements to return
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: username
+          description: list user respect the username
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Username"
+          
+          
       operationId: listUsers
       
       responses:
@@ -147,6 +159,7 @@ paths:
                     uid: 10
                   - username: alux
                     uid: 840
+    
   /users/{uid}/:
     summary:  users
     description: >
@@ -167,7 +180,7 @@ paths:
           required: true
           description: Numeric ID of the user to get
         
-      operationId: getUserProfile
+      operationId: getUser
       
       responses:
         "200":
@@ -178,77 +191,44 @@ paths:
                 {$ref: "#/components/schemas/User"}
         "404":
           description: user not found
-  
-  /user/{uid}/myUsername:
-    description: >
-      this resource rappresent username associated to user
-    summary: update username
     
     put:
       tags:
         - user
-      summary: update username
+      summary: assign or update username
       description: >
-        this method give user id (*uid*) ad update its username
-      
-      
-      parameters:
-        - in: path
-          name: uid
-          schema:
-            $ref: "#/components/schemas/Id"
-          required: true
-          description: Numeric ID of the user to get
-    
-      operationId: SetMyUserName
-      
-      requestBody:
-        content:
-          application/json:
-            schema: {$ref: "#/components/schemas/Username"}
-      responses:
-        "204":
-          description: >
-            username updated
-        "201":
-          description: >
-            username assigned with success
-        "404":
-          description: >
-            user not found
-    
-    get:
-      tags:
-        - user
-      summary: get user by username
-      description: >
-        give username in request and get user
+        assign username or update old username with new username.
+        The username to set is in the body request
       
       parameters:
         - name: uid
           in: path
+          description: user id
           required: true
           schema:
             $ref: "#/components/schemas/Id"
-        - name: username
-          in: query
-          required: true
-          schema:
-            $ref: "#/components/schemas/Username"
+          
       
-      operationId: getUserByUsername
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Username"
+        description: new username
+        required: true
+      
+      operationId: updateMyUserName
       
       responses:
-        "200":
+        "204":
           description: >
-            user found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "404":
+            success, assigned new username
+        "403":
           description: >
-            user not found
+            operation not authorizated for this user
+            
+          
+  
   
   /user/{uid}/followers/:
     summary: user followers
@@ -258,6 +238,7 @@ paths:
     get:
       tags:
         - user
+        - follower
       summary: get all followers
       description: >
         give a UID return a list contanings all followers user
@@ -271,6 +252,22 @@ paths:
           schema:
             $ref: "#/components/schemas/Id"
           description: user id
+        
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: maximum number of elements to include in response
+        
+        - name: username
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Username"
+          description: search followers by their username
+          
       
       responses:
         "200":
@@ -292,6 +289,7 @@ paths:
     delete:
       tags:
         - user
+        - follower
       summary: unfollow user
       description:
         gived uid and followedID then remove follower{followerID} from user followers
@@ -320,9 +318,10 @@ paths:
         "403":
           description: user not authorizated
     
-    put:    # basta user id per il follow
+    put:
       tags:
         - user
+        - follower
       summary:  follow user
       description: >
         give user ID and addad follows
@@ -357,6 +356,7 @@ paths:
     get:
       tags:
         - user
+        - ban
       summary: users banned
       description: >
         list all user banned by user 
@@ -368,6 +368,13 @@ paths:
           schema:
             $ref: "#/components/schemas/Id"
           description: user id
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: maximum number of elements to include in response
       
       operationId: listBannedUser
       
@@ -490,7 +497,7 @@ paths:
         "404":
           description: user not found
   
-  /user/{uid}/myPhoto: 
+  /user/{uid}/myPhotos: 
     
     parameters:
       - name: uid
@@ -505,15 +512,7 @@ paths:
         - photo
       summary: update photo
       description: >
-        give photo to up ...
-        
-      parameters:
-        - name: uid
-          in: path
-          schema:
-            $ref: "#/components/schemas/Id"
-          required: true
-          description: user id
+        give photo and update it
         
       requestBody:
         description: photo to update
@@ -538,6 +537,27 @@ paths:
       description: >
         give uid get all photo has updated
       
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: maximum number of elements to include in response
+        - name: sortBy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: ["dataUpdate", "size"]
+          description: ordering photo getted by value
+        - name: reverse
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: order photo in reverse order
       
       operationId: listPhoto
       
@@ -764,56 +784,6 @@ paths:
           description: >
             operation not authorized, you not owner this like
       
-    get:
-      tags:
-        - photo
-        - like
-        
-      summary: get the like on a photo
-      description: >
-        give user Id, photo id and user id that put like and get like if he putted like
-        else notify a error
-      
-      parameters:
-        - name: uid
-          in: path
-          description: user id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-        
-        - name: photoId
-          in: path
-          description: photo id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-       
-        - name: likeUserId
-          in: path
-          required: true
-          description: uid user that put  like
-          schema:
-            $ref: "#/components/schemas/Id"
-        
-      operationId: getLike
-      
-      responses:
-        "200":  
-          description: >
-            successfully getted like
-            
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Id"
-                
-    
-        "404":
-          description: >
-            like, user or photo not found
-      
-      
     
   /user/{uid}/myPhoto/{photoId}/comments/:
     post:
@@ -879,6 +849,19 @@ paths:
           description: photo id
           schema:
             $ref: "#/components/schemas/Id"
+        - name: limit
+          in: query
+          required: false
+          description: maximum number of elements to include in response
+          schema:
+            type: integer
+            minimum: 1
+        - name: sortByData
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: sort comments by data creation
     
       responses:
         "200":
@@ -1017,4 +1000,6 @@ paths:
                     $ref: "#/components/schemas/Id"
                   username:
                     $ref: "#/components/schemas/Username"
-                
+  # note: improved  get method design. Added parameters in get query
+  # for more control on numer elementes getted (avoid DOS attack) and
+  # and implemented filter for user reserch based on username and sort collections of photo

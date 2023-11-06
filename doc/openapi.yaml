@@ -16,7 +16,7 @@ info:
     email: pizzi.1995517@studenti.uniroma1.it
   
 servers:
-  - url: http://localhost:3000
+  - url: https//localhost:8080
 
 components:
   schemas:
@@ -39,6 +39,9 @@ components:
     Username:
       description: username of a user
       type: string
+      pattern: 'ˆ.*?$'
+      minLength: 3
+      maxLength: 16
       example: marioross
     
     Id:
@@ -46,8 +49,28 @@ components:
       type: integer
       format: int64 
       readOnly: true
-      example: 19957 
-      
+      example: 4570 
+    
+    Profile:
+      description: user profile rappresentation
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        stream:
+          $ref: "#/components/schemas/StreamPhotos"
+        follower:
+          type: integer
+          minimum: 0
+          description: number user that follow a specific user
+          example: 12
+        following:
+          type: integer
+          minimum: 0
+          description: numer of users following by specific user
+          example: 70
+        
+    
     Photo:
       description: >
         this object rappresent a photo
@@ -73,14 +96,20 @@ components:
           type: string
           format: byte
           example: a good photo
-
+    
+    StreamPhotos:
+      description: model of stream of photos
+      type: array
+      items:
+        $ref: "#/components/schemas/Photo"
+    
     Comment:
       description: > 
         this object rappresent a comment on a photo.
       type: object
       properties:
-        userId:
-          $ref: "#/components/schemas/Id"
+        user:
+          $ref: "#/components/schemas/User"
   
         text:
           type: string
@@ -94,6 +123,10 @@ components:
           format: data-time
           example: 2017-07-21T17:32:28Z
           readOnly: true
+      required:
+        - user
+        - text
+        - timeStamp
 
 paths:
   /users/:
@@ -170,7 +203,13 @@ paths:
         - user
       summary: get specific user profile
       description: >
-        returns the user identified by the *uid*
+        give user id and put user profile. User profile is object contain 
+        all information on user, in particular:
+          - information about user
+          - stream photos updated
+          - number of photo have been updated
+          - number of followers
+          - number of following
       
       parameters:
         - in: path
@@ -180,7 +219,7 @@ paths:
           required: true
           description: Numeric ID of the user to get
         
-      operationId: getUser
+      operationId: getUserProfile
       
       responses:
         "200":
@@ -188,7 +227,7 @@ paths:
           content:
             application/json:
               schema:
-                {$ref: "#/components/schemas/User"}
+                {$ref: "#/components/schemas/Profile"}
         "404":
           description: user not found
     
@@ -217,7 +256,7 @@ paths:
         description: new username
         required: true
       
-      operationId: updateMyUserName
+      operationId: setMyUserName
       
       responses:
         "204":
@@ -228,9 +267,9 @@ paths:
             operation not authorizated for this user
             
           
+
   
-  
-  /user/{uid}/followers/:
+  /users/{uid}/followers/:
     summary: user followers
     description: >
       this resurce rappresent the followers of specific user
@@ -282,7 +321,7 @@ paths:
 
   
   
-  /user/{uid}/followers/{followerID}:
+  /users/{uid}/followers/{followerId}:
     summary: a follower
     description: this resource rappresent follower
     
@@ -301,7 +340,7 @@ paths:
             $ref: "#/components/schemas/Id"
           description: user wuold remove follow
           
-        - name: followerID
+        - name: followerId
           in: path
           required: true
           schema:
@@ -324,7 +363,7 @@ paths:
         - follower
       summary:  follow user
       description: >
-        give user ID and addad follows
+        give user  and added to  follower of user
       
       parameters:
         - name: uid
@@ -334,12 +373,19 @@ paths:
             $ref: "#/components/schemas/Id"
           description: user id 
         
-        - name: followerID
+        - name: followerId
           in: path
           required: true
           schema:
             $ref: "#/components/schemas/Id"
           description: user id of follower
+      
+      requestBody:
+        description: information on followers
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
       
       operationId: followUser
       
@@ -348,8 +394,289 @@ paths:
           description: added new follower
         "204":
           description: just follow the user
+  
+  /users/{uid}/following/:
+    summary: users following by specific user
+    description: > 
+      this resource rappresent all users following by user
+    
+    get:
+      tags:
+        - photo
+      summary: get following users
+      description: >
+        give user id and get all user that following the user
+      
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: user id
+          schema:
+            $ref: "#/components/schemas/Id"
+        - name: username
+          in: query
+          required: false
+          description: username to find
+          schema:
+            $ref: "#/components/schemas/Username"
+        - name: limit
+          in: query
+          required: false
+          description: maximum number of elements to include in response
+          schema:
+            type: integer
+            minimum: 1
+            example: 3
+      
+      operationId: getFollowings
+      
+      responses:
+        "200":
+          description: success, get users following
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "404":
+          description: user not found
+  
+  /users/{uid}/following/{followingId}:
+    summary: user following this user
+    description: >
+      this resource rappresent following user
+    
+    put:
+      tags:
+        - following
+        - user
+      summary: add new following
+      description: >
+        give uid user and uid of following user
+      
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: user id to follow
+          schema:
+            $ref: "#/components/schemas/Id"
+        - name: followingId
+          required: true
+          in: path
+          description: user id to following
+          schema:
+            $ref: "#/components/schemas/Id"
+      
+      requestBody:
+        description: informations about user to following
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      
+      operationId: following
+      
+      responses:
+        "201":
+          description: success, added new following
+        "204":
+          description: just following the user
+        "404":
+          description: user not found
+    
+    delete:
+      tags: 
+        - following
+        - user
+      summary: delete following
+      description: >
+        give user id and  user following id and stop following him
+      
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: user id to follow
+          schema:
+            $ref: "#/components/schemas/Id"
+        - name: followingId
+          required: true
+          in: path
+          description: user id to following
+          schema:
+            $ref: "#/components/schemas/Id"
+      
+      operationId: unfollowing
 
-  /user/{uid}/banned/:
+      responses:
+        "200":
+          description: success, unFollowing the users
+        "404":
+          description: user not found
+    
+    
+  /users/{uid}/myStream:
+    summary: user stream photos
+    description: >
+      this resource rappresent stream of photos associated a user.
+      the photos in the stream are taken by followed users. The user
+      can put like or comment on photos in the stream
+    
+    parameters:
+        - name: uid
+          in: path
+          description: user id
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+    
+    post:
+      tags:
+        - photo
+        - user
+      summary: add photo to the stream
+      description: >
+        give photo in body request and update it in personal user stream
+      
+      operationId: addPhotoMyStream
+      
+      requestBody:
+        description: photo to update
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/Photo"}
+      
+      responses:
+        "201":
+          description: >
+            success, photo updated
+        "404":
+          description: >
+            user not found
+        "403":
+          description: >
+            operation not permitted
+      
+    get:
+      tags:
+        - photo
+        - stream
+      summary: list personal stream photos 
+      description: >
+        give uid get all photo in his stream
+      
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+          description: maximum number of elements to include in response
+        - name: sortBy
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: ["dataUpdate", "size"]
+          description: ordering photo getted by value
+        - name: reverse
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: order photo in reverse order
+        - name: username
+          in: query
+          required: false
+          description: filter photos of stream by username 
+          schema:
+            $ref: "#/components/schemas/Username"
+          
+      operationId: getMyStream
+      
+      responses:
+        "200":
+          description: >
+            getted stream photos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StreamPhotos"
+        "404":
+          description: >
+            user not found
+        
+        "403":
+          description: >
+            operation not permitted
+    
+            
+        
+  /users/{uid}/myStream/{photoId}:
+  
+    parameters:
+        - name: uid
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+          description: user id
+        - name: photoId
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+          description: photo id
+    
+    get:
+      tags:
+        - photo
+        - stream
+        - user
+      summary: get photo from stream
+      description: >
+        give *uid* and *photoId* and get photo associated
+    
+      operationId: getPhotoMyStream
+      responses:
+        "200":
+          description: >
+            success, getted desired photo from stream
+        "404":
+          description: >
+            user or photo not found
+        "403":
+          description: >
+            operation not permitted, user not authorizated to get photos from this stream
+    
+    delete:
+      tags:
+        - photo
+        - stream
+        - user
+      summary: delete photo from stream
+      description: >
+        give *uid* and *photoId* and deleted photo associated
+    
+      operationId: deletePhotoMyStream
+      responses:
+        "201":
+          description: >
+            success, removed desired photo from stream
+        "404":
+          description: >
+            user or photo not found
+        "403":
+          description: >
+            operation not permitted, user not authorizated to delete photos from this stream
+          
+      
+    
+  /users/{uid}/banned/:
     summary: banned user
     description: this resource rappresent user banned by uid user
     
@@ -375,6 +702,12 @@ paths:
             type: integer
             minimum: 1
           description: maximum number of elements to include in response
+        - name: username
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Username"
+          description: find users banned by username
       
       operationId: listBannedUser
       
@@ -393,7 +726,7 @@ paths:
           description: >
             user not found
   
-  /user/{uid}/banned/{bannedId}:
+  /users/{uid}/banned/{bannedId}:
     summary: users banned
     description: >
       this resource describe banned user
@@ -463,41 +796,8 @@ paths:
         "403":
           description: user not authorizated
     
-    get:
-      tags:
-        - user
-        - ban
-      summary: get user banned
-      description: >
-        taken uid of the user has banned and uid of user banned and get last one
-      
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          description: uid who ban
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: bannedId
-          in: path
-          required: true
-          description: uid user  banned
-          schema:
-            $ref: "#/components/schemas/Id"
-      
-      operationId: getUserBanned
-      
-      responses:
-        "200":
-          description: get user banned
-          content:
-            application/json:
-              schema: {$ref: '#/components/schemas/User'}
-        
-        "404":
-          description: user not found
   
-  /user/{uid}/myPhotos: 
+  /users/{uid}/myPhotos: 
     
     parameters:
       - name: uid
@@ -533,9 +833,9 @@ paths:
     get:
       tags:
         - photo
-      summary: list photos updated
+      summary: list stream photos updated
       description: >
-        give uid get all photo has updated
+        give *uid* get all photo has updated
       
       parameters:
         - name: limit
@@ -568,11 +868,14 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  {$ref: "#/components/schemas/Photo"}
+                $ref: "#/components/schemas/StreamPhotos"
+        "403": 
+          description: >
+            operation not permitted, user actor banned or not following this user
+          
+          
   
-  /user/{uid}/myPhoto/{photoId}/: #
+  /users/{uid}/myPhotos/{photoId}/: #
     summary: photo updated by user
     description: >
       this resource rappresent the streams of photos update by user in time
@@ -598,6 +901,8 @@ paths:
           schema:
             $ref: "#/components/schemas/Id"
       
+      operationId: deletePhoto
+        
       responses:
         "200":
           description: >
@@ -644,7 +949,7 @@ paths:
           description: >
             photo or user not found
   
-  /user/{uid}/myPhoto/{photoId}/likes/: #
+  /users/{uid}/myPhotos/{photoId}/likes/: #
     summary: likes on photo
     description: >
       This resource describes the likes received for the photo
@@ -688,7 +993,7 @@ paths:
           description: >
             user or photo not found
   
-  /user/{uid}/myPhoto/{photoId}/likes/{likeUserId}:
+  /users/{uid}/myPhotos/{photoId}/likes/{likeUserId}:
     put:
       tags:
         - photo
@@ -785,7 +1090,7 @@ paths:
             operation not authorized, you not owner this like
       
     
-  /user/{uid}/myPhoto/{photoId}/comments/:
+  /users/{uid}/myPhotos/{photoId}/comments/:
     post:
       tags:
         - comment
@@ -862,6 +1167,12 @@ paths:
           schema:
             type: boolean
           description: sort comments by data creation
+        - name: username
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/Username"
+          description: get comment give by particular username
     
       responses:
         "200":
@@ -874,7 +1185,7 @@ paths:
                 items:
                   {$ref: "#/components/schemas/Comment"}
   
-  /user/{uid}/myPhoto/{photoId}/comments/{commentId}:
+  /users/{uid}/myPhotos/{photoId}/comments/{commentId}:
     summary: comment on photo
     description: >
       this resource rappresent a single comment on photo
@@ -960,9 +1271,6 @@ paths:
         "404":
           description: >
             user or comment not found
-        
-  
-  
   /session:
     post:
       tags: ["login"]
@@ -1000,6 +1308,3 @@ paths:
                     $ref: "#/components/schemas/Id"
                   username:
                     $ref: "#/components/schemas/Username"
-  # note: improved  get method design. Added parameters in get query
-  # for more control on numer elementes getted (avoid DOS attack) and
-  # and implemented filter for user reserch based on username and sort collections of photo

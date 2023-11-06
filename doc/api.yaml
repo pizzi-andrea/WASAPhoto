@@ -129,6 +129,7 @@ components:
         - timeStamp
 
 paths:
+
   /users/:
     summary: users
     description: >
@@ -153,6 +154,9 @@ paths:
       responses:
         "201":
           description: successfull create new user
+        "204":
+          description: >
+            empty body, found nothing
 
     get:
       tags:
@@ -196,7 +200,15 @@ paths:
   /users/{uid}/:
     summary:  users
     description: >
-      this resource rappresent a single user
+       Resource rappresent a single user
+       
+    parameters:
+        - in: path
+          name: uid
+          schema:
+            $ref: "#/components/schemas/Id"
+          required: true
+          description: Numeric ID of the user to get
     
     get:
       tags:
@@ -211,13 +223,6 @@ paths:
           - number of followers
           - number of following
       
-      parameters:
-        - in: path
-          name: uid
-          schema:
-            $ref: "#/components/schemas/Id"
-          required: true
-          description: Numeric ID of the user to get
         
       operationId: getUserProfile
       
@@ -239,15 +244,6 @@ paths:
         assign username or update old username with new username.
         The username to set is in the body request
       
-      parameters:
-        - name: uid
-          in: path
-          description: user id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-          
-      
       requestBody:
         content:
           application/json:
@@ -265,6 +261,10 @@ paths:
         "403":
           description: >
             operation not authorizated for this user
+        "404":
+          description: >
+            user not found
+        
             
           
 
@@ -274,6 +274,14 @@ paths:
     description: >
       this resurce rappresent the followers of specific user
     
+    parameters:
+      - name: uid
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/Id"
+        description: user id
+        
     get:
       tags:
         - user
@@ -285,13 +293,6 @@ paths:
       operationId: listFollowers
       
       parameters:
-        - name: uid
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-          description: user id
-        
         - name: limit
           in: query
           required: false
@@ -310,48 +311,53 @@ paths:
       
       responses:
         "200":
-          description: return list of followers
+          description: >
+            success, return list of followers
           content:
             application/json:
               schema:
                 type: array
                 items: {$ref: "#/components/schemas/User"}
         "404":
-          description: user not found
+          description: >
+            not found, user not found
+        
+        "204":
+          description: >
+            empty body, found nothing
 
-  
-  
   /users/{uid}/followers/{followerId}:
     summary: a follower
     description: this resource rappresent follower
     
+    parameters:
+      - name: uid
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/Id"
+        description: user wuold remove follow
+          
+      - name: followerId
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/Id"
+        description: user to unfollow
+        
     delete:
       tags:
         - user
         - follower
       summary: unfollow user
-      description:
-        gived uid and followedID then remove follower{followerID} from user followers
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-          description: user wuold remove follow
-          
-        - name: followerId
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-          description: user to unfollow
+      description: >
+        gived uid and *followedId* then remove follower *followerId* from user followers
       
       operationId: unfollowUser
       
       responses:
-        "200":
-          description: success , now unfollow the user
+        "204":
+          description: success , unfollow the user
         "404":
           description: just no follow user or user Id not exist
         "403":
@@ -365,20 +371,6 @@ paths:
       description: >
         give user  and added to  follower of user
       
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-          description: user id 
-        
-        - name: followerId
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-          description: user id of follower
       
       requestBody:
         description: information on followers
@@ -400,20 +392,23 @@ paths:
     description: > 
       this resource rappresent all users following by user
     
+    parameters:
+      - name: uid
+        in: path
+        required: true
+        description: > 
+          id of user who wants to see the users he follows
+        schema:
+          $ref: "#/components/schemas/Id"
+            
     get:
       tags:
         - photo
       summary: get following users
       description: >
-        give user id and get all user that following the user
+        given the *id* of the user who wants to see the users he follows he will get the list of followed users
       
       parameters:
-        - name: uid
-          in: path
-          required: true
-          description: user id
-          schema:
-            $ref: "#/components/schemas/Id"
         - name: username
           in: query
           required: false
@@ -433,7 +428,8 @@ paths:
       
       responses:
         "200":
-          description: success, get users following
+          description: >
+            success, get users following
           content:
             application/json:
               schema:
@@ -441,12 +437,27 @@ paths:
                 items:
                   $ref: "#/components/schemas/User"
         "404":
-          description: user not found
+          description: >
+            not found, user not found
   
   /users/{uid}/following/{followingId}:
     summary: user following this user
     description: >
       this resource rappresent following user
+    
+    parameters:
+      - name: uid
+        in: path
+        required: true
+        description: user id to follow
+        schema:
+          $ref: "#/components/schemas/Id"
+      - name: followingId
+        required: true
+        in: path
+        description: user id to following
+        schema:
+          $ref: "#/components/schemas/Id"
     
     put:
       tags:
@@ -456,19 +467,7 @@ paths:
       description: >
         give uid user and uid of following user
       
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          description: user id to follow
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: followingId
-          required: true
-          in: path
-          description: user id to following
-          schema:
-            $ref: "#/components/schemas/Id"
+      
       
       requestBody:
         description: informations about user to following
@@ -481,12 +480,15 @@ paths:
       
       responses:
         "201":
-          description: success, added new following
+          description: >
+            success, added new following
         "204":
-          description: just following the user
+          description: > 
+            empty, just following the user
         "404":
-          description: user not found
-    
+          description: >
+            not found, user not found
+            
     delete:
       tags: 
         - following
@@ -494,28 +496,17 @@ paths:
       summary: delete following
       description: >
         give user id and  user following id and stop following him
-      
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          description: user id to follow
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: followingId
-          required: true
-          in: path
-          description: user id to following
-          schema:
-            $ref: "#/components/schemas/Id"
-      
+
       operationId: unfollowing
 
       responses:
-        "200":
-          description: success, unFollowing the users
+        "204":
+          description: >
+            success, unFollowing the users
         "404":
-          description: user not found
+          description: >
+            not found, user not found
+        
     
     
   /users/{uid}/myStream:
@@ -523,7 +514,7 @@ paths:
     description: >
       this resource rappresent stream of photos associated a user.
       the photos in the stream are taken by followed users. The user
-      can put like or comment on photos in the stream
+      can put like or comment on photos in the stream.
     
     parameters:
         - name: uid
@@ -532,41 +523,14 @@ paths:
           required: true
           schema:
             $ref: "#/components/schemas/Id"
-    
-    post:
-      tags:
-        - photo
-        - user
-      summary: add photo to the stream
-      description: >
-        give photo in body request and update it in personal user stream
-      
-      operationId: addPhotoMyStream
-      
-      requestBody:
-        description: photo to update
-        content:
-          application/json:
-            schema: {$ref: "#/components/schemas/Photo"}
-      
-      responses:
-        "201":
-          description: >
-            success, photo updated
-        "404":
-          description: >
-            user not found
-        "403":
-          description: >
-            operation not permitted
-      
+
     get:
       tags:
         - photo
         - stream
       summary: list personal stream photos 
       description: >
-        give uid get all photo in his stream
+        given *uid* of user that who wants to get all photo in his stream
       
       parameters:
         - name: limit
@@ -601,21 +565,23 @@ paths:
       responses:
         "200":
           description: >
-            getted stream photos
+            success, getted stream photos
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/StreamPhotos"
         "404":
           description: >
-            user not found
+            not found, user not found
         
         "403":
           description: >
-            operation not permitted
-    
+            operation not allowed, uid does not correspond to the owner of the photo
             
-        
+        "204":
+          description: >
+            empty body, found nothing
+    
   /users/{uid}/myStream/{photoId}:
   
     parameters:
@@ -648,37 +614,30 @@ paths:
             success, getted desired photo from stream
         "404":
           description: >
-            user or photo not found
+            not found, user or photo not found
         "403":
           description: >
-            operation not permitted, user not authorizated to get photos from this stream
+            operation not allowed, uid does not correspond to the owner of the photo
+        
+        "204":
+          description: >
+            empty body, found nothing
     
-    delete:
-      tags:
-        - photo
-        - stream
-        - user
-      summary: delete photo from stream
-      description: >
-        give *uid* and *photoId* and deleted photo associated
     
-      operationId: deletePhotoMyStream
-      responses:
-        "201":
-          description: >
-            success, removed desired photo from stream
-        "404":
-          description: >
-            user or photo not found
-        "403":
-          description: >
-            operation not permitted, user not authorizated to delete photos from this stream
           
       
     
   /users/{uid}/banned/:
-    summary: banned user
+    summary: banned users
     description: this resource rappresent user banned by uid user
+    
+    parameters:
+        - name: uid
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/Id"
+          description: user id
     
     get:
       tags:
@@ -686,15 +645,10 @@ paths:
         - ban
       summary: users banned
       description: >
-        list all user banned by user 
-      
+        given *uid* then list all user banned by user associated at *uid* 
+    
       parameters:
-        - name: uid
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-          description: user id
+
         - name: limit
           in: query
           required: false
@@ -714,22 +668,43 @@ paths:
       responses:
         "200":
           description: >
-            list all user banned
+            success, getted all user banned
           
           content:
+              
             application/json:
               schema:
                 type: array
                 items:
                   $ref: "#/components/schemas/User"
+                description: list  of banned users
+
         "404":
           description: >
-            user not found
+            not found, user not found
+        
+        "204":
+          description: >
+            empty body, found nothing
   
   /users/{uid}/banned/{bannedId}:
     summary: users banned
     description: >
       this resource describe banned user
+    
+    parameters:
+      - name: uid
+        in: path
+        required: true
+        description: uid who wonts ban
+        schema:
+          $ref: "#/components/schemas/Id"
+      - name: bannedId
+        in: path
+        required: true
+        description: uid user to ban
+        schema:
+          $ref: "#/components/schemas/Id"
     
     put:
       tags:
@@ -740,29 +715,17 @@ paths:
         taken uid of the user who wants to ban and uid of the user to be banned, 
         bans the user(BannedID)
       
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          description: uid who wonts ban
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: bannedId
-          in: path
-          required: true
-          description: uid user to ban
-          schema:
-            $ref: "#/components/schemas/Id"
+      
       
       operationId: banUser
       
       responses:
         "201":
-          description: successfull banned user
+          description: success,  banned user
         "204":
-          description: user just banned
+          description: empty response, user just banned
         "404":
-          description: user not found
+          description: not found, user not found
     
     delete:
       tags:
@@ -772,29 +735,18 @@ paths:
       description: >
         taken uid of the user who wants unbband id of user banned and delete last one
       
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          description: uid who wonts unban
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: bannedId
-          in: path
-          required: true
-          description: uid user to unbanned
-          schema:
-            $ref: "#/components/schemas/Id"
-      
       operationId: unbanUser
       
       responses:
-        "200":
-          description: successfull unbanned user
+        "204":
+          description: >
+            success, unbanned user
         "404":
-          description: user not found
+          description: >
+            not found, user not found
         "403":
-          description: user not authorizated
+          description: >
+            operation not allowed,  user not authorizated
     
   
   /users/{uid}/myPhotos: 
@@ -835,7 +787,7 @@ paths:
         - photo
       summary: list stream photos updated
       description: >
-        give *uid* get all photo has updated
+        given *uid* get all photo has updated
       
       parameters:
         - name: limit
@@ -851,7 +803,7 @@ paths:
           schema:
             type: string
             enum: ["dataUpdate", "size"]
-          description: ordering photo getted by value
+          description: ordering photo getted by value in enum
         - name: reverse
           in: query
           required: false
@@ -864,55 +816,51 @@ paths:
       responses:
         "200":
           description: >
-            list photo updated
+            success, stream photos updated
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/StreamPhotos"
-        "403": 
+        
+        "204":
           description: >
-            operation not permitted, user actor banned or not following this user
-          
-          
+            empty body, found nothing
   
   /users/{uid}/myPhotos/{photoId}/: #
     summary: photo updated by user
     description: >
       this resource rappresent the streams of photos update by user in time
-    
+  
+    parameters:
+      - name: uid
+        in: path
+        description: user id
+        required: true
+        schema:
+          $ref: "#/components/schemas/Id"
+      - name: photoId
+        in: path
+        description: photo id
+        required: true
+        schema:
+          $ref: "#/components/schemas/Id"
+          
     delete:
       tags:
         - photo
       summary: delete photo updated
       description: >
         provide uid and photoID and delete the photo corresponding to photoID
-      
-      parameters:
-        - name: uid
-          in: path
-          description: user id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: photoId
-          in: path
-          description: photo id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-      
+    
       operationId: deletePhoto
         
       responses:
-        "200":
+        "204":
           description: >
             success, deleted photo
         "404":
           description: >
-            photo or user not found
-        "403":
-          description: >
-            operation not authorized
+            not found, photo or user not found
     
     get:
       tags:
@@ -920,26 +868,12 @@ paths:
       summary: get photo
       description: give *uid* and photo id and get photo with photo id gived
       
-      parameters:
-        - name: uid
-          in: path
-          description: user id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: photoId
-          in: path
-          description: photo id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-      
       operationId: getPhoto
       
       responses:
         "200": 
           description: >
-            photo founded
+            success, photo founded
           
           content:
             application/json:
@@ -947,21 +881,18 @@ paths:
           
         "404":
           description: >
-            photo or user not found
+            not found, photo or user not found
+        
+        "204":
+          description: >
+            empty body, found nothing
   
-  /users/{uid}/myPhotos/{photoId}/likes/: #
+  /users/{uid}/myPhotos/{photoId}/likes/:
     summary: likes on photo
     description: >
       This resource describes the likes received for the photo
     
-    get:
-      tags:
-        - photo
-        - like
-      summary: get likes collected by photo
-      description: give photo id and get all likes recived
-      
-      parameters:
+    parameters:
         - name: uid
           in: path
           description: user id
@@ -974,6 +905,12 @@ paths:
           required: true
           schema:
             $ref: "#/components/schemas/Id"
+    get:
+      tags:
+        - photo
+        - like
+      summary: get likes collected by photo
+      description: give photo id and get all likes recived
       
       operationId: getLikes
       
@@ -991,19 +928,15 @@ paths:
                 description: user id that put like
         "404":
           description: >
-            user or photo not found
+            not found, user or photo not found
+        
+        "204":
+          description: >
+            empty body, found nothing
   
   /users/{uid}/myPhotos/{photoId}/likes/{likeUserId}:
-    put:
-      tags:
-        - photo
-        - like
-      summary: put like a photo
-      description: >
-        provide photo id and owner id. 
-        The like is identified by the *uid* of the user who likes it.
-      
-      parameters:
+    
+    parameters:
         - name: uid
           in: path
           description: user id
@@ -1024,22 +957,32 @@ paths:
           description: uid user put like
           schema:
             $ref: "#/components/schemas/Id"
+    put:
       
+      tags:
+        - photo
+        - like
+      summary: put like a photo
+      description: >
+        provide photo id and owner id. 
+        The like is identified by the *uid* of the user who likes it.
+      
+    
       operationId: likePhoto
       
       responses:
         "201":  
           description: >
-            successfully liked the photo
+            success, like added to the photo
         "204": 
           description: >
-            just liked this photo
+            not content, just liked this photo
         "404":
           description: >
-            user or photo not found
+            not found, user or photo not found
         "403":
           description: >
-            operation not authorized
+           operation not allowed, user identified by likeUserId cannot like
       
     delete:
       tags:
@@ -1049,48 +992,38 @@ paths:
       description: >
         provide photo id and owner id
         and remove like given user identificated by
-        likeUserId
-        
-      parameters:
-        - name: uid
-          in: path
-          description: user id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-          example: 999
-        
-        - name: photoId
-          in: path
-          description: photo id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-          example: 10
-        
-        - name: likeUserId
-          in: path
-          required: true
-          description: uid user wont remove like
-          schema:
-            $ref: "#/components/schemas/Id"
-          example: 7
+        *likeUserId*
         
       operationId: unlikePhoto
       
       responses:
-        "200":  
+        "204":  
           description: >
-            successfully unliked the photo
+            success, unliked the photo
         "404":
           description: >
-            like, user or photo not found
+            not found, user or photo not found
         "403":
           description: >
-            operation not authorized, you not owner this like
+            operation not allowed, you not owner this like
       
     
   /users/{uid}/myPhotos/{photoId}/comments/:
+    
+    parameters:
+      - name: uid
+        in: path
+        required: true
+        description: user id
+        schema:
+          $ref: "#/components/schemas/Id"
+      - name: photoId
+        in: path
+        required: true
+        description: photo id
+        schema:
+          $ref: "#/components/schemas/Id"
+    
     post:
       tags:
         - comment
@@ -1100,19 +1033,7 @@ paths:
         give user id and photo id if user is owner of photo add a comment
         stored in the body of request
       
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          description: user id
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: photoId
-          in: path
-          required: true
-          description: photo id
-          schema:
-            $ref: "#/components/schemas/Id"
+      
       
       requestBody:
         description: > 
@@ -1125,13 +1046,15 @@ paths:
       
       responses:
         "201":
-          description: success, new comment added to photo
+          description: >
+            success, new comment added to photo
           content:
             application/json:
               schema: {$ref: "#/components/schemas/Comment"}
           
         "404":
-          description: photo or user not found
+          description: >
+            not found, photo or user not found
     
     get:
       tags:
@@ -1142,18 +1065,6 @@ paths:
         give photo id and user id of owner photo then get all comments on photo
       
       parameters:
-        - name: uid
-          in: path
-          required: true
-          description: user id
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: photoId
-          in: path
-          required: true
-          description: photo id
-          schema:
-            $ref: "#/components/schemas/Id"
         - name: limit
           in: query
           required: false
@@ -1176,7 +1087,8 @@ paths:
     
       responses:
         "200":
-          description: success, get all comments on photo
+          description: >
+            success, get all comments on photo
           
           content:
             application/json:
@@ -1184,11 +1096,37 @@ paths:
                 type: array
                 items:
                   {$ref: "#/components/schemas/Comment"}
+        "404":
+          description: >
+            not found, user not found
+        "204":
+          description: >
+            empty body, found nothing
   
   /users/{uid}/myPhotos/{photoId}/comments/{commentId}:
     summary: comment on photo
     description: >
       this resource rappresent a single comment on photo
+    
+    parameters:
+      - name: uid
+        in: path
+        required: true
+        description: user id
+        schema:
+          $ref: "#/components/schemas/Id"
+      - name: photoId
+        in: path
+        required: true
+        description: photo id
+        schema:
+          $ref: "#/components/schemas/Id"
+      - name: commentId
+        in: path
+        required: true
+        description: comment id
+        schema:
+          $ref: "#/components/schemas/Id"
     delete:
       tags:
         - comment
@@ -1197,35 +1135,15 @@ paths:
       description: >
         give user id of owner photo, photo id and remove comment on photo identified from comment id given
       
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          description: user id
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: photoId
-          in: path
-          required: true
-          description: photo id
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: commentId
-          in: path
-          required: true
-          description: comment id
-          schema:
-            $ref: "#/components/schemas/Id"
-      
       operationId: uncommentPhoto
       
       responses:
-        "201":
+        "204":
           description: >
-            successfull deleted comment
+            success, deleted comment
         "404":
           description: >
-            photo or user not found
+            not found, photo or user not found
         "403":
           description: >
             operation not authorized, you not owner this like
@@ -1271,6 +1189,11 @@ paths:
         "404":
           description: >
             user or comment not found
+        
+        "204":
+          description: >
+            empty body, found nothing
+  
   /session:
     post:
       tags: ["login"]
@@ -1308,3 +1231,5 @@ paths:
                     $ref: "#/components/schemas/Id"
                   username:
                     $ref: "#/components/schemas/Username"
+        
+

@@ -39,7 +39,7 @@ components:
     Username:
       description: username of a user
       type: string
-      pattern: 'ˆ.*?$'
+      pattern: '^.*?$'
       minLength: 3
       maxLength: 16
       example: marioross
@@ -1215,7 +1215,7 @@ paths:
                 name:
                   type: string
                   example: Maria
-                  pattern: 'ˆ.*?$'
+                  pattern: '^.*?$'
                   minLength: 3
                   maxLength: 16
         required: true

@@ -3,19 +3,19 @@
   Total number of warnings : 37
 
   errors
-   7  (70%) : Request bodies and non-204 responses should define a content object
-   3  (30%) : Common path parameters should be defined on the path object.
+   7  (70%) : Request bodies and non-204 responses should define a content object FIXED
+   3  (30%) : Common path parameters should be defined on the path object. FIXED
 
   warnings
-   1   (3%) : OpenAPI object must have non-empty "tags" array.
-   2   (5%) : Should define a pattern for a valid string
-   4  (11%) : Should define a minLength for a valid string
-   4  (11%) : Should define a maxLength for a valid string
+   1   (3%) : OpenAPI object must have non-empty "tags" array. (?)
+   2   (5%) : Should define a pattern for a valid string (?)
+   4  (11%) : Should define a minLength for a valid string (?)
+   4  (11%) : Should define a maxLength for a valid string (?)
    2   (5%) : "example" property must match format "byte" FIXED
    7  (19%) : Array schemas should define a numeric minItems field FIXED
    7  (19%) : Array schemas should define a numeric maxItems field FIXED
-   3   (8%) : Schema property should have a non-empty description
-   6  (16%) : Schema should have a non-empty description
+   3   (8%) : Schema property should have a non-empty description FIXED
+   6  (16%) : Schema should have a non-empty description FIXED
    1   (3%) : Operation must have "operationId". FIXED
 
   design errors

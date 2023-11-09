@@ -19,6 +19,45 @@ servers:
   - url: https//localhost:8080
 
 components:
+
+  parameters:
+    queryLimit:
+      description: >
+        security parameter to limit the number of items in a response and avoid DOS attacks
+      name: limit
+      in: query
+      required: false
+      schema:
+        description: format limit values
+        type: integer
+        format: int
+        minimum: 1
+        example: 50
+    
+    usernameFilter:
+      description: >
+        parameter use to filter set of users by his username
+      name: username
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/Username"
+    
+  
+    
+  securitySchemes:
+    
+    BearerAuth:
+      description: >
+        basic safety mechanism based on "bearer" mechanism. APIs that require a minimum level of security can adopt this method
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    
+    
+        
+      
+  
   schemas:
     User:
       description: |
@@ -90,18 +129,27 @@ components:
           description: data
           type: string
           format: binary
+          example: myPhoto.png
         
         descriptionImg:
           description: image description
           type: string
           format: byte
-          example: a good photo
+          example: a good photo 😎
+          minLength: 1
+          maxLength: 250
+      required:
+        - imageData
+        - timeUpdate
+          
     
     StreamPhotos:
       description: model of stream of photos
       type: array
       items:
         $ref: "#/components/schemas/Photo"
+      minItems: 0
+      # add maxItems ?
     
     Comment:
       description: > 
@@ -127,6 +175,9 @@ components:
         - user
         - text
         - timeStamp
+  
+    
+        
 
 paths:
 
@@ -154,10 +205,10 @@ paths:
       responses:
         "201":
           description: successfull create new user
-        "204":
-          description: >
-            empty body, found nothing
-
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
     get:
       tags:
         - user
@@ -165,19 +216,9 @@ paths:
       description: >
         this method return the list of users currently registered
       parameters: 
-        - name: limit
-          description: limit elements to return
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-        - name: username
-          description: list user respect the username
-          in: query
-          required: false
-          schema:
-            $ref: "#/components/schemas/Username"
+        
+        - $ref: "#/components/parameters/queryLimit"
+        - $ref: "#/components/parameters/usernameFilter"
           
           
       operationId: listUsers
@@ -189,8 +230,12 @@ paths:
           content:
             application/json:
               schema:
+                description: list of users  
                 type: array
-                items: {$ref: "#/components/schemas/User"}
+                items: 
+                  $ref: "#/components/schemas/User"
+                minItems: 0
+             
                 example:
                   - username: MarioRoss
                     uid: 10
@@ -290,24 +335,13 @@ paths:
       description: >
         give a UID return a list contanings all followers user
       
-      operationId: listFollowers
+      
       
       parameters:
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-          description: maximum number of elements to include in response
-        
-        - name: username
-          in: query
-          required: false
-          schema:
-            $ref: "#/components/schemas/Username"
-          description: search followers by their username
+        - $ref: "#/components/parameters/queryLimit"
+        - $ref: "#/components/parameters/usernameFilter"
           
+      operationId: listFollowers
       
       responses:
         "200":
@@ -316,8 +350,11 @@ paths:
           content:
             application/json:
               schema:
+                description: list of followers
                 type: array
-                items: {$ref: "#/components/schemas/User"}
+                items: 
+                  $ref: "#/components/schemas/User"
+                minItems: 0
         "404":
           description: >
             not found, user not found
@@ -384,6 +421,10 @@ paths:
       responses:
         "201": 
           description: added new follower
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
         "204":
           description: just follow the user
   
@@ -403,26 +444,14 @@ paths:
             
     get:
       tags:
-        - photo
+        - user
       summary: get following users
       description: >
         given the *id* of the user who wants to see the users he follows he will get the list of followed users
       
       parameters:
-        - name: username
-          in: query
-          required: false
-          description: username to find
-          schema:
-            $ref: "#/components/schemas/Username"
-        - name: limit
-          in: query
-          required: false
-          description: maximum number of elements to include in response
-          schema:
-            type: integer
-            minimum: 1
-            example: 3
+        - $ref: "#/components/parameters/queryLimit"
+        - $ref: "#/components/parameters/usernameFilter"
       
       operationId: getFollowings
       
@@ -434,8 +463,10 @@ paths:
             application/json:
               schema:
                 type: array
+                description: list of following
                 items:
                   $ref: "#/components/schemas/User"
+                minItems: 0
         "404":
           description: >
             not found, user not found
@@ -482,6 +513,10 @@ paths:
         "201":
           description: >
             success, added new following
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
         "204":
           description: > 
             empty, just following the user
@@ -533,17 +568,14 @@ paths:
         given *uid* of user that who wants to get all photo in his stream
       
       parameters:
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-          description: maximum number of elements to include in response
+      
+        - $ref: "#/components/parameters/queryLimit"
+        - $ref: "#/components/parameters/usernameFilter"
         - name: sortBy
           in: query
           required: false
           schema:
+            description: options for sorting photos
             type: string
             enum: ["dataUpdate", "size"]
           description: ordering photo getted by value
@@ -551,14 +583,11 @@ paths:
           in: query
           required: false
           schema:
+            description: type value ordering flag
             type: boolean
+            default: true
           description: order photo in reverse order
-        - name: username
-          in: query
-          required: false
-          description: filter photos of stream by username 
-          schema:
-            $ref: "#/components/schemas/Username"
+        
           
       operationId: getMyStream
       
@@ -612,6 +641,11 @@ paths:
         "200":
           description: >
             success, getted desired photo from stream
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Photo"
+          
         "404":
           description: >
             not found, user or photo not found
@@ -649,19 +683,8 @@ paths:
     
       parameters:
 
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-          description: maximum number of elements to include in response
-        - name: username
-          in: query
-          required: false
-          schema:
-            $ref: "#/components/schemas/Username"
-          description: find users banned by username
+        - $ref: "#/components/parameters/queryLimit"
+        - $ref: "#/components/parameters/usernameFilter"
       
       operationId: listBannedUser
       
@@ -671,12 +694,12 @@ paths:
             success, getted all user banned
           
           content:
-              
             application/json:
               schema:
                 type: array
                 items:
                   $ref: "#/components/schemas/User"
+                minItems: 0
                 description: list  of banned users
 
         "404":
@@ -716,12 +739,22 @@ paths:
         bans the user(BannedID)
       
       
-      
+      requestBody:
+        description: information about user to ban
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+              
       operationId: banUser
       
       responses:
         "201":
           description: success,  banned user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
         "204":
           description: empty response, user just banned
         "404":
@@ -769,8 +802,9 @@ paths:
       requestBody:
         description: photo to update
         content:
-          application/json:
-            schema: {$ref: "#/components/schemas/Photo"}
+          multipart/form-data:
+            schema: 
+              $ref: "#/components/schemas/Photo"
       
       operationId: uploadPhoto
       
@@ -778,6 +812,10 @@ paths:
         "201":
           description: >
             success, update photo
+          content:
+            multipart/form-data:
+              schema: 
+                $ref: "#/components/schemas/Photo"
         "404":
           description: >
             user not found
@@ -790,17 +828,12 @@ paths:
         given *uid* get all photo has updated
       
       parameters:
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-            minimum: 1
-          description: maximum number of elements to include in response
+        - $ref: "#/components/parameters/queryLimit"
         - name: sortBy
           in: query
           required: false
           schema:
+            description: options for sorting photos
             type: string
             enum: ["dataUpdate", "size"]
           description: ordering photo getted by value in enum
@@ -808,7 +841,9 @@ paths:
           in: query
           required: false
           schema:
+            description: flag for reverse sorting
             type: boolean
+            default: true
           description: order photo in reverse order
       
       operationId: listPhoto
@@ -877,7 +912,8 @@ paths:
           
           content:
             application/json:
-              schema: {$ref: "#/components/schemas/Photo"}
+              schema: 
+                $ref: "#/components/schemas/Photo"
           
         "404":
           description: >
@@ -918,14 +954,15 @@ paths:
         "200":
           description: >
             success, getted likes
-          
           content:
             application/json:
               schema:
+                description: >
+                  list of users that put like to the  photo
                 type: array
                 items:
-                  $ref: "#/components/schemas/Id"
-                description: user id that put like
+                  $ref: "#/components/schemas/User"
+                minItems: 0
         "404":
           description: >
             not found, user or photo not found
@@ -967,13 +1004,23 @@ paths:
         provide photo id and owner id. 
         The like is identified by the *uid* of the user who likes it.
       
-    
+      requestBody:
+        description: information about user that put like
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      
       operationId: likePhoto
       
       responses:
         "201":  
           description: >
             success, like added to the photo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
         "204": 
           description: >
             not content, just liked this photo
@@ -1040,7 +1087,8 @@ paths:
           comment to add
         content:
           application/json:
-            schema: {$ref: "#/components/schemas/Comment"}
+            schema: 
+              $ref: "#/components/schemas/Comment"
       
       operationId: commentPhoto
       
@@ -1050,7 +1098,8 @@ paths:
             success, new comment added to photo
           content:
             application/json:
-              schema: {$ref: "#/components/schemas/Comment"}
+              schema: 
+                $ref: "#/components/schemas/Comment"
           
         "404":
           description: >
@@ -1065,26 +1114,19 @@ paths:
         give photo id and user id of owner photo then get all comments on photo
       
       parameters:
-        - name: limit
-          in: query
-          required: false
-          description: maximum number of elements to include in response
-          schema:
-            type: integer
-            minimum: 1
+        - $ref: "#/components/parameters/queryLimit"
+        - $ref: "#/components/parameters/usernameFilter"
         - name: sortByData
           in: query
           required: false
           schema:
+            description: flag for sorting comments on photo by update data
             type: boolean
+            default: true
           description: sort comments by data creation
-        - name: username
-          in: query
-          required: false
-          schema:
-            $ref: "#/components/schemas/Username"
-          description: get comment give by particular username
-    
+        
+      
+      operationId: getComments
       responses:
         "200":
           description: >
@@ -1092,10 +1134,12 @@ paths:
           
           content:
             application/json:
-              schema: 
+              schema:
+                description: list of comments on photo
                 type: array
                 items:
-                  {$ref: "#/components/schemas/Comment"}
+                  $ref: "#/components/schemas/Comment"
+                minItems: 0
         "404":
           description: >
             not found, user not found
@@ -1156,26 +1200,6 @@ paths:
       description: >
         give user id photo owner, photo id and id of comment on photo and get it
       
-      parameters:
-        - name: uid
-          in: path
-          required: true
-          description: user id
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: photoId
-          in: path
-          required: true
-          description: photo id
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: commentId
-          in: path
-          required: true
-          description: comment id
-          schema:
-            {$ref: "#/components/schemas/Comment"}
-      
       operationId: getComment
       
       responses:
@@ -1196,7 +1220,8 @@ paths:
   
   /session:
     post:
-      tags: ["login"]
+      tags: 
+        - login
       summary: Logs in the user
       description: |-
         If the user does not exist, it will be created,
@@ -1210,14 +1235,11 @@ paths:
         content:
           application/json:
             schema:
+              description: username
               type: object
               properties:
                 name:
-                  type: string
-                  example: Maria
-                  pattern: '^.*?$'
-                  minLength: 3
-                  maxLength: 16
+                  $ref: "#/components/schemas/Username"
         required: true
       responses:
         "201":
@@ -1225,6 +1247,7 @@ paths:
           content:
             application/json:
               schema:
+                description: id and username of user logged
                 type: object
                 properties:
                   identifier:

@@ -43,7 +43,14 @@ components:
       schema:
         $ref: "#/components/schemas/Username"
     
-  
+  responses:
+    UnauthorizedError:
+      description: >
+        Access token is missing or invalid 
+
+    UnauthorizedToken:
+      description: >
+        the submitted token does not have the necessary permissions to access this resource
     
   securitySchemes:
     
@@ -68,8 +75,6 @@ components:
           $ref: "#/components/schemas/Id"
         username: 
           $ref: "#/components/schemas/Username"
-      
-
       required:
         - uid
         - username
@@ -175,9 +180,38 @@ components:
         - user
         - text
         - timeStamp
+
+tags:
+  - name: user
+    description: >
+      manage users account and use
+      social functionality
+  - name: photo
+    description: >
+      functionality on photo. Manage photo stream
+      and put comments and like to photo
+  - name: stream
+    description: >
+      Manage streams of photos
+  - name: follower
+    description: >
+      Manage user followers 
+  - name: like
+    description: >
+      Manage likes putted to the photos
+  - name: ban
+    description: >
+      Manage system blocking of users
+  - name: comment
+    description: >
+      Manage comments gived to photos
+  - name: following
+    description: >
+      Manage user that followings
+  - name: login
+    description: log-in function for users
   
-    
-        
+      
 
 paths:
 
@@ -268,6 +302,8 @@ paths:
           - number of followers
           - number of following
       
+      security:
+        - BearerAuth: []
         
       operationId: getUserProfile
       
@@ -280,6 +316,11 @@ paths:
                 {$ref: "#/components/schemas/Profile"}
         "404":
           description: user not found
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
+          
     
     put:
       tags:
@@ -299,13 +340,17 @@ paths:
       
       operationId: setMyUserName
       
+      security:
+        - BearerAuth: []
+      
       responses:
         "204":
           description: >
             success, assigned new username
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
         "403":
-          description: >
-            operation not authorizated for this user
+          $ref: "#/components/responses/UnauthorizedToken"
         "404":
           description: >
             user not found
@@ -328,6 +373,8 @@ paths:
         description: user id
         
     get:
+      security:
+        - BearerAuth: []
       tags:
         - user
         - follower
@@ -363,6 +410,11 @@ paths:
           description: >
             empty body, found nothing
 
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
+
   /users/{uid}/followers/{followerId}:
     summary: a follower
     description: this resource rappresent follower
@@ -389,7 +441,9 @@ paths:
       summary: unfollow user
       description: >
         gived uid and *followedId* then remove follower *followerId* from user followers
-      
+      security:
+        - BearerAuth: []
+        
       operationId: unfollowUser
       
       responses:
@@ -397,8 +451,10 @@ paths:
           description: success , unfollow the user
         "404":
           description: just no follow user or user Id not exist
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
         "403":
-          description: user not authorizated
+          $ref: "#/components/responses/UnauthorizedToken"
     
     put:
       tags:
@@ -416,6 +472,9 @@ paths:
             schema:
               $ref: "#/components/schemas/User"
       
+      security:
+        - BearerAuth: []
+      
       operationId: followUser
       
       responses:
@@ -427,6 +486,10 @@ paths:
                 $ref: "#/components/schemas/User"
         "204":
           description: just follow the user
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
   
   /users/{uid}/following/:
     summary: users following by specific user
@@ -445,6 +508,7 @@ paths:
     get:
       tags:
         - user
+        - following
       summary: get following users
       description: >
         given the *id* of the user who wants to see the users he follows he will get the list of followed users
@@ -452,7 +516,9 @@ paths:
       parameters:
         - $ref: "#/components/parameters/queryLimit"
         - $ref: "#/components/parameters/usernameFilter"
-      
+      security:
+      - BearerAuth: []
+  
       operationId: getFollowings
       
       responses:
@@ -470,6 +536,10 @@ paths:
         "404":
           description: >
             not found, user not found
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
   
   /users/{uid}/following/{followingId}:
     summary: user following this user
@@ -507,6 +577,9 @@ paths:
             schema:
               $ref: "#/components/schemas/User"
       
+      security:
+        - BearerAuth: []
+        
       operationId: following
       
       responses:
@@ -523,6 +596,10 @@ paths:
         "404":
           description: >
             not found, user not found
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
             
     delete:
       tags: 
@@ -531,7 +608,10 @@ paths:
       summary: delete following
       description: >
         give user id and  user following id and stop following him
-
+      
+      security:
+        - BearerAuth: []
+        
       operationId: unfollowing
 
       responses:
@@ -541,6 +621,11 @@ paths:
         "404":
           description: >
             not found, user not found
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
+
         
     
     
@@ -588,7 +673,8 @@ paths:
             default: true
           description: order photo in reverse order
         
-          
+      security:
+        - BearerAuth: []
       operationId: getMyStream
       
       responses:
@@ -603,9 +689,10 @@ paths:
           description: >
             not found, user not found
         
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
         "403":
-          description: >
-            operation not allowed, uid does not correspond to the owner of the photo
+          $ref: "#/components/responses/UnauthorizedToken"
             
         "204":
           description: >
@@ -635,7 +722,7 @@ paths:
       summary: get photo from stream
       description: >
         give *uid* and *photoId* and get photo associated
-    
+        
       operationId: getPhotoMyStream
       responses:
         "200":
@@ -651,7 +738,7 @@ paths:
             not found, user or photo not found
         "403":
           description: >
-            operation not allowed, uid does not correspond to the owner of the photo
+            operation not allowed, owner banned you
         
         "204":
           description: >
@@ -674,6 +761,9 @@ paths:
           description: user id
     
     get:
+      security:
+        - BearerAuth: []
+        
       tags:
         - user
         - ban
@@ -709,6 +799,10 @@ paths:
         "204":
           description: >
             empty body, found nothing
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
   
   /users/{uid}/banned/{bannedId}:
     summary: users banned
@@ -746,6 +840,9 @@ paths:
             schema:
               $ref: "#/components/schemas/User"
               
+      security:
+        - BearerAuth: []
+      
       operationId: banUser
       
       responses:
@@ -759,6 +856,10 @@ paths:
           description: empty response, user just banned
         "404":
           description: not found, user not found
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
     
     delete:
       tags:
@@ -767,7 +868,9 @@ paths:
       summary: unban user
       description: >
         taken uid of the user who wants unbband id of user banned and delete last one
-      
+      security:
+        - BearerAuth: []
+        
       operationId: unbanUser
       
       responses:
@@ -777,9 +880,10 @@ paths:
         "404":
           description: >
             not found, user not found
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
         "403":
-          description: >
-            operation not allowed,  user not authorizated
+          $ref: "#/components/responses/UnauthorizedToken"
     
   
   /users/{uid}/myPhotos: 
@@ -793,6 +897,9 @@ paths:
           $ref: "#/components/schemas/Id"
     
     post:
+      security:
+        - BearerAuth: []
+        
       tags:
         - photo
       summary: update photo
@@ -819,8 +926,14 @@ paths:
         "404":
           description: >
             user not found
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
     
     get:
+      security:
+        - BearerAuth: []
       tags:
         - photo
       summary: list stream photos updated
@@ -860,6 +973,10 @@ paths:
         "204":
           description: >
             empty body, found nothing
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
   
   /users/{uid}/myPhotos/{photoId}/: #
     summary: photo updated by user
@@ -888,6 +1005,8 @@ paths:
         provide uid and photoID and delete the photo corresponding to photoID
     
       operationId: deletePhoto
+      security:
+        - BearerAuth: []
         
       responses:
         "204":
@@ -896,6 +1015,10 @@ paths:
         "404":
           description: >
             not found, photo or user not found
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
     
     get:
       tags:
@@ -942,6 +1065,9 @@ paths:
           schema:
             $ref: "#/components/schemas/Id"
     get:
+      security:
+        - BearerAuth: []
+        
       tags:
         - photo
         - like
@@ -970,6 +1096,10 @@ paths:
         "204":
           description: >
             empty body, found nothing
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
   
   /users/{uid}/myPhotos/{photoId}/likes/{likeUserId}:
     
@@ -1013,6 +1143,8 @@ paths:
       
       operationId: likePhoto
       
+      security:
+        - BearerAuth: []
       responses:
         "201":  
           description: >
@@ -1027,9 +1159,10 @@ paths:
         "404":
           description: >
             not found, user or photo not found
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
         "403":
-          description: >
-           operation not allowed, user identified by likeUserId cannot like
+          $ref: "#/components/responses/UnauthorizedToken"
       
     delete:
       tags:
@@ -1042,7 +1175,8 @@ paths:
         *likeUserId*
         
       operationId: unlikePhoto
-      
+      security:
+        - BearerAuth: []
       responses:
         "204":  
           description: >
@@ -1050,9 +1184,10 @@ paths:
         "404":
           description: >
             not found, user or photo not found
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
         "403":
-          description: >
-            operation not allowed, you not owner this like
+          $ref: "#/components/responses/UnauthorizedToken"
       
     
   /users/{uid}/myPhotos/{photoId}/comments/:
@@ -1090,6 +1225,8 @@ paths:
             schema: 
               $ref: "#/components/schemas/Comment"
       
+      security:
+        - BearerAuth: []
       operationId: commentPhoto
       
       responses:
@@ -1104,8 +1241,15 @@ paths:
         "404":
           description: >
             not found, photo or user not found
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
     
     get:
+      security:
+        - BearerAuth: []
+        
       tags:
         - photo
         - comment
@@ -1146,6 +1290,10 @@ paths:
         "204":
           description: >
             empty body, found nothing
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
   
   /users/{uid}/myPhotos/{photoId}/comments/{commentId}:
     summary: comment on photo
@@ -1179,7 +1327,9 @@ paths:
       description: >
         give user id of owner photo, photo id and remove comment on photo identified from comment id given
       
-      operationId: uncommentPhoto
+      security:
+        - BearerAuth: []
+        
       
       responses:
         "204":
@@ -1188,9 +1338,10 @@ paths:
         "404":
           description: >
             not found, photo or user not found
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
         "403":
-          description: >
-            operation not authorized, you not owner this like
+          $ref: "#/components/responses/UnauthorizedToken"
     
     get:
       tags:
@@ -1255,4 +1406,3 @@ paths:
                   username:
                     $ref: "#/components/schemas/Username"
         
-

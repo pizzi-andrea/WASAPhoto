@@ -136,7 +136,6 @@ components:
         descriptionImg:
           description: image description
           type: string
-          format: byte
           example: a good photo 😎
           minLength: 1
           maxLength: 250
@@ -151,7 +150,8 @@ components:
       items:
         $ref: "#/components/schemas/Photo"
       minItems: 0
-      # add maxItems ?
+      maxItems: 100
+      
     
     TimeStamp:
       description: >
@@ -172,7 +172,6 @@ components:
   
         text:
           type: string
-          format: byte
           minLength: 1
           maxLength: 250
           example: 
@@ -279,7 +278,8 @@ paths:
                 type: array
                 items: 
                   $ref: "#/components/schemas/User"
-                minItems: 0
+                minItems: 1
+                maxItems: 9999
              
                 example:
                   - username: MarioRoss
@@ -288,6 +288,10 @@ paths:
                     uid: 840
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+
+        "204":
+          description: >
+            empty body, found nothing
     
   /users/{uid}/:
     summary:  users
@@ -415,7 +419,8 @@ paths:
                 type: array
                 items: 
                   $ref: "#/components/schemas/User"
-                minItems: 0
+                minItems: 1
+                maxItems: 9999
         "404":
           description: >
             not found, user not found
@@ -546,10 +551,14 @@ paths:
                 description: list of following
                 items:
                   $ref: "#/components/schemas/User"
-                minItems: 0
+                minItems: 1
+                maxItems: 9999
         "404":
           description: >
             not found, user not found
+        "204":
+          description: >
+            empty body, found nothing
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -809,7 +818,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/User"
-                minItems: 0
+                minItems: 1
+                maxItems: 9999
                 description: list  of banned users
 
         "404":
@@ -1115,7 +1125,8 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/User"
-                minItems: 0
+                minItems: 1
+                maxItems: 9999
         "404":
           description: >
             not found, user or photo not found
@@ -1310,7 +1321,9 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Comment"
-                minItems: 0
+                minItems: 1
+                maxItems: 9999
+
         "404":
           description: >
             not found, user not found

@@ -1,22 +1,14 @@
-  Total number of design errors : 13
-  Total number of errors   : 10
-  Total number of warnings : 37
-
-  errors
-   7  (70%) : Request bodies and non-204 responses should define a content object FIXED
-   3  (30%) : Common path parameters should be defined on the path object. FIXED
+  Total number of design errors : 1
+  Total number of errors   : 0
+  Total number of warnings : 8
 
   warnings
-   1   (3%) : OpenAPI object must have non-empty "tags" array. (FIXED)
-   2   (5%) : Should define a pattern for a valid string (?)
-   4  (11%) : Should define a minLength for a valid string FIXED
-   4  (11%) : Should define a maxLength for a valid string FIXED
-   2   (5%) : "example" property must match format "byte" FIXED
-   7  (19%) : Array schemas should define a numeric minItems field FIXED
-   7  (19%) : Array schemas should define a numeric maxItems field FIXED
-   3   (8%) : Schema property should have a non-empty description FIXED
-   6  (16%) : Schema should have a non-empty description FIXED
-   1   (3%) : Operation must have "operationId". FIXED
+   1  (13%) : "example" property must not have fewer than 780 characters
+   3  (38%) : Should define a pattern for a valid string
+   1  (13%) : Should define a minLength for a valid string
+   1  (13%) : Should define a maxLength for a valid string
+   1  (13%) : Schema property should have a non-empty description
+   1  (13%) : Operation must have "operationId". FIXED
 
   design errors
-  13 : Some APIs needs a security scheme defined, but none is found. Without a security scheme, how can you enforce authorization? FIXED
+  1 : Some APIs endpoints are missing. FIXED

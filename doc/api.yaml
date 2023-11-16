@@ -1,8 +1,8 @@
 openapi: 3.0.1
 info:
   title: WASAPhoto APIs
-  version: 1.0.0
-  description: |
+  version: 1.0.1
+  description: >
     **"Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto!"**
     
     WASAPhoto is web application based on RESTfull architecture to allows upload your photos directly from your PC, and they will be visible to everyone following you.
@@ -16,207 +16,9 @@ info:
     email: pizzi.1995517@studenti.uniroma1.it
   
 servers:
-  - url: https//localhost:8080
-
-components:
-
-  parameters:
-    queryLimit:
-      description: >
-        security parameter to limit the number of items in a response and avoid DOS attacks
-      name: limit
-      in: query
-      required: false
-      schema:
-        description: format limit values
-        type: integer
-        format: int
-        minimum: 1
-        example: 50
-    
-    usernameFilter:
-      description: >
-        parameter use to filter set of users by his username
-      name: username
-      in: query
-      required: false
-      schema:
-        $ref: "#/components/schemas/Username"
-    
-  responses:
-    UnauthorizedError:
-      description: >
-        Access token is missing or invalid 
-
-    UnauthorizedToken:
-      description: >
-        the submitted token does not have the necessary permissions to access this resource
-    
-  securitySchemes:
-    
-    BearerAuth:
-      description: >
-        basic safety mechanism based on "bearer" mechanism. APIs that require a minimum level of security can adopt this method
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-    
-    
-        
-      
-  
-  schemas:
-    User:
-      description: |
-        this object rappresent a user
-      type: object
-      properties:
-        uid:
-          $ref: "#/components/schemas/Id"
-        username: 
-          $ref: "#/components/schemas/Username"
-      required:
-        - uid
-        - username
-      
-    
-    Username:
-      description: username of a user
-      type: string
-      pattern: '^.*?$'
-      minLength: 3
-      maxLength: 16
-      example: marioross
-    
-    Id:
-      description: Identificator at 64-bit
-      type: integer
-      format: int64 
-      readOnly: true
-      example: 4570 
-    
-    Profile:
-      description: user profile rappresentation
-      type: object
-      properties:
-        user:
-          $ref: "#/components/schemas/User"
-        stream:
-          $ref: "#/components/schemas/StreamPhotos"
-        follower:
-          type: integer
-          minimum: 0
-          description: number user that follow a specific user
-          example: 12
-        following:
-          type: integer
-          minimum: 0
-          description: numer of users following by specific user
-          example: 70
-        
-    
-    Photo:
-      description: >
-        this object rappresent a photo
-      type: object
-      properties:
-        photoId:
-          $ref: "#/components/schemas/Id"
-        timeUpdate:
-          $ref: "#/components/schemas/TimeStamp"
-
-        imageData:
-          description: data
-          type: string
-          format: binary
-          minLength: 780
-          maxLength: 625000 # circa 5 mbyte
-          example: myPhoto.png
-        
-        descriptionImg:
-          description: image description
-          type: string
-          example: a good photo 😎
-          minLength: 1
-          maxLength: 250
-      required:
-        - imageData
-        - timeUpdate
-          
-    
-    StreamPhotos:
-      description: model of stream of photos
-      type: array
-      items:
-        $ref: "#/components/schemas/Photo"
-      minItems: 0
-      maxItems: 100
-      
-    
-    TimeStamp:
-      description: >
-        this components describe timestamp value
-        conform to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) specification
-      type: string
-      format: data-time
-      example: 2017-07-21T17:32:28Z
-      readOnly: true
-    
-    Comment:
-      description: > 
-        this object rappresent a comment on a photo.
-      type: object
-      properties:
-        user:
-          $ref: "#/components/schemas/User"
-  
-        text:
-          type: string
-          minLength: 1
-          maxLength: 250
-          example: 
-            i like you photo!
-        timeStamp:
-          $ref: "#/components/schemas/TimeStamp"
-      required:
-        - user
-        - text
-        - timeStamp
-
-tags:
-  - name: user
-    description: >
-      manage users account and use
-      social functionality
-  - name: photo
-    description: >
-      functionality on photo. Manage photo stream
-      and put comments and like to photo
-  - name: stream
-    description: >
-      Manage streams of photos
-  - name: follower
-    description: >
-      Manage user followers 
-  - name: like
-    description: >
-      Manage likes putted to the photos
-  - name: ban
-    description: >
-      Manage system blocking of users
-  - name: comment
-    description: >
-      Manage comments gived to photos
-  - name: following
-    description: >
-      Manage user that followings
-  - name: login
-    description: log-in function for users
-  
-      
+  - url: https//localhost:3030
 
 paths:
-
   /users/:
     summary: users
     description: >
@@ -228,12 +30,13 @@ paths:
         
       summary: add new user
       description: >
-        create new user registred in login phase
+        create new user logged
       
       tags:
         - user
       requestBody:
-        description: user to register
+        description: >
+          user to register
         content:
           application/json:
             schema:
@@ -243,13 +46,16 @@ paths:
       
       responses:
         "201":
-          description: successfull create new user
+          description: >
+            successfull create new user
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
+        "500":
+          $ref: "#/components/responses/ServerError"
     get:
       security:
         - BearerAuth: []
@@ -261,8 +67,8 @@ paths:
         this method return the list of users currently registered
       parameters: 
         
-        - $ref: "#/components/parameters/queryLimit"
-        - $ref: "#/components/parameters/usernameFilter"
+        - $ref: "#/components/parameters/QueryLimit"
+        - $ref: "#/components/parameters/UsernameFilter"
           
           
       operationId: listUsers
@@ -274,17 +80,18 @@ paths:
           content:
             application/json:
               schema:
-                description: list of users  
+                description: >
+                  list of users  
                 type: array
                 items: 
                   $ref: "#/components/schemas/User"
                 minItems: 1
-                maxItems: 9999
+                maxItems: 300
              
                 example:
-                  - username: MarioRoss
+                  - username: "MarioRoss"
                     uid: 10
-                  - username: alux
+                  - username: "alux"
                     uid: 840
         "401":
           $ref: "#/components/responses/UnauthorizedError"
@@ -292,19 +99,16 @@ paths:
         "204":
           description: >
             empty body, found nothing
-    
+        "500":
+          $ref: "#/components/responses/ServerError"
+          
   /users/{uid}/:
     summary:  users
     description: >
        Resource rappresent a single user
        
     parameters:
-        - in: path
-          name: uid
-          schema:
-            $ref: "#/components/schemas/Id"
-          required: true
-          description: Numeric ID of the user to get
+        - $ref: "#/components/parameters/Uid"
     
     get:
       tags:
@@ -326,7 +130,8 @@ paths:
       
       responses:
         "200":
-          description: get user profile corresponding to *uid*
+          description: >
+            get user profile corresponding to *uid*
           content:
             application/json:
               schema:
@@ -338,8 +143,9 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
-          
-    
+        "500":
+          $ref: "#/components/responses/ServerError"
+
     put:
       tags:
         - user
@@ -353,7 +159,8 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/Username"
-        description: new username
+        description: >
+          new username
         required: true
       
       operationId: setMyUserName
@@ -372,24 +179,15 @@ paths:
         "404":
           description: >
             user not found
-        
-            
-          
+        "500":
+          $ref: "#/components/responses/ServerError"
 
-  
   /users/{uid}/followers/:
     summary: user followers
     description: >
       this resurce rappresent the followers of specific user
-    
     parameters:
-      - name: uid
-        in: path
-        required: true
-        schema:
-          $ref: "#/components/schemas/Id"
-        description: user id
-        
+      - $ref: "#/components/parameters/Uid"
     get:
       security:
         - BearerAuth: []
@@ -399,12 +197,9 @@ paths:
       summary: get all followers
       description: >
         give a UID return a list contanings all followers user
-      
-      
-      
       parameters:
-        - $ref: "#/components/parameters/queryLimit"
-        - $ref: "#/components/parameters/usernameFilter"
+        - $ref: "#/components/parameters/QueryLimit"
+        - $ref: "#/components/parameters/UsernameFilter"
           
       operationId: listFollowers
       
@@ -415,7 +210,8 @@ paths:
           content:
             application/json:
               schema:
-                description: list of followers
+                description: >
+                  list of followers
                 type: array
                 items: 
                   $ref: "#/components/schemas/User"
@@ -433,26 +229,16 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /users/{uid}/followers/{followerId}:
     summary: a follower
-    description: this resource rappresent follower
-    
+    description: >
+      this resource rappresent follower
     parameters:
-      - name: uid
-        in: path
-        required: true
-        schema:
-          $ref: "#/components/schemas/Id"
-        description: user wuold remove follow
-          
-      - name: followerId
-        in: path
-        required: true
-        schema:
-          $ref: "#/components/schemas/Id"
-        description: user to unfollow
-        
+      - $ref: "#/components/parameters/Uid"
+      - $ref: "#/components/parameters/FollowerId"
     delete:
       tags:
         - user
@@ -467,13 +253,17 @@ paths:
       
       responses:
         "204":
-          description: success , unfollow the user
+          description: >
+            success , unfollow the user
         "404":
-          description: just no follow user or user Id not exist
+          description: >
+            just no follow user or user Id not exist
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
     
     put:
       tags:
@@ -485,7 +275,8 @@ paths:
       
       
       requestBody:
-        description: information on followers
+        description: >
+          information on followers
         content:
           application/json:
             schema:
@@ -498,17 +289,21 @@ paths:
       
       responses:
         "201": 
-          description: added new follower
+          description: >
+            added new follower
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
         "204":
-          description: just follow the user
+          description: >
+            just follow the user
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
   
   /users/{uid}/following/:
     summary: users following by specific user
@@ -516,13 +311,7 @@ paths:
       this resource rappresent all users following by user
     
     parameters:
-      - name: uid
-        in: path
-        required: true
-        description: > 
-          id of user who wants to see the users he follows
-        schema:
-          $ref: "#/components/schemas/Id"
+      - $ref: "#/components/parameters/Uid"
             
     get:
       tags:
@@ -533,8 +322,8 @@ paths:
         given the *id* of the user who wants to see the users he follows he will get the list of followed users
       
       parameters:
-        - $ref: "#/components/parameters/queryLimit"
-        - $ref: "#/components/parameters/usernameFilter"
+        - $ref: "#/components/parameters/QueryLimit"
+        - $ref: "#/components/parameters/UsernameFilter"
       security:
       - BearerAuth: []
   
@@ -548,7 +337,8 @@ paths:
             application/json:
               schema:
                 type: array
-                description: list of following
+                description: >
+                  list of following
                 items:
                   $ref: "#/components/schemas/User"
                 minItems: 1
@@ -563,6 +353,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
   
   /users/{uid}/following/{followingId}:
     summary: user following this user
@@ -570,18 +362,8 @@ paths:
       this resource rappresent following user
     
     parameters:
-      - name: uid
-        in: path
-        required: true
-        description: user id to follow
-        schema:
-          $ref: "#/components/schemas/Id"
-      - name: followingId
-        required: true
-        in: path
-        description: user id to following
-        schema:
-          $ref: "#/components/schemas/Id"
+      - $ref: "#/components/parameters/Uid"
+      - $ref: "#/components/parameters/FollowingId"
     
     put:
       tags:
@@ -594,7 +376,8 @@ paths:
       
       
       requestBody:
-        description: informations about user to following
+        description: >
+          informations about user to following
         content:
           application/json:
             schema:
@@ -623,6 +406,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
             
     delete:
       tags: 
@@ -648,6 +433,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
         
     
@@ -660,12 +447,7 @@ paths:
       can put like or comment on photos in the stream.
     
     parameters:
-        - name: uid
-          in: path
-          description: user id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
+        - $ref: "#/components/parameters/Uid"
 
     get:
       tags:
@@ -676,25 +458,30 @@ paths:
         given *uid* of user that who wants to get all photo in his stream
       
       parameters:
-      
-        - $ref: "#/components/parameters/queryLimit"
-        - $ref: "#/components/parameters/usernameFilter"
+        - $ref: "#/components/parameters/QueryLimit"
+        - $ref: "#/components/parameters/UsernameFilter"
+        
         - name: sortBy
           in: query
           required: false
           schema:
-            description: options for sorting photos
+            description: >
+              options for sorting photos
             type: string
             enum: ["dataUpdate", "size"]
-          description: ordering photo getted by value
+          description: >
+            ordering photo getted by value
+       
         - name: reverse
           in: query
           required: false
           schema:
-            description: type value ordering flag
+            description: >
+              type value ordering flag
             type: boolean
             default: true
-          description: order photo in reverse order
+          description: >
+            order photo in reverse order
         
       security:
         - BearerAuth: []
@@ -720,22 +507,14 @@ paths:
         "204":
           description: >
             empty body, found nothing
+        "500":
+          $ref: "#/components/responses/ServerError"
     
   /users/{uid}/myStream/{photoId}:
   
     parameters:
-        - name: uid
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-          description: user id
-        - name: photoId
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-          description: photo id
+        - $ref: "#/components/parameters/Uid"
+        - $ref: "#/components/parameters/PhotoId"
     
     get:
       
@@ -772,22 +551,16 @@ paths:
         "204":
           description: >
             empty body, found nothing
-    
-    
-          
-      
-    
+        "500":
+          $ref: "#/components/responses/ServerError"
+
   /users/{uid}/banned/:
     summary: banned users
-    description: this resource rappresent user banned by uid user
+    description: >
+      this resource rappresent user banned by uid user
     
     parameters:
-        - name: uid
-          in: path
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-          description: user id
+        - $ref: "#/components/parameters/Uid"
     
     get:
       security:
@@ -802,8 +575,8 @@ paths:
     
       parameters:
 
-        - $ref: "#/components/parameters/queryLimit"
-        - $ref: "#/components/parameters/usernameFilter"
+        - $ref: "#/components/parameters/QueryLimit"
+        - $ref: "#/components/parameters/UsernameFilter"
       
       operationId: listBannedUser
       
@@ -819,8 +592,9 @@ paths:
                 items:
                   $ref: "#/components/schemas/User"
                 minItems: 1
-                maxItems: 9999
-                description: list  of banned users
+                maxItems: 100
+                description: >
+                  list  of banned users
 
         "404":
           description: >
@@ -833,6 +607,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
   
   /users/{uid}/banned/{bannedId}:
     summary: users banned
@@ -840,18 +616,8 @@ paths:
       this resource describe banned user
     
     parameters:
-      - name: uid
-        in: path
-        required: true
-        description: uid who wonts ban
-        schema:
-          $ref: "#/components/schemas/Id"
-      - name: bannedId
-        in: path
-        required: true
-        description: uid user to ban
-        schema:
-          $ref: "#/components/schemas/Id"
+      - $ref: "#/components/parameters/Uid"
+      - $ref: "#/components/parameters/BannedId"
     
     put:
       tags:
@@ -861,10 +627,10 @@ paths:
       description: >
         taken uid of the user who wants to ban and uid of the user to be banned, 
         bans the user(BannedID)
-      
-      
+
       requestBody:
-        description: information about user to ban
+        description: >
+          information about user to ban
         content:
           application/json:
             schema:
@@ -877,19 +643,24 @@ paths:
       
       responses:
         "201":
-          description: success,  banned user
+          description: >
+            success, banned user
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
         "204":
-          description: empty response, user just banned
+          description: >
+            empty response, user just banned
         "404":
-          description: not found, user not found
+          description: >
+            not found, user not found
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
     
     delete:
       tags:
@@ -914,17 +685,14 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
     
   
   /users/{uid}/myPhotos: 
     
     parameters:
-      - name: uid
-        in: path
-        required: true
-        description: user id
-        schema:
-          $ref: "#/components/schemas/Id"
+      - $ref: "#/components/parameters/Uid"
     
     post:
       security:
@@ -937,7 +705,8 @@ paths:
         give photo and update it
         
       requestBody:
-        description: photo to update
+        description: >
+          photo to update
         content:
           multipart/form-data:
             schema: 
@@ -960,6 +729,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
     
     get:
       security:
@@ -971,23 +742,27 @@ paths:
         given *uid* get all photo has updated
       
       parameters:
-        - $ref: "#/components/parameters/queryLimit"
+        - $ref: "#/components/parameters/QueryLimit"
         - name: sortBy
           in: query
           required: false
           schema:
-            description: options for sorting photos
+            description: >
+              options for sorting photos
             type: string
             enum: ["dataUpdate", "size"]
-          description: ordering photo getted by value in enum
+          description: >
+            ordering photo getted by value in enum
         - name: reverse
           in: query
           required: false
           schema:
-            description: flag for reverse sorting
+            description: >
+              flag for reverse sorting
             type: boolean
             default: true
-          description: order photo in reverse order
+          description: >
+            order photo in reverse order
       
       operationId: listPhoto
       
@@ -1007,6 +782,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
   
   /users/{uid}/myPhotos/{photoId}/: #
     summary: photo updated by user
@@ -1014,18 +791,8 @@ paths:
       this resource rappresent the streams of photos update by user in time
   
     parameters:
-      - name: uid
-        in: path
-        description: user id
-        required: true
-        schema:
-          $ref: "#/components/schemas/Id"
-      - name: photoId
-        in: path
-        description: photo id
-        required: true
-        schema:
-          $ref: "#/components/schemas/Id"
+      - $ref: "#/components/parameters/Uid"
+      - $ref: "#/components/parameters/PhotoId"
           
     delete:
       tags:
@@ -1049,6 +816,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
     
     get:
       tags:
@@ -1056,7 +825,8 @@ paths:
       security:
         - BearerAuth: []
       summary: get photo
-      description: give *uid* and photo id and get photo with photo id gived
+      description: >
+        give *uid* and photo id and get photo with photo id gived
       operationId: getPhoto
       
       responses:
@@ -1082,6 +852,8 @@ paths:
         "204":
           description: >
             empty body, found nothing
+        "500":
+          $ref: "#/components/responses/ServerError"
   
   /users/{uid}/myPhotos/{photoId}/likes/:
     summary: likes on photo
@@ -1089,18 +861,8 @@ paths:
       This resource describes the likes received for the photo
     
     parameters:
-        - name: uid
-          in: path
-          description: user id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-        - name: photoId
-          in: path
-          description: photo id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
+        - $ref: "#/components/parameters/Uid"
+        - $ref: "#/components/parameters/PhotoId"
     get:
       security:
         - BearerAuth: []
@@ -1109,7 +871,8 @@ paths:
         - photo
         - like
       summary: get likes collected by photo
-      description: give photo id and get all likes recived
+      description: >
+        give photo id and get all likes recived
       
       operationId: getLikes
       
@@ -1138,30 +901,15 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
   
   /users/{uid}/myPhotos/{photoId}/likes/{likeUserId}:
     
     parameters:
-        - name: uid
-          in: path
-          description: user id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-        
-        - name: photoId
-          in: path
-          description: photo id
-          required: true
-          schema:
-            $ref: "#/components/schemas/Id"
-        
-        - name: likeUserId
-          in: path
-          required: true
-          description: uid user put like
-          schema:
-            $ref: "#/components/schemas/Id"
+        - $ref: "#/components/parameters/Uid"
+        - $ref: "#/components/parameters/PhotoId"
+        - $ref: "#/components/parameters/LikeId"
     put:
       
       tags:
@@ -1173,7 +921,8 @@ paths:
         The like is identified by the *uid* of the user who likes it.
       
       requestBody:
-        description: information about user that put like
+        description: >
+          information about user that put like
         content:
           application/json:
             schema:
@@ -1201,6 +950,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
       
     delete:
       tags:
@@ -1226,23 +977,15 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
       
     
   /users/{uid}/myPhotos/{photoId}/comments/:
     
     parameters:
-      - name: uid
-        in: path
-        required: true
-        description: user id
-        schema:
-          $ref: "#/components/schemas/Id"
-      - name: photoId
-        in: path
-        required: true
-        description: photo id
-        schema:
-          $ref: "#/components/schemas/Id"
+      - $ref: "#/components/parameters/Uid"
+      - $ref: "#/components/parameters/PhotoId"
     
     post:
       tags:
@@ -1283,6 +1026,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
     
     get:
       security:
@@ -1296,16 +1041,18 @@ paths:
         give photo id and user id of owner photo then get all comments on photo
       
       parameters:
-        - $ref: "#/components/parameters/queryLimit"
-        - $ref: "#/components/parameters/usernameFilter"
+        - $ref: "#/components/parameters/QueryLimit"
+        - $ref: "#/components/parameters/UsernameFilter"
         - name: sortByData
           in: query
           required: false
           schema:
-            description: flag for sorting comments on photo by update data
+            description: >
+              flag for sorting comments on photo by update data
             type: boolean
             default: true
-          description: sort comments by data creation
+          description: >
+            sort comments by data creation
         
       
       operationId: getComments
@@ -1317,12 +1064,13 @@ paths:
           content:
             application/json:
               schema:
-                description: list of comments on photo
+                description: >
+                  list of comments on photo
                 type: array
                 items:
                   $ref: "#/components/schemas/Comment"
                 minItems: 1
-                maxItems: 9999
+                maxItems: 500
 
         "404":
           description: >
@@ -1334,6 +1082,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
   
   /users/{uid}/myPhotos/{photoId}/comments/{commentId}:
     summary: comment on photo
@@ -1341,24 +1091,9 @@ paths:
       this resource rappresent a single comment on photo
     
     parameters:
-      - name: uid
-        in: path
-        required: true
-        description: user id
-        schema:
-          $ref: "#/components/schemas/Id"
-      - name: photoId
-        in: path
-        required: true
-        description: photo id
-        schema:
-          $ref: "#/components/schemas/Id"
-      - name: commentId
-        in: path
-        required: true
-        description: comment id
-        schema:
-          $ref: "#/components/schemas/Id"
+      - $ref: "#/components/parameters/Uid"
+      - $ref: "#/components/parameters/PhotoId"
+      - $ref: "#/components/parameters/CommentId"
     delete:
       tags:
         - comment
@@ -1370,7 +1105,7 @@ paths:
       security:
         - BearerAuth: []
         
-      
+      operationId: uncommentPhoto
       responses:
         "204":
           description: >
@@ -1382,6 +1117,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
     
     get:
       tags:
@@ -1418,13 +1155,15 @@ paths:
         "204":
           description: >
             empty body, found nothing
+        "500":
+          $ref: "#/components/responses/ServerError"
   
   /session:
     post:
       tags: 
         - login
       summary: Logs in the user
-      description: |-
+      description: >
         If the user does not exist, it will be created,
         and an identifier is returned.
         If the user exists, the user identifier is returned.
@@ -1432,11 +1171,13 @@ paths:
       operationId: doLogin
      
       requestBody:
-        description: User details
+        description: >
+          User details
         content:
           application/json:
             schema:
-              description: username
+              description: >
+                username
               type: object
               properties:
                 name:
@@ -1444,15 +1185,294 @@ paths:
         required: true
       responses:
         "201":
-          description: User log-in action successful
+          description: >
+            User log-in action successful
           content:
             application/json:
               schema:
-                description: id and username of user logged
+                description: >
+                  id and username of user logged
                 type: object
                 properties:
                   identifier:
                     $ref: "#/components/schemas/Id"
                   username:
+                
                     $ref: "#/components/schemas/Username"
+        "500":
+          $ref: "#/components/responses/ServerError"
         
+components:
+
+  parameters:
+    
+    QueryLimit:
+      description: >
+        security parameter to limit the number of items in a response and avoid DOS attacks
+      name: limit
+      in: query
+      required: false
+      schema:
+        description: >
+          format limit values
+        type: integer
+        format: int
+        minimum: 1
+        example: 50
+    
+    UsernameFilter:
+      description: >
+        parameter use to filter set of users by his username
+      name: username
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/Username"
+    
+    Uid:
+      name: uid
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Id"
+      description: >
+        user id
+    
+    PhotoId:
+      name: photoId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Id"
+      description: >
+        photo id
+    
+    CommentId:
+      name: commentId
+      in: path
+      required: true
+      description: >
+        comment id
+      schema:
+        $ref: "#/components/schemas/Id"
+    
+    LikeId:
+      name: likeUserId
+      in: path
+      required: true
+      description: >
+        uid user put like
+      schema:
+        $ref: "#/components/schemas/Id"
+    
+    FollowerId:
+      name: followerId
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Id"
+      description: >
+        user to unfollow
+    
+    FollowingId:
+      name: followingId
+      required: true
+      in: path
+      description: >
+        user id to following
+      schema:
+        $ref: "#/components/schemas/Id"
+    
+    BannedId:
+      name: bannedId
+      in: path
+      required: true
+      description: >
+        uid user to ban
+      schema:
+        $ref: "#/components/schemas/Id"
+    
+    
+    
+    
+  responses:
+    UnauthorizedError:
+      description: >
+        Access token is missing or invalid 
+
+    UnauthorizedToken:
+      description: >
+        the submitted token does not have the necessary permissions to access this resource
+    
+    ServerError:
+      description: >
+        server internal error, for more information see log file
+
+  securitySchemes:
+    
+    BearerAuth:
+      description: >
+        basic safety mechanism based on "bearer" mechanism. APIs that require a minimum level of security can adopt this method
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    
+  schemas:
+    User:
+      description: >
+        this object rappresent a user
+      type: object
+      properties:
+        uid:
+          $ref: "#/components/schemas/Id"
+        username: 
+          $ref: "#/components/schemas/Username"
+      required:
+        - uid
+        - username
+      
+    
+    Username:
+      description: >
+        username of a user
+      type: string
+      pattern: '^.*?$'
+      minLength: 3
+      maxLength: 16
+      example: "marioross"
+    
+    Id:
+      description: >
+        Identificator at 64-bit
+      type: integer
+      format: int64 
+      readOnly: true
+      example: 4570 
+    
+    Profile:
+      description: >
+        user profile rappresentation
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        stream:
+          $ref: "#/components/schemas/StreamPhotos"
+        follower:
+          type: integer
+          minimum: 0
+          description: >
+            number user that follow a specific user
+          example: 12
+        following:
+          type: integer
+          minimum: 0
+          description: >
+            numer of users following by specific user
+          example: 70
+        
+    
+    Photo:
+      description: >
+        this object rappresent a photo
+      type: object
+      properties:
+        photoId:
+          $ref: "#/components/schemas/Id"
+        timeUpdate:
+          $ref: "#/components/schemas/TimeStamp"
+
+        imageData:
+          description: >
+            data
+          type: string
+          format: binary
+        
+        descriptionImg:
+          description: >
+            image description
+          type: string
+          example: "a good photo!"
+          minLength: 1
+          maxLength: 250
+          pattern: "^.*?$"
+      required:
+        - imageData
+        - timeUpdate
+          
+    
+    StreamPhotos:
+      description: >
+        model of stream of photos
+      type: array
+      items:
+        $ref: "#/components/schemas/Photo"
+      minItems: 0
+      maxItems: 100
+      
+    
+    TimeStamp:
+      description: >
+        this components describe timestamp value
+        conform to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) specification
+      type: string
+      format: data-time
+      pattern: '^[1-9]\d{3}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$'
+      example: "2017-07-21T17:32:28Z"
+      readOnly: true
+    
+    Comment:
+      description: > 
+        this object rappresent a comment on a photo.
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+  
+        text:
+          description: >
+            comment text encoded in UNICODE format
+          type: string
+          minLength: 1
+          maxLength: 250
+          pattern: "^.*$"
+          example: 
+            "😀 i like you photo! 😀"
+        timeStamp:
+          $ref: "#/components/schemas/TimeStamp"
+      required:
+        - user
+        - text
+        - timeStamp
+
+tags:
+  - name: user
+    description: >
+      manage users account and use
+      social functionality
+  - name: photo
+    description: >
+      functionality on photo. Manage photo stream
+      and put comments and like to photo
+  - name: stream
+    description: >
+      Manage streams of photos
+  - name: follower
+    description: >
+      Manage user followers 
+  - name: like
+    description: >
+      Manage likes putted to the photos
+  - name: ban
+    description: >
+      Manage system blocking of users
+  - name: comment
+    description: >
+      Manage comments gived to photos
+  - name: following
+    description: >
+      Manage user that followings
+  - name: login
+    description: >
+      log-in function for users
+  

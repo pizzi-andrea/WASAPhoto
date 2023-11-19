@@ -4,7 +4,7 @@
 
   warnings
    1  (13%) : "example" property must not have fewer than 780 characters FIXED
-   3  (38%) : Should define a pattern for a valid string
+   3  (38%) : Should define a pattern for a valid string FIXED
    1  (13%) : Should define a minLength for a valid string FIXED
    1  (13%) : Should define a maxLength for a valid string FIXED
    1  (13%) : Schema property should have a non-empty description FIXED

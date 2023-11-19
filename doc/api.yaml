@@ -216,7 +216,7 @@ paths:
                 items: 
                   $ref: "#/components/schemas/User"
                 minItems: 1
-                maxItems: 9999
+                maxItems: 1000
         "404":
           description: >
             not found, user not found
@@ -308,7 +308,7 @@ paths:
   /users/{uid}/following/:
     summary: users following by specific user
     description: > 
-      this resource rappresent all users following by user
+      this resource rappresent all users followed by user
     
     parameters:
       - $ref: "#/components/parameters/Uid"
@@ -327,22 +327,22 @@ paths:
       security:
       - BearerAuth: []
   
-      operationId: getFollowings
+      operationId: getFollowed
       
       responses:
         "200":
           description: >
-            success, get users following
+            success, get users followed
           content:
             application/json:
               schema:
                 type: array
                 description: >
-                  list of following
+                  list of followed
                 items:
                   $ref: "#/components/schemas/User"
                 minItems: 1
-                maxItems: 9999
+                maxItems: 1000
         "404":
           description: >
             not found, user not found
@@ -359,46 +359,37 @@ paths:
   /users/{uid}/following/{followingId}:
     summary: user following this user
     description: >
-      this resource rappresent following user
+      this resource rappresent a followed user
     
     parameters:
       - $ref: "#/components/parameters/Uid"
       - $ref: "#/components/parameters/FollowingId"
     
-    put:
+    get:
       tags:
-        - following
         - user
-      summary: add new following
+        - following
+      summary: get followed user
       description: >
-        give uid user and uid of following user
+        given the *id* of the user and *id* following user and get it
       
-      
-      
-      requestBody:
-        description: >
-          informations about user to following
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
-      
+      parameters:
+        - $ref: "#/components/parameters/QueryLimit"
+        - $ref: "#/components/parameters/UsernameFilter"
       security:
-        - BearerAuth: []
-        
-      operationId: following
+      - BearerAuth: []
+  
+      operationId: getFollowing
       
       responses:
-        "201":
+        "200":
           description: >
-            success, added new following
+            success, get user following
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
-        "204":
-          description: > 
-            empty, just following the user
+                
         "404":
           description: >
             not found, user not found
@@ -408,33 +399,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedToken"
         "500":
           $ref: "#/components/responses/ServerError"
-            
-    delete:
-      tags: 
-        - following
-        - user
-      summary: delete following
-      description: >
-        give user id and  user following id and stop following him
-      
-      security:
-        - BearerAuth: []
-        
-      operationId: unfollowing
-
-      responses:
-        "204":
-          description: >
-            success, unFollowing the users
-        "404":
-          description: >
-            not found, user not found
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-        "403":
-          $ref: "#/components/responses/UnauthorizedToken"
-        "500":
-          $ref: "#/components/responses/ServerError"
+    
+    
 
         
     
@@ -889,7 +855,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/User"
                 minItems: 1
-                maxItems: 9999
+                maxItems: 1000
         "404":
           description: >
             not found, user or photo not found
@@ -1387,6 +1353,10 @@ components:
             data
           type: string
           format: binary
+          #minLength: 5000 bug
+          maxLength: 5000000
+          
+
         
         descriptionImg:
           description: >

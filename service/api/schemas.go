@@ -51,11 +51,13 @@ type Comment struct {
 
 /* define rule for string. A rule is compose by limit and regex*/
 type Rule struct {
-	min     int
-	max     int
-	pattern regexp.Regexp
+	min        int
+	max        int
+	pattern, _ regexp.Regexp
 }
 
+/*
 func (rg *Rule) validate(chr string) bool {
 	return len(chr) <= rg.max && len(chr) >= rg.min && rg.pattern.MatchString(chr)
 }
+*/

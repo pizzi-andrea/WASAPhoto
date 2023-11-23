@@ -1353,7 +1353,7 @@ components:
             data
           type: string
           format: binary
-          #minLength: 5000 bug
+          minLength: 0
           maxLength: 5000000
           
 

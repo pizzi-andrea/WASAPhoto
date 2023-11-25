@@ -1,4 +1,4 @@
-package api
+package database
 
 import (
 	"container/list"
@@ -13,47 +13,60 @@ type Username = string     // username of a user
 
 // conform to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) specification
 type Photo struct { //this object rappresent a photo
-	photoId        Id
-	timeUpdate     TimeStamp
-	imageData      image.Image // data
-	descriptionImg string      // image description
-	maxLength      int
+	PhotoId        Id
+	TimeUpdate     TimeStamp
+	ImageData      image.Image // data
+	DescriptionImg string      // image description
+	MaxLength      int
 }
 
 /*this object rappresent a user*/
 type User struct {
 	uid      Id
-	username Username
+	Username Username
+}
+
+func (usr *User) GetId() Id {
+	return usr.uid
+}
+
+func NewUser(uid Id, username Username) User {
+	usr := User{
+		uid:      uid,
+		Username: username,
+	}
+
+	return usr
 }
 
 /*user profile rappresentation*/
 type Profile struct {
-	user      User
-	stream    StreamPhotos
-	follower  int //number user that follow a specific user
-	following int //numer of users following by specific user
+	User      User
+	Stream    StreamPhotos
+	Follower  int //number user that follow a specific user
+	Following int //numer of users following by specific user
 }
 
 /*this object rappresent a photo*/
 type StreamPhotos struct { //model of stream of photos
 
-	items    list.List
-	minItems int
-	maxItems int
+	Items    list.List
+	MinItems int
+	MaxItems int
 }
 
 /*this object rappresent a comment on a photo.*/
 type Comment struct {
-	user      User      // this object rappresent a user
-	text      string    // comment text encoded in UNICODE format
-	timeStamp TimeStamp // this components describe timestamp value conform to RFC3339 specification
+	User      User      // this object rappresent a user
+	Text      string    // comment text encoded in UNICODE format
+	TimeStamp TimeStamp // this components describe timestamp value conform to RFC3339 specification
 }
 
 /* define rule for string. A rule is compose by limit and regex*/
 type Rule struct {
-	min        int
-	max        int
-	pattern, _ regexp.Regexp
+	Min        int
+	Max        int
+	Pattern, _ regexp.Regexp
 }
 
 /*

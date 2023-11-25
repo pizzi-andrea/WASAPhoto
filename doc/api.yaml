@@ -16,7 +16,7 @@ info:
     email: pizzi.1995517@studenti.uniroma1.it
   
 servers:
-  - url: https//localhost:3030
+  - url: http://localhost:3000
 
 paths:
   /users/:
@@ -24,38 +24,6 @@ paths:
     description: >
       this resource rappresent collection of users
     
-    post:
-      security:
-        - BearerAuth: []
-        
-      summary: add new user
-      description: >
-        create new user logged
-      
-      tags:
-        - user
-      requestBody:
-        description: >
-          user to register
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
-
-      operationId: addNewUser
-      
-      responses:
-        "201":
-          description: >
-            successfull create new user
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-        "500":
-          $ref: "#/components/responses/ServerError"
     get:
       security:
         - BearerAuth: []

@@ -1400,7 +1400,8 @@ components:
       properties:
         user:
           $ref: "#/components/schemas/User"
-  
+        commentId:
+          $ref: "#/components/schemas/Id"
         text:
           description: >
             comment text encoded in UNICODE format
@@ -1416,6 +1417,7 @@ components:
         - user
         - text
         - timeStamp
+        - commentId
 
 tags:
   - name: user
@@ -1447,4 +1449,3 @@ tags:
   - name: login
     description: >
       log-in function for users
-  

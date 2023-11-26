@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: WASAPhoto APIs
-  version: 1.0.1
+  version: 1.0.2
   description: >
     **"Keep in touch with your friends by sharing photos of special moments, thanks to WASAPhoto!"**
     
@@ -16,7 +16,7 @@ info:
     email: pizzi.1995517@studenti.uniroma1.it
   
 servers:
-  - url: https//localhost:3030
+  - url: http://localhost:3030
 
 paths:
   /users/:
@@ -24,38 +24,6 @@ paths:
     description: >
       this resource rappresent collection of users
     
-    post:
-      security:
-        - BearerAuth: []
-        
-      summary: add new user
-      description: >
-        create new user logged
-      
-      tags:
-        - user
-      requestBody:
-        description: >
-          user to register
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
-
-      operationId: addNewUser
-      
-      responses:
-        "201":
-          description: >
-            successfull create new user
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-        "500":
-          $ref: "#/components/responses/ServerError"
     get:
       security:
         - BearerAuth: []
@@ -137,8 +105,7 @@ paths:
               schema:
                 {$ref: "#/components/schemas/Profile"}
         "404":
-          description: >
-            user not found
+          $ref: "#/components/responses/UserNotFound"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -178,7 +145,7 @@ paths:
           $ref: "#/components/responses/UnauthorizedToken"
         "404":
           description: >
-            user not found
+            $ref: "#/components/responses/UserNotFound"
         "500":
           $ref: "#/components/responses/ServerError"
 
@@ -218,13 +185,10 @@ paths:
                 minItems: 1
                 maxItems: 1000
         "404":
-          description: >
-            not found, user not found
-        
+          $ref: "#/components/responses/UserNotFound"
         "204":
           description: >
             empty body, found nothing
-
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -344,8 +308,7 @@ paths:
                 minItems: 1
                 maxItems: 1000
         "404":
-          description: >
-            not found, user not found
+          $ref: "#/components/responses/UserNotFound"
         "204":
           description: >
             empty body, found nothing
@@ -391,8 +354,7 @@ paths:
                 $ref: "#/components/schemas/User"
                 
         "404":
-          description: >
-            not found, user not found
+          $ref: "#/components/responses/UserNotFound"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -462,9 +424,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/StreamPhotos"
         "404":
-          description: >
-            not found, user not found
-        
+          $ref: "#/components/responses/UserNotFound"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -509,8 +469,7 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
           
         "404":
-          description: >
-            not found, user or photo not found
+          $ref: "#/components/responses/UserNotFound"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
         
@@ -563,8 +522,7 @@ paths:
                   list  of banned users
 
         "404":
-          description: >
-            not found, user not found
+          $ref: "#/components/responses/UserNotFound"
         
         "204":
           description: >
@@ -619,8 +577,7 @@ paths:
           description: >
             empty response, user just banned
         "404":
-          description: >
-            not found, user not found
+          $ref: "#/components/responses/UserNotFound"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -645,8 +602,7 @@ paths:
           description: >
             success, unbanned user
         "404":
-          description: >
-            not found, user not found
+          $ref: "#/components/responses/UserNotFound"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -689,8 +645,7 @@ paths:
               schema: 
                 $ref: "#/components/schemas/Photo"
         "404":
-          description: >
-            user not found
+          $ref: "#/components/responses/UserNotFound"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -776,8 +731,7 @@ paths:
           description: >
             success, deleted photo
         "404":
-          description: >
-            not found, photo or user not found
+          $ref: "#/components/responses/UserNotFound"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -806,9 +760,8 @@ paths:
                 $ref: "#/components/schemas/Photo"
           
         "404":
-          description: >
-            not found, photo or user not found
-        
+          $ref: "#/components/responses/UserNotFound"
+      
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         
@@ -910,8 +863,7 @@ paths:
           description: >
             not content, just liked this photo
         "404":
-          description: >
-            not found, user or photo not found
+          $ref: "#/components/responses/UserNotFound"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -937,8 +889,7 @@ paths:
           description: >
             success, unliked the photo
         "404":
-          description: >
-            not found, user or photo not found
+          $ref: "#/components/responses/UserNotFound"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -986,8 +937,7 @@ paths:
                 $ref: "#/components/schemas/Comment"
           
         "404":
-          description: >
-            not found, photo or user not found
+          $ref: "#/components/responses/UserNotFound"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -1039,8 +989,7 @@ paths:
                 maxItems: 500
 
         "404":
-          description: >
-            not found, user not found
+          $ref: "#/components/responses/UserNotFound"
         "204":
           description: >
             empty body, found nothing
@@ -1077,8 +1026,7 @@ paths:
           description: >
             success, deleted comment
         "404":
-          description: >
-            not found, photo or user not found
+          $ref: "#/components/responses/UserNotFound"
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -1124,7 +1072,8 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
   
-  /session:
+  /session/:
+
     post:
       tags: 
         - login
@@ -1156,17 +1105,46 @@ paths:
           content:
             application/json:
               schema:
-                description: >
-                  id and username of user logged
-                type: object
-                properties:
-                  identifier:
-                    $ref: "#/components/schemas/Id"
-                  username:
-                
-                    $ref: "#/components/schemas/Username"
+                $ref: "#/components/schemas/Token"
         "500":
           $ref: "#/components/responses/ServerError"
+    
+    
+  /session/{tokenId}:
+
+    description: >
+      This endpoint rappresent single user logged identificated from token
+    parameters:
+        - name: tokenId
+          description: >
+            Token id
+          in: path 
+          required: true
+          schema:
+            format: int64
+          example: 1
+
+    
+    delete:
+      tags:
+        - login
+      summary: Logout User
+      description: >
+        If the user is logged, it will be logout if user not logged
+        method to do nothing.
+      
+      operationId: doLogout
+
+      responses:
+        "204":
+          description: >
+            success, user logout action successful
+        "404":
+          description: >
+            not found, user not logged
+            
+
+
         
 components:
 
@@ -1273,6 +1251,9 @@ components:
     ServerError:
       description: >
         server internal error, for more information see log file
+    UserNotFound:
+      description: >
+        Not found, user not found
 
   securitySchemes:
     
@@ -1297,7 +1278,21 @@ components:
         - uid
         - username
       
-    
+    Token: 
+      description: >
+        This object rappresent a token identification. The token will be used by users to authenticate to the system.
+        The token is composed from two fields: 
+          - tokenId: corresponding to uid of owner
+          - owner:   username of owner 
+      type: object
+      properties:
+        tokenId:
+          $ref: "#/components/schemas/Id"
+        owner:
+          $ref: "#/components/schemas/Username"
+
+
+
     Username:
       description: >
         username of a user

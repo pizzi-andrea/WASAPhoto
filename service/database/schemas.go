@@ -22,19 +22,19 @@ type Photo struct {
 
 /*this object rappresent a user*/
 type User struct {
-	uid      Id
+	Uid      Id
 	Username Username
 }
 
 // get uid of user
 func (usr *User) GetId() Id {
-	return usr.uid
+	return usr.Uid
 }
 
 // create new user object
 func NewUser(uid Id, username Username) User {
 	usr := User{
-		uid:      uid,
+		Uid:      uid,
 		Username: username,
 	}
 

@@ -43,7 +43,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		}
 	}
 
-	users, _ := rt.db.GetUsers(u.Name, 0, 0)
+	users, _ := rt.db.GetUsers(u.Name)
 	for _, user := range users {
 
 		if user.Username == u.Name {
@@ -63,20 +63,22 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	newUser := database.NewUser(uint64(len(users)), u.Name)
-	token = database.Token{
-		TokenId: newUser.GetId(),
-		Owner:   newUser.Username,
-	}
-
-	if err := rt.db.PostUser(newUser); err != nil {
+	if userQuery, err := rt.db.PostUser(newUser); err != nil {
 		fmt.Println(fmt.Errorf("error insert values: %w", err))
 		return
 
+	} else {
+
+		token = database.Token{
+			TokenId: userQuery.GetId(),
+			Owner:   userQuery.Username,
+		}
+
+		w.Header().Add("content-type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		io.WriteString(w, "User create, log-in action successful\n")
+		json.NewEncoder(w).Encode(token)
+		UserLogged = append(UserLogged, token)
 	}
 
-	w.Header().Add("content-type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	io.WriteString(w, "User create, log-in action successful\n")
-	json.NewEncoder(w).Encode(token)
-	UserLogged = append(UserLogged, token)
 }

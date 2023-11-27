@@ -39,8 +39,8 @@ import (
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	GetUser(uid Id) (User, error)
-	GetUsers(username Username, limit int, offset int) ([]User, error)
-	PostUser(user User) (_error error)
+	GetUsers(username Username) ([]User, error)
+	PostUser(user User) (newU User, _error error)
 
 	Ping() error
 }

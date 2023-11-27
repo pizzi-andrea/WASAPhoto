@@ -1,7 +1,7 @@
 package database
 
-func (db *appdbimpl) PostUser(user User) (_error error) {
+func (db *appdbimpl) PostUser(user User) (newU User, _error error) {
 
-	_, _error = db.c.Exec("INSERT INTO Users (username) VALUES (?)", user.Username)
+	_error = db.c.QueryRow("INSERT INTO Users (username) VALUES (?) RETURNING *", user.Username).Scan(&newU.uid, &newU.Username)
 	return
 }

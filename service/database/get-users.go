@@ -4,7 +4,7 @@ import "database/sql"
 
 // get users, Users getted can filtered by  usrname.
 // With offset parameters is possible specify the number of rows to skip from the beginning of the table
-func (db *appdbimpl) GetUsers(username Username, limit int, offset int) ([]User, error) {
+func (db *appdbimpl) GetUsers(username Username) ([]User, error) {
 	var users []User
 	var err error
 	var rows *sql.Rows
@@ -18,6 +18,7 @@ func (db *appdbimpl) GetUsers(username Username, limit int, offset int) ([]User,
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 
 	for rows.Next() {
@@ -32,10 +33,6 @@ func (db *appdbimpl) GetUsers(username Username, limit int, offset int) ([]User,
 		return users, err
 	}
 
-	if limit == 0 {
-		return users, nil
-	} else {
-		return users[:min(len(users), limit)], nil
-	}
+	return users, nil
 
 }

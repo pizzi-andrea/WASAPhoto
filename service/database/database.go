@@ -39,6 +39,9 @@ import (
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	GetUser(uid Id) (User, error)
+	GetUsers(username Username, limit int, offset int) ([]User, error)
+	PostUser(user User) (_error error)
+
 	Ping() error
 }
 
@@ -46,6 +49,73 @@ type appdbimpl struct {
 	c *sql.DB
 }
 
+/*
+var (
+	t_user = Table{
+		NameTable: "user",
+
+		Fields: Field{
+
+			"uid": {
+				Ftype:      SQLITE_INTEGER,
+				PrimaryKey: true,
+				Unique:     true,
+				NotNull:    true,
+			},
+
+			"username": {
+				Ftype:      SQLITE_TEXT,
+				PrimaryKey: false,
+				Unique:     true,
+				NotNull:    true,
+				Check:      "",
+			},
+		},
+	}
+
+	t_photo = Table{
+		NameTable: "photo",
+
+		Fields: Field{
+
+			"photoId": {
+				Ftype:      SQLITE_INTEGER,
+				PrimaryKey: true,
+				Unique:     true,
+				NotNull:    true,
+			},
+
+			"imageData": {
+				Ftype:      SQLITE_BLOB,
+				PrimaryKey: false,
+				Unique:     false,
+				NotNull:    true,
+			},
+
+			"timeUpdate": {
+				Ftype:      SQLITE_TIME,
+				PrimaryKey: false,
+				Unique:     false,
+				NotNull:    true,
+			},
+
+			"descriptionImg": {
+				Ftype:      SQLITE_TEXT,
+				PrimaryKey: false,
+				Unique:     false,
+				NotNull:    true,
+			},
+
+			"Owner": {
+				Ftype:      SQLITE_INTEGER,
+				PrimaryKey: false,
+				Unique:     false,
+				NotNull:    true,
+			},
+		},
+	}
+)
+*/
 // New returns a new instance of AppDatabase based on the SQLite connection `db`.
 // `db` is required - an error will be returned if `db` is `nil`.
 func New(db *sql.DB) (AppDatabase, error) {
@@ -55,13 +125,13 @@ func New(db *sql.DB) (AppDatabase, error) {
 
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 	var tableName string
-	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='example_table';`).Scan(&tableName)
+	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='WASAPhoto';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {
-		sqlStmt := `CREATE TABLE example_table (id INTEGER NOT NULL PRIMARY KEY, name TEXT);`
-		_, err = db.Exec(sqlStmt)
-		if err != nil {
+
+		if err = initDb(db); err != nil {
 			return nil, fmt.Errorf("error creating database structure: %w", err)
 		}
+
 	}
 
 	return &appdbimpl{

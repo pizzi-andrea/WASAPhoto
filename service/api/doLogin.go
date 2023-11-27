@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 
 	"net/http"
@@ -16,35 +17,66 @@ If the user does not exist, it will be created,
 	and an identifier is returned.
 	If the user exists, the user identifier is returned.
 */
+type loginUser struct {
+	Name database.Username `json:"name"`
+}
+
+var UserLogged []database.Token
+
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var err error
+	var u loginUser
+	var token database.Token
 
-	var users []database.User //
-
-	var str_username string
-	username, _error := r.GetBody()
-	if _error != nil {
-		//TODO
+	if err = json.NewDecoder(r.Body).Decode(&u); err != nil {
+		fmt.Println(fmt.Errorf("error json parsing %w", err))
 		return
+
 	}
 
-	json.NewDecoder(username).Decode(&str_username)
-	for _, user := range users {
-		if user.Username == str_username {
-			w.Header().Set("content-type", "application/json")
-			w.WriteHeader(http.StatusCreated)
-			io.WriteString(w, "User log-in action successful")
-			json.NewEncoder(w).Encode(user)
+	for _, token := range UserLogged {
+		if token.Owner == u.Name {
+			w.Header().Set("content-type", "text/plain")
+			w.WriteHeader(http.StatusOK)
+			io.WriteString(w, "User just logged")
 			return
 		}
 	}
 
-	newUser := database.NewUser(uint64(len(users)), str_username)
+	users, _ := rt.db.GetUsers(u.Name, 0, 0)
+	for _, user := range users {
 
-	// serialize new user
+		if user.Username == u.Name {
+			token = database.Token{
+				TokenId: user.GetId(),
+				Owner:   user.Username,
+			}
+
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusCreated)
+			io.WriteString(w, "User just exist, log-in action successful")
+			json.NewEncoder(w).Encode(token)
+			UserLogged = append(UserLogged, token)
+			return
+
+		}
+	}
+
+	newUser := database.NewUser(uint64(len(users)), u.Name)
+	token = database.Token{
+		TokenId: newUser.GetId(),
+		Owner:   newUser.Username,
+	}
+
+	if err := rt.db.PostUser(newUser); err != nil {
+		fmt.Println(fmt.Errorf("error insert values: %w", err))
+		return
+
+	}
 
 	w.Header().Add("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	io.WriteString(w, "User log-in action successful")
-	json.NewEncoder(w).Encode(newUser)
-
+	io.WriteString(w, "User create, log-in action successful\n")
+	json.NewEncoder(w).Encode(token)
+	UserLogged = append(UserLogged, token)
 }

@@ -7,17 +7,18 @@ import (
 /* resources */
 
 const r_users = "/users/"                              // this resource rappresent collection of users
-const r_user = "/users/:uid/"                          // Resource rappresent a single user
-const r_followers = "/users/:uid/followers"            // this resurce rappresent the followers of specific user
+const r_user = r_users + ":uid/"                       // Resource rappresent a single user
+const r_followers = r_user + "followers/"              // this resurce rappresent the followers of specific user
 const r_follower = "/users/:uid/followers/:followerId" // this resource rappresent follower
-const r_login = "/session"
+const r_login = "/session/"
+const r_userlog = r_login + ":tokenId" // this endpont rappresent logged user
 const r_root = "/"
 
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) Handler() http.Handler {
 	// Register routes
 
-	//add new user
+	//
 	rt.router.POST(r_login, rt.doLogin)
 
 	//list registred users
@@ -28,6 +29,9 @@ func (rt *_router) Handler() http.Handler {
 
 	// get specific user profile
 	rt.router.GET(r_user, rt.getUserProfile)
+
+	// Logout User
+	rt.router.DELETE(r_userlog, rt.doLogout)
 
 	/*
 		// get all followers

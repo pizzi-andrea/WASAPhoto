@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS Photos (
 	photoId INTEGER  PRIMARY KEY,	-- photo identificator
 	owner INTEGER NOT NULL,		-- uid of owner
 	descriptionImg TEXT NOT NULL,	-- image description
-	ImageData BLOB NOT NULL,	-- file
+	imageData BLOB NOT NULL,	-- file
 	timeUpdate TIMESTAMP NOT NULL,	-- time to update
 	
 	
@@ -51,8 +51,8 @@ CREATE TABLE IF NOT EXISTS Followers (
 	to_ INTEGER NOT NULL,
 	
 	PRIMARY KEY(from_, to_)
-	CONSTRAINT ref_to_from FOREIGN KEY(from_) REFERENCES User(uid),
-	CONSTRAINT ref_to FOREIGN KEY(to_) REFERENCES User(uid)
+	CONSTRAINT ref_to_from FOREIGN KEY(from_) REFERENCES Users(uid),
+	CONSTRAINT ref_to FOREIGN KEY(to_) REFERENCES Users(uid)
 );
 -- Create banned schema
 
@@ -61,6 +61,6 @@ CREATE TABLE IF NOT EXISTS Bans (
 	to_ INTEGER NOT NULL,
 	
 	PRIMARY KEY(from_, to_),
-	CONSTRAINT ref_to_from FOREIGN KEY(from_) REFERENCES User(uid)
-	CONSTRAINT ref_to FOREIGN KEY(to_) REFERENCES User(uid)
+	CONSTRAINT ref_to_from FOREIGN KEY(from_) REFERENCES Users(uid)
+	CONSTRAINT ref_to FOREIGN KEY(to_) REFERENCES Users(uid)
 );

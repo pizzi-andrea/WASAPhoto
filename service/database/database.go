@@ -41,6 +41,9 @@ type AppDatabase interface {
 	GetUser(uid Id) (User, error)
 	GetUsers(username Username) ([]User, error)
 	PostUser(user User) (newU User, _error error)
+	GetFollower(uid Id) (followers []User, err error)
+	GetFollowing(uid Id) (following []User, err error)
+	GetMyStream(uid Id) (photos StreamPhotos, err error)
 
 	Ping() error
 }

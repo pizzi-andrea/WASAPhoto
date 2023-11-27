@@ -16,7 +16,7 @@ info:
     email: pizzi.1995517@studenti.uniroma1.it
   
 servers:
-  - url: http://localhost:3030
+  - url: http://localhost:3000
 
 paths:
   /users/:

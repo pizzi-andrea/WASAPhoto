@@ -8,11 +8,11 @@ import (
 )
 
 type Id = uint64           // Identificator at 64-bit
-type TimeStamp = time.Time // this components describe timestamp value
+type TimeStamp = time.Time // this components describe timestamp value conform to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) specification
 type Username = string     // username of a user
 
-// conform to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) specification
-type Photo struct { //this object rappresent a photo
+/*this object rappresent a photo*/
+type Photo struct {
 	PhotoId        Id
 	TimeUpdate     TimeStamp
 	ImageData      image.Image // data
@@ -26,10 +26,12 @@ type User struct {
 	Username Username
 }
 
+// get uid of user
 func (usr *User) GetId() Id {
 	return usr.uid
 }
 
+// create new user object
 func NewUser(uid Id, username Username) User {
 	usr := User{
 		uid:      uid,
@@ -70,7 +72,13 @@ type Rule struct {
 }
 
 /*
-func (rg *Rule) validate(chr string) bool {
-	return len(chr) <= rg.max && len(chr) >= rg.min && rg.pattern.MatchString(chr)
-}
+This object rappresent a token identification. The token will be used by users to authenticate to the system.
+
+	The token is composed from two fields:
+	  - tokenId: corresponding to uid of owner
+	  - owner:   username of owner
 */
+type Token struct {
+	TokenId Id
+	Owner   Username
+}

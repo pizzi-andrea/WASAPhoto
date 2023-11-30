@@ -6,9 +6,7 @@ import (
 
 // get users, Users getted can filtered by  usrname.
 // With offset parameters is possible specify the number of rows to skip from the beginning of the table
-func (db *appdbimpl) GetUsers(username Username) ([]User, error) {
-	var users []User
-	var err error
+func (db *appdbimpl) GetUsers(username Username) (users []User, err error) {
 	var rows *sql.Rows
 	var uid Id
 	var name Username

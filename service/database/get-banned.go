@@ -1,12 +1,15 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
-func (db *appdbimpl) GetFollowers(uid Id) (followers []User, err error) {
+func (db *appdbimpl) GetBanned(uid Id) (followers []User, err error) {
 	var username Username
 	var rows *sql.Rows
 
-	if rows, err = db.c.Query(`SELECT uid, username FROM Followers, Users WHERE to_ = ? AND from_ = uid`, uid); err != nil {
+	if rows, err = db.c.Query(`SELECT uid, username FROM Users u, Bans b 
+	WHERE b.from_ = ? AND u.uid = b.to_`, uid); err != nil {
 		return
 	}
 

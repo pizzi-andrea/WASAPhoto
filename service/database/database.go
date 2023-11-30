@@ -39,11 +39,14 @@ import (
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
 	GetUser(uid Id) (User, error)
-	GetUsers(username Username) ([]User, error)
-	PostUser(user User) (newU User, _error error)
-	GetFollower(uid Id) (followers []User, err error)
+	GetUsers(username Username) (users []User, err error)
+	PostUser(user User) (newU User, err error)
+	GetFollowers(uid Id) (followers []User, err error)
 	GetFollowing(uid Id) (following []User, err error)
 	GetMyStream(uid Id) (photos StreamPhotos, err error)
+	GetBan(uid Id) (followers []User, err error)
+	GetBanned(uid Id) (followers []User, err error)
+	SetUsername(uid Id, username string) (user User, err error)
 
 	Ping() error
 }
@@ -125,7 +128,6 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if db == nil {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
-
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 	var tableName string
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='WASAPhoto';`).Scan(&tableName)

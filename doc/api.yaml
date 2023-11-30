@@ -112,6 +112,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedToken"
         "500":
           $ref: "#/components/responses/ServerError"
+        "400":
+          $ref: "#/components/responses/BadRequest"
 
     put:
       tags:
@@ -1008,46 +1010,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Token"
-        "500":
+        "400":
+          $ref: "#/components/responses/BadRequest"
+	"500":
           $ref: "#/components/responses/ServerError"
-    
-    
-  /session/{tokenId}:
 
-    description: >
-      This endpoint rappresent single user logged identificated from token
-    parameters:
-        - name: tokenId
-          description: >
-            Token id
-          in: path 
-          required: true
-          schema:
-            format: int64
-          example: 1
-
-    
-    delete:
-      tags:
-        - login
-      summary: Logout User
-      description: >
-        If the user is logged, it will be logout if user not logged
-        method to do nothing.
-      
-      operationId: doLogout
-
-      responses:
-        "204":
-          description: >
-            success, user logout action successful
-        "404":
-          description: >
-            not found, user not logged
-            
-
-
-        
 components:
 
   parameters:
@@ -1156,6 +1123,10 @@ components:
     UserNotFound:
       description: >
         Not found, user not found
+
+    BadRequest:
+    	description: >
+    	 Bad request, formating error 
 
   securitySchemes:
     

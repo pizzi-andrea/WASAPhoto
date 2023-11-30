@@ -5,20 +5,20 @@ import (
 )
 
 /* resources */
-
-const r_users = "/users/"                              // this resource rappresent collection of users
-const r_user = r_users + ":uid/"                       // Resource rappresent a single user
-const r_followers = r_user + "followers/"              // this resurce rappresent the followers of specific user
-const r_follower = "/users/:uid/followers/:followerId" // this resource rappresent follower
-const r_login = "/session/"
-const r_userlog = r_login + ":tokenId" // this endpont rappresent logged user
 const r_root = "/"
+const r_users = r_root + "users/"              // Endpoint rappresent the list of WasaPhoto users
+const r_user = r_users + ":uid/"               // Endpont rappresent a WasaPhoto user
+const r_followers = r_user + "followers/"      // Endpoint rappresent the followers of specific user
+const r_follower = r_followers + ":followerId" // Endpont rappresent follower a user
+const r_login = r_root + "session"
 
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) Handler() http.Handler {
 	// Register routes
 
-	//
+	rt.router.GET(r_root, rt.hello)
+
+	//Logs in the user
 	rt.router.POST(r_login, rt.doLogin)
 
 	//list registred users
@@ -30,13 +30,9 @@ func (rt *_router) Handler() http.Handler {
 	// get specific user profile
 	rt.router.GET(r_user, rt.getUserProfile)
 
-	// Logout User
-	rt.router.DELETE(r_userlog, rt.doLogout)
-
+	// get all followers
+	rt.router.GET(r_followers, rt.listFollowers)
 	/*
-		// get all followers
-		rt.router.GET("/users/:uid/followers", rt.listFollowers)
-
 		// unfollow user
 		rt.router.DELETE("/users/:uid/followers/:followerId", rt.unfollowUser)
 
@@ -97,15 +93,10 @@ func (rt *_router) Handler() http.Handler {
 		// get comment on photo
 		rt.router.GET("/users/:uid/myPhotos/:photoId/comments/:commentId", rt.getComment)
 
-		// Logs in the user
-		rt.router.POST("/session", rt.doLogin)
 
 		// Special routes
 		rt.router.GET("/liveness", rt.liveness)
 	*/
-
-	// test method
-	rt.router.GET(r_root, rt.hello)
 	return rt.router
 
 }

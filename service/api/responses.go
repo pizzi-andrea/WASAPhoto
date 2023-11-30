@@ -18,4 +18,9 @@ var (
 		Status:     "server internal error, for more information see log file",
 		StatusCode: http.StatusInternalServerError,
 	}
+
+	BadRequest http.Response = http.Response{
+		Status:     "Bad request, syntax errors",
+		StatusCode: http.StatusBadRequest,
+	}
 )

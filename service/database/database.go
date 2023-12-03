@@ -44,10 +44,11 @@ type AppDatabase interface {
 	PostUser(username Username) (usr *User, err error)
 	GetFollowers(uid Id, username Username, largeSearch bool) (followers []User, err error)
 	GetFollowing(uid Id, username Username, largeSearch bool) (following []User, err error)
-	GetMyStream(uid Id) (photos StreamPhotos, err error)
+	GetMyStream(uid Id, username Username, largeSearch bool, by []OrderBy, ord ...Ordering) (photos StreamPhotos, err error)
+	GetPhotoStream(uid, photoId Id) (img *Photo, err error)
 	GetBanned(uid Id) (banned []User, err error)
-	SetUsername(uid Id, username string) (usr *User, err error) // update username of user associted to uid
-	GetPhotos(uid Id) (photos StreamPhotos, err error)          // give user id and put all photos posted by user associated to uid
+	SetUsername(uid Id, username string) (usr *User, err error)                       // update username of user associted to uid
+	GetPhotos(uid Id, by []OrderBy, ord ...Ordering) (photos StreamPhotos, err error) // give user id and put all photos posted by user associated to uid
 	IsBanned(from Id, to Id) (r bool, err error)
 	DelFollow(from, to Id) (r bool, err error)
 	IsFollower(from Id, to Id) (r bool, err error)
@@ -55,6 +56,8 @@ type AppDatabase interface {
 	PutBan(from, to Id) (r bool, err error)
 	DelBan(from, to Id) (r bool, err error)
 	PutPhoto(imgData []byte, desc string, owner Id) (photo *Photo, err error)
+	GetPhoto(id Id) (img *Photo, err error)
+	DelPhoto(id Id) (r bool, err error)
 	Ping() error
 }
 

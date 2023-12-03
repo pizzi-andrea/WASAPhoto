@@ -1,3 +1,5 @@
+-- enable foreign constraint
+PRAGMA foreign_keys = ON;
 -- Create Users schema
 
 CREATE TABLE IF NOT EXISTS Users (
@@ -15,7 +17,7 @@ CREATE TABLE IF NOT EXISTS Photos (
 	timeUpdate TIMESTAMP NOT NULL,	-- time to update
 	
 	
-	CONSTRAINT ref_to_user FOREIGN KEY(owner) REFERENCES Users(uid)
+	CONSTRAINT ref_to_user FOREIGN KEY(owner) REFERENCES Users(uid) ON DELETE CASCADE
 );
 
 
@@ -28,8 +30,8 @@ CREATE TABLE IF NOT EXISTS Comments (
 	text_ TEXT NOT NULL,
 	timeStamp_ TIMESTAMP NOT NULL,
 
-	CONSTRAINT ref_to_user FOREIGN KEY(author) REFERENCES Users(uid),
-	CONSTRAINT ref_to_photo FOREIGN KEY(photo) REFERENCES Photos(photoId)
+	CONSTRAINT ref_to_user FOREIGN KEY(author) REFERENCES Users(uid) ON DELETE CASCADE,
+	CONSTRAINT ref_to_photo FOREIGN KEY(photo) REFERENCES Photos(photoId) ON DELETE CASCADE
 );
 
 
@@ -39,8 +41,8 @@ CREATE TABLE IF NOT EXISTS Likes (
 	user INTEGER NOT NULL,
 	photo INTEGER NOT NULL,
 	PRIMARY KEY(user, photo),
-	CONSTRAINT ref_to_user FOREIGN KEY(user) REFERENCES Users(uid),
-	CONSTRAINT ref_to_photo FOREIGN KEY(photo) REFERENCES Photos(photoId)
+	CONSTRAINT ref_to_user FOREIGN KEY(user) REFERENCES Users(uid) ON DELETE CASCADE,
+	CONSTRAINT ref_to_photo FOREIGN KEY(photo) REFERENCES Photos(photoId) ON DELETE CASCADE
 );
 
 
@@ -51,8 +53,8 @@ CREATE TABLE IF NOT EXISTS Followers (
 	to_ INTEGER NOT NULL,
 	
 	PRIMARY KEY(from_, to_)
-	CONSTRAINT ref_to_from FOREIGN KEY(from_) REFERENCES Users(uid),
-	CONSTRAINT ref_to FOREIGN KEY(to_) REFERENCES Users(uid)
+	CONSTRAINT ref_to_from FOREIGN KEY(from_) REFERENCES Users(uid) ON DELETE CASCADE,
+	CONSTRAINT ref_to FOREIGN KEY(to_) REFERENCES Users(uid) ON DELETE CASCADE
 );
 -- Create banned schema
 
@@ -61,6 +63,6 @@ CREATE TABLE IF NOT EXISTS Bans (
 	to_ INTEGER NOT NULL,
 	
 	PRIMARY KEY(from_, to_),
-	CONSTRAINT ref_to_from FOREIGN KEY(from_) REFERENCES Users(uid)
-	CONSTRAINT ref_to FOREIGN KEY(to_) REFERENCES Users(uid)
+	CONSTRAINT ref_to_from FOREIGN KEY(from_) REFERENCES Users(uid) ON DELETE CASCADE,
+	CONSTRAINT ref_to FOREIGN KEY(to_) REFERENCES Users(uid) ON DELETE CASCADE
 );

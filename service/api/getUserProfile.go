@@ -114,7 +114,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	/*
 		get photo stream. Photo stream is composed by photos of other followed users
 	*/
-	if photos, err = rt.db.GetPhotos(database.Id(uid)); err != nil {
+	if photos, err = rt.db.GetPhotos(database.Id(uid), []database.OrderBy{}); err != nil {
 		fmt.Println(fmt.Errorf("%w", err))
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)

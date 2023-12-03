@@ -62,7 +62,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	/*
-		Check if user  that want unban user can it. Only user have put ban
+		Check if user  that want ban user can it. Only user have put ban
 		can delete it
 	*/
 	if tk.Value != database.Id(from) {
@@ -91,6 +91,9 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 			io.WriteString(w, ServerError.Status)
 			return
 		}
+		/* TODO: check error */
+		rt.db.DelFollow(database.Id(from), database.Id(to)) // if user put ban auto. lost the follow
+		rt.db.DelFollow(database.Id(to), database.Id(from)) // if user recive ban auto. lost the follow
 		w.Header().Set("content-type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 		json.NewEncoder(w).Encode(*u)

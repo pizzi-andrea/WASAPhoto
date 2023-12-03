@@ -13,6 +13,11 @@ const r_follower = r_followers + ":followerId" // Endpont rappresent follower a 
 const r_login = r_root + "session"
 const r_banned = r_user + "banned/"
 const r_userBanned = r_banned + ":bannedId"
+const r_followed = r_user + "followed"
+const r_myPhotos = r_user + "myPhotos/"
+const r_myPhoto = r_myPhotos + ":photoId/"
+const r_myStream = r_user + "myStream/"
+const r_streamPhoto = r_myStream + ":photoId"
 
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) Handler() http.Handler {
@@ -46,14 +51,12 @@ func (rt *_router) Handler() http.Handler {
 		// get followed user
 		rt.router.GET("/users/{uid}/following/:followingId", rt.getFollowing)
 	*/
-	/*
 
-		// list personal stream photos
-		rt.router.GET("/users/:uid/myStream", rt.getMyStream)
+	// list personal stream photos
+	rt.router.GET(r_myStream, rt.getMyStream)
 
-		// get photo from stream
-		rt.router.GET("/users/:uid/myStream/:photoId", rt.getPhotoMyStream)
-	*/
+	// get photo from stream
+	rt.router.GET(r_streamPhoto, rt.getPhotoMyStream)
 
 	// banned users
 	rt.router.GET(r_banned, rt.listBannedUsers)
@@ -65,17 +68,17 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.DELETE(r_userBanned, rt.unbanUser)
 
 	// update photo
-	rt.router.POST("/users/:uid/myPhotos", rt.uploadPhoto)
+	rt.router.POST(r_myPhotos, rt.uploadPhoto)
+
+	// list stream photos updated
+	rt.router.GET(r_myPhotos, rt.listPhoto)
+
+	// delete photo updated
+	rt.router.DELETE(r_myPhoto, rt.deletePhoto)
+
+	// get photo
+	rt.router.GET(r_myPhoto, rt.getPhoto)
 	/*
-		// list stream photos updated
-		rt.router.GET("/users/:uid/myPhotos", rt.listPhoto)
-
-		// delete photo updated
-		rt.router.DELETE("/users/:uid/myPhotos/:photoId/", rt.deletePhoto)
-
-		// get photo
-		rt.router.GET("/users/:uid/myPhotos/:photoId/", rt.getPhoto)
-
 		// get likes collected by photo
 		rt.router.GET("/users/:uid/myPhotos/:photoId/likes/", rt.getLikes)
 

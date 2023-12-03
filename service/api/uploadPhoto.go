@@ -9,6 +9,7 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 
+	"pizzi1995517.it/WASAPhoto/service/api/security"
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
@@ -17,6 +18,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	var uid int
 	var err error
 	var user *database.User
+	var tk *security.Token
 
 	// Parsing URL parameters
 	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
@@ -43,6 +45,25 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	}
 
+	/*
+		Applay barrear authentication. only owner can post photo in his account
+	*/
+	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
+		w.Header().Set("content-type", "text/plain") // 401
+		w.WriteHeader(UnauthorizedError.StatusCode)
+		io.WriteString(w, UnauthorizedError.Status)
+		return
+	}
+
+	/*
+		checks if the user who wants post photo is account owner
+	*/
+	if tk.Value != uint64(uid) {
+		w.Header().Set("content-type", "text/plain") // 403
+		w.WriteHeader(UnauthorizedToken.StatusCode)
+		io.WriteString(w, UnauthorizedToken.Status)
+		return
+	}
 	// parsing body values
 	var photo *database.Photo = &database.Photo{
 		ImageData: make([]byte, MaxBytePhoto),

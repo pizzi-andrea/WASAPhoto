@@ -303,7 +303,8 @@ paths:
             description: >
               options for sorting photos
             type: string
-            enum: ["dataUpdate", "size"]
+            enum: ["dataUpdate"]
+            default: "dataUpdate"
           description: >
             ordering photo getted by value
        
@@ -313,8 +314,10 @@ paths:
           schema:
             description: >
               type value ordering flag
-            type: boolean
-            default: true
+            type: string
+            enum: ["asc", "desc"]
+            default: "desc"
+            
           description: >
             order photo in reverse order
         
@@ -578,17 +581,19 @@ paths:
             description: >
               options for sorting photos
             type: string
-            enum: ["dataUpdate", "size"]
+            enum: ["dataUpdate"]   # future updates [, "size", "likes", "comments"]
+            default: "dataUpdate"
           description: >
             ordering photo getted by value in enum
-        - name: reverse
+        - name: ordering
           in: query
           required: false
           schema:
             description: >
               flag for reverse sorting
-            type: boolean
-            default: true
+            type: string
+            enum: ["asc", "desc"]
+            default: "desc"
           description: >
             order photo in reverse order
       

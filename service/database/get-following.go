@@ -1,9 +1,20 @@
 package database
 
-func (db *appdbimpl) GetFollowing(uid Id) (following []User, err error) {
-	var username Username
-	rows, err := db.c.Query(`SELECT uid, username FROM Followers, Users
-	WHERE to_ = uid AND from_ = ?`, uid)
+import "database/sql"
+
+func (db *appdbimpl) GetFollowing(uid Id, username Username, largeSearch bool) (following []User, err error) {
+	var rows *sql.Rows
+	if largeSearch {
+		rows, err = db.c.Query("SELECT uid, username FROM Followers, Users WHERE to_ = uid AND from_ = ? AND username LIKE '%"+username+"%'", uid)
+	} else {
+		rows, err = db.c.Query(`SELECT uid, username FROM Followers, Users WHERE to_ = uid AND from_ = ? AND username = ?`, uid, username)
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
 
 	for rows.Next() {
 		if _err := rows.Scan(&uid, &username); _err != nil {

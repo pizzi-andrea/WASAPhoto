@@ -13,15 +13,15 @@ func (db *appdbimpl) GetMyStream(uid Id) (photos StreamPhotos, err error) {
 	_, err = db.c.Exec(`	
 PRAGMA temp_store = 3;
 	
-CREATE TEMP TABLE UsersNoBanned AS SELECT uid FROM Users u , Bans b 
+CREATE TEMP TABLE IF NOT EXISTS UsersNoBanned AS SELECT uid FROM Users u , Bans b 
 	WHERE b.to_ != ? AND u.uid = b.from_ ;
 
-CREATE TEMP TABLE MyFollowers AS SELECT uid FROM UsersNoBanned unb, Followers f
+CREATE TEMP TABLE IF NOT EXISTS MyFollowers AS SELECT uid FROM UsersNoBanned unb, Followers f
 	WHERE f.from_ = ? AND unb.uid = f.to_;
 
 
 
-CREATE TEMP TABLE MyStream AS SELECT photoId, owner, descriptionImg, imageData, timeUpdate FROM MyFollowers myf, Photos p
+CREATE TEMP TABLE IF NOT EXISTS MyStream AS SELECT photoId, owner, descriptionImg, imageData, timeUpdate FROM MyFollowers myf, Photos p
 	WHERE myf.uid = p.owner;
 	`, uid, uid)
 
@@ -36,8 +36,7 @@ CREATE TEMP TABLE MyStream AS SELECT photoId, owner, descriptionImg, imageData, 
 	}
 
 	for rows.Next() {
-		if _err := rows.Scan(&photo.PhotoId, &owner, &photo.DescriptionImg, &photo.ImageData, &photo.TimeUpdate); _err != nil {
-			err = _err
+		if err = rows.Scan(&photo.PhotoId, &owner, &photo.DescriptionImg, &photo.ImageData, &photo.TimeUpdate); err != nil {
 			return
 		}
 

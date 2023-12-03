@@ -38,16 +38,23 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	GetUser(uid Id) (User, error)
-	GetUsers(username Username) (users []User, err error)
-	PostUser(user User) (newU User, err error)
-	GetFollowers(uid Id) (followers []User, err error)
-	GetFollowing(uid Id) (following []User, err error)
+	GetUserFromId(uid Id) (usr *User, err error) //
+	GetUserFromUser(Username Username) (usr *User, err error)
+	GetUsers(username Username, largeSearch bool) (users []User, err error)
+	PostUser(username Username) (usr *User, err error)
+	GetFollowers(uid Id, username Username, largeSearch bool) (followers []User, err error)
+	GetFollowing(uid Id, username Username, largeSearch bool) (following []User, err error)
 	GetMyStream(uid Id) (photos StreamPhotos, err error)
-	GetBan(uid Id) (followers []User, err error)
-	GetBanned(uid Id) (followers []User, err error)
-	SetUsername(uid Id, username string) (user User, err error)
-
+	GetBanned(uid Id) (banned []User, err error)
+	SetUsername(uid Id, username string) (usr *User, err error) // update username of user associted to uid
+	GetPhotos(uid Id) (photos StreamPhotos, err error)          // give user id and put all photos posted by user associated to uid
+	IsBanned(from Id, to Id) (r bool, err error)
+	DelFollow(from, to Id) (r bool, err error)
+	IsFollower(from Id, to Id) (r bool, err error)
+	PutFollow(from Id, to Id) (r bool, err error)
+	PutBan(from, to Id) (r bool, err error)
+	DelBan(from, to Id) (r bool, err error)
+	PutPhoto(imgData []byte, desc string, owner Id) (photo *Photo, err error)
 	Ping() error
 }
 

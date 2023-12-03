@@ -198,6 +198,9 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
 
+
+ 
+
   /users/{uid}/followers/{followerId}:
     summary: a follower
     description: >
@@ -223,7 +226,7 @@ paths:
             success , unfollow the user
         "404":
           description: >
-            just no follow user or user Id not exist
+            Not found, just no follow user or user Id not exist
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -263,7 +266,7 @@ paths:
                 $ref: "#/components/schemas/User"
         "204":
           description: >
-            just follow the user
+            Empty response, just follow the user
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -407,7 +410,7 @@ paths:
         - $ref: "#/components/parameters/QueryLimit"
         - $ref: "#/components/parameters/UsernameFilter"
       
-      operationId: listBannedUser
+      operationId: listBannedUsers
       
       responses:
         "200":
@@ -545,7 +548,7 @@ paths:
           description: >
             success, update photo
           content:
-            multipart/form-data:
+            application/json:
               schema: 
                 $ref: "#/components/schemas/Photo"
         "404":
@@ -1012,7 +1015,7 @@ paths:
                 $ref: "#/components/schemas/Token"
         "400":
           $ref: "#/components/responses/BadRequest"
-	"500":
+        "500":
           $ref: "#/components/responses/ServerError"
 
 components:
@@ -1125,8 +1128,8 @@ components:
         Not found, user not found
 
     BadRequest:
-    	description: >
-    	 Bad request, formating error 
+      description: >
+       Bad request, formating error 
 
   securitySchemes:
     
@@ -1154,15 +1157,13 @@ components:
     Token: 
       description: >
         This object rappresent a token identification. The token will be used by users to authenticate to the system.
-        The token is composed from two fields: 
-          - tokenId: corresponding to uid of owner
-          - owner:   username of owner 
+        The token is composed from : 
+          - value,  secred token identifier  
       type: object
       properties:
-        tokenId:
+        value:
           $ref: "#/components/schemas/Id"
-        owner:
-          $ref: "#/components/schemas/Username"
+        
 
 
 

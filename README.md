@@ -18,37 +18,37 @@ WASAPhoto is web application based on RESTfull architecture to allows upload you
         - [X] API
         - [ ] implementation
 
-    - [ ] followers --> list other user that follow a user
+    - [X] followers --> list other user that follow a user
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 
-    - [ ] following --> user can place or unplace follow to other users
+    - [X] following --> user can place or unplace follow to other users
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 
     - [ ] likes --> user can assign like to photos from others users 
         - [X] API
         - [ ] implementation
 
-    - [ ] banned users --> user can banned or unbanned other users
+    - [X] banned users --> user can banned or unbanned other users
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 
-    - [ ] username --> user can modify his username
+    - [X] username --> user can modify his username
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 
     - [ ] comments --> user can comment or uncomment other user photo's 
         - [X] API
         - [ ] implementation
 
-    - [ ] search --> searching other users via username 
+    - [X] search --> searching other users via username 
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 
-    - [ ] login (Simplified login) --> login on register on WASAPhoto with username 
+    - [X] login (Simplified login) --> login on register on WASAPhoto with username 
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 
 2. Photos datas
     - [ ] data upload

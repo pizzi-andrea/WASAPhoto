@@ -26,12 +26,13 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	var err error
 	var u loginUser
 	var token security.Token
+	var user *database.User
 
 	/*
 		Decode values in body request *r
 	*/
 	if err = json.NewDecoder(r.Body).Decode(&u); err != nil {
-		println(fmt.Errorf("%w", err))
+		fmt.Println(fmt.Errorf("NewDecoder: %w", err))
 		w.Header().Set("content-type", "text/plain") //400
 		w.WriteHeader(BadRequest.Request.Response.StatusCode)
 		io.WriteString(w, BadRequest.Status)
@@ -40,46 +41,56 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	//  check if user is registred
-	user, _ := rt.db.GetUsers(u.Name)
-
-	/*
-		If user registred, make logged
-	*/
-	if len(user) == 1 {
-		token = security.Token{
-			TokenId: user[0].Uid,
-			Owner:   user[0].Username,
-		}
-		w.Header().Set("content-type", "application/json") //201 code
-		w.WriteHeader(http.StatusCreated)
-		io.WriteString(w, "User just exist, log-in action successful")
-		security.RecordToken(token)
-		json.NewEncoder(w).Encode(token)
-		return
-
-	}
-	// check db query error
-	newUser := database.NewUser(0, u.Name)
-	if userQuery, err := rt.db.PostUser(newUser); err != nil {
+	if user, err = rt.db.GetUserFromUser(u.Name); err != nil {
+		fmt.Println(fmt.Errorf("GetUserFromUser: %w", err))
 		w.Header().Set("content-type", "text/plain") // 500 code
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
 		return
 
-	} else {
-		/*
-			if user not registred,  registred it and make logged
-		*/
+	}
+
+	/*
+		If user registred, make logged
+	*/
+	if user != nil {
 
 		token = security.Token{
-			TokenId: userQuery.GetId(),
-			Owner:   userQuery.Username,
+			Value: user.Uid,
 		}
-		security.RecordToken(token) // 201 code
-		w.Header().Add("content-type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		io.WriteString(w, "User create, log-in action successful\n")
+
+		//io.WriteString(w, "User just exist, log-in action successful")
+		security.RecordToken(token)
 		json.NewEncoder(w).Encode(token)
+		w.Header().Set("content-type", "application/json") //201 code
+		//w.WriteHeader(http.StatusCreated)
+		return
+
 	}
+	// check db query error
+
+	if user, err = rt.db.PostUser(u.Name); err != nil || user == nil {
+
+		fmt.Println(fmt.Errorf("PostUser:%w", err))
+		w.Header().Set("content-type", "text/plain") // 500 code
+		w.WriteHeader(ServerError.StatusCode)
+		io.WriteString(w, ServerError.Status)
+		return
+
+	}
+
+	/*
+		if user not registred,  registred it and make logged
+	*/
+
+	token = security.Token{
+		Value: user.Uid,
+	}
+
+	security.RecordToken(token) // 201 code
+	w.Header().Add("content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	//io.WriteString(w, "User create, log-in action successful\n")
+	json.NewEncoder(w).Encode(token)
 
 }

@@ -8,6 +8,5 @@ This object rappresent a token identification. The token will be used by users t
 	  - owner:   username of owner
 */
 type Token struct {
-	TokenId uint64
-	Owner   string
+	Value uint64
 }

@@ -11,6 +11,8 @@ const r_user = r_users + ":uid/"               // Endpont rappresent a WasaPhoto
 const r_followers = r_user + "followers/"      // Endpoint rappresent the followers of specific user
 const r_follower = r_followers + ":followerId" // Endpont rappresent follower a user
 const r_login = r_root + "session"
+const r_banned = r_user + "banned/"
+const r_userBanned = r_banned + ":bannedId"
 
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) Handler() http.Handler {
@@ -32,37 +34,39 @@ func (rt *_router) Handler() http.Handler {
 
 	// get all followers
 	rt.router.GET(r_followers, rt.listFollowers)
+
+	// unfollow user
+	rt.router.DELETE(r_follower, rt.unfollowUser)
+
+	//follow user
+	rt.router.PUT(r_follower, rt.followUser)
+
 	/*
-		// unfollow user
-		rt.router.DELETE("/users/:uid/followers/:followerId", rt.unfollowUser)
-
-		//follow user
-		rt.router.PUT("/users/:uid/followers/:followerId", rt.followUser)
-
-		// get following users
-		rt.router.GET("/users/:uid/following", rt.getFollowed)
 
 		// get followed user
 		rt.router.GET("/users/{uid}/following/:followingId", rt.getFollowing)
+	*/
+	/*
 
 		// list personal stream photos
 		rt.router.GET("/users/:uid/myStream", rt.getMyStream)
 
 		// get photo from stream
 		rt.router.GET("/users/:uid/myStream/:photoId", rt.getPhotoMyStream)
+	*/
 
-		// banned users
-		rt.router.GET("/users/:uid/banned/", rt.listBannedUser)
+	// banned users
+	rt.router.GET(r_banned, rt.listBannedUsers)
 
-		// ban user identificated by *uid*
-		rt.router.PUT("/users/:uid/banned/:bannedId", rt.banUser)
+	// ban user identificated by *uid*
+	rt.router.PUT(r_userBanned, rt.banUser)
 
-		// unban user identificated by uid
-		rt.router.DELETE("/users/:uid/banned/:bannedId", rt.unbanUser)
+	// unban user identificated by uid
+	rt.router.DELETE(r_userBanned, rt.unbanUser)
 
-		// update photo
-		rt.router.POST("/users/:uid/myPhotos", rt.uploadPhoto)
-
+	// update photo
+	rt.router.POST("/users/:uid/myPhotos", rt.uploadPhoto)
+	/*
 		// list stream photos updated
 		rt.router.GET("/users/:uid/myPhotos", rt.listPhoto)
 

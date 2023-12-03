@@ -22,6 +22,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	var uid int
 	var u string
 	var err error
+	var user *database.User
 
 	var tk *security.Token
 
@@ -29,7 +30,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		Parse URL parameters
 	*/
 	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
-		w.Header().Set("content-type", "plain/text") // 400
+		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(BadRequest.StatusCode)
 		io.WriteString(w, BadRequest.Status)
 		return
@@ -38,11 +39,19 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	/*
 		if user id in URL path not exist, then user not found
 	*/
-	if _, err = rt.db.GetUser(database.Id(uid)); err != nil {
+	if user, err = rt.db.GetUserFromId(database.Id(uid)); err != nil {
+		w.Header().Set("content-type", "text/plain") // 500
+		w.WriteHeader(ServerError.StatusCode)
+		io.WriteString(w, ServerError.Status)
+		return
+	}
+
+	if user == nil {
 		w.Header().Add("content-type", "text/plain") // 404
 		w.WriteHeader(http.StatusNotFound)
 		io.WriteString(w, "user not found")
 		return
+
 	}
 
 	/*
@@ -61,7 +70,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		Applay barrear authentication. Username can update only his username
 	*/
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
-		w.Header().Set("content-type", "plain/text") // 401
+		w.Header().Set("content-type", "text/plain") // 401
 		w.WriteHeader(UnauthorizedError.StatusCode)
 		io.WriteString(w, UnauthorizedError.Status)
 		return
@@ -70,8 +79,8 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	/*
 		checks if the user who wants to change username is the owner
 	*/
-	if tk.TokenId != uint64(uid) {
-		w.Header().Set("content-type", "plain/text") // 403
+	if tk.Value != uint64(uid) {
+		w.Header().Set("content-type", "text/plain") // 403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
 		io.WriteString(w, UnauthorizedToken.Status)
 		return

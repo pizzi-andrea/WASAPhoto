@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -31,7 +32,8 @@ func (rt *_router) listUsers(w http.ResponseWriter, r *http.Request, ps httprout
 		Applay barrear authentication. if the user has passed the login phase then he will be able to access
 	*/
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
-		w.Header().Set("content-type", "plain/text")
+		fmt.Println(fmt.Errorf("authentication error: %w", err))
+		w.Header().Set("content-type", "text/plain")
 		w.WriteHeader(UnauthorizedError.StatusCode)
 		io.WriteString(w, UnauthorizedError.Status)
 		return
@@ -39,47 +41,68 @@ func (rt *_router) listUsers(w http.ResponseWriter, r *http.Request, ps httprout
 
 	/*parse URL parameters */
 	if limit, err = strconv.Atoi(pLimit); pLimit != "" && err != nil {
-		w.Header().Set("content-type", "plain/text") // 400
+		fmt.Println(fmt.Errorf("atoi error: %w", err))
+		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(BadRequest.StatusCode)
 		io.WriteString(w, BadRequest.Status)
 		return
 
 	}
 
-	if users, err = rt.db.GetUsers(pUsername); pUsername != "" && err != err {
-		w.Header().Set("content-type", "plain/text") // 400
-		w.WriteHeader(BadRequest.StatusCode)
-		io.WriteString(w, BadRequest.Status)
-		return
-	}
-
-	//future dev-----------------------------------------
-	offset := 0
-	if offset > len(users) {
+	if users, err = rt.db.GetUsers(pUsername, true); err != nil {
+		fmt.Println(fmt.Errorf("query getUsers error: %w", err))
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
 		return
 	}
+
+	//future dev-----------------------------------------
+	offset := 0
+	//-----------------------------------------------------------
+	// response object
+
 	if limit == 0 {
 		limit = len(users)
 	}
-	//----------------------------------------------------
-
-	// response object
+	var usersOk []database.User
 	users = users[offset:min(len(users), limit)]
-
 	// if response body is empty
 	if len(users) == 0 {
+		fmt.Println("empty body")
 		w.Header().Set("content-type", "text/plain")
 		w.WriteHeader(http.StatusNoContent)
-		io.WriteString(w, "empty body, found nothing") // 204
+
+		return
+	}
+	var b bool
+
+	for _, u := range users {
+		if b, err = rt.db.IsBanned(u.Uid, tk.Value); err != nil {
+			fmt.Println(fmt.Errorf("query ban error: %w", err))
+			w.Header().Set("content-type", "text/plain") // 500
+			w.WriteHeader(ServerError.StatusCode)
+			io.WriteString(w, ServerError.Status)
+			return
+		}
+
+		if !b {
+			usersOk = append(usersOk, u)
+		}
+	}
+
+	// if response body is empty
+	if len(usersOk) == 0 {
+		fmt.Println("empty body")
+		w.Header().Set("content-type", "text/plain")
+		w.WriteHeader(http.StatusNoContent)
+
 		return
 	}
 
 	// write values getted in to response
 	w.Header().Set("content-type", "application/json") // 200
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(users)
+	json.NewEncoder(w).Encode(usersOk)
 
 }

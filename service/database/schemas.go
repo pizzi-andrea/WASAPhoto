@@ -1,8 +1,6 @@
 package database
 
 import (
-	"container/list"
-	"image"
 	"regexp"
 	"time"
 )
@@ -15,30 +13,14 @@ type Username = string     // username of a user
 type Photo struct {
 	PhotoId        Id
 	TimeUpdate     TimeStamp
-	ImageData      image.Image // data
-	DescriptionImg string      // image description
-	MaxLength      int
+	ImageData      []byte // data
+	DescriptionImg string // image description
 }
 
 /*this object rappresent a user*/
 type User struct {
 	Uid      Id
 	Username Username
-}
-
-// get uid of user
-func (usr *User) GetId() Id {
-	return usr.Uid
-}
-
-// create new user object
-func NewUser(uid Id, username Username) User {
-	usr := User{
-		Uid:      uid,
-		Username: username,
-	}
-
-	return usr
 }
 
 /*user profile rappresentation*/
@@ -50,12 +32,7 @@ type Profile struct {
 }
 
 /*this object rappresent a photo*/
-type StreamPhotos struct { //model of stream of photos
-
-	Items    list.List
-	MinItems int
-	MaxItems int
-}
+type StreamPhotos = []Photo //model of stream of photos
 
 /*this object rappresent a comment on a photo.*/
 type Comment struct {
@@ -69,16 +46,4 @@ type Rule struct {
 	Min        int
 	Max        int
 	Pattern, _ regexp.Regexp
-}
-
-/*
-This object rappresent a token identification. The token will be used by users to authenticate to the system.
-
-	The token is composed from two fields:
-	  - tokenId: corresponding to uid of owner
-	  - owner:   username of owner
-*/
-type Token struct {
-	TokenId Id
-	Owner   Username
 }

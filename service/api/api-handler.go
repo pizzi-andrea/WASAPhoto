@@ -5,20 +5,27 @@ import (
 )
 
 /* resources */
-
-const r_users = "/users/"                              // this resource rappresent collection of users
-const r_user = r_users + ":uid/"                       // Resource rappresent a single user
-const r_followers = r_user + "followers/"              // this resurce rappresent the followers of specific user
-const r_follower = "/users/:uid/followers/:followerId" // this resource rappresent follower
-const r_login = "/session/"
-const r_userlog = r_login + ":tokenId" // this endpont rappresent logged user
 const r_root = "/"
+const r_users = r_root + "users/"              // Endpoint rappresent the list of WasaPhoto users
+const r_user = r_users + ":uid/"               // Endpont rappresent a WasaPhoto user
+const r_followers = r_user + "followers/"      // Endpoint rappresent the followers of specific user
+const r_follower = r_followers + ":followerId" // Endpont rappresent follower a user
+const r_login = r_root + "session"
+const r_banned = r_user + "banned/"
+const r_userBanned = r_banned + ":bannedId"
+const r_followed = r_user + "followed"
+const r_myPhotos = r_user + "myPhotos/"
+const r_myPhoto = r_myPhotos + ":photoId/"
+const r_myStream = r_user + "myStream/"
+const r_streamPhoto = r_myStream + ":photoId"
 
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) Handler() http.Handler {
 	// Register routes
 
-	//
+	rt.router.GET(r_root, rt.hello)
+
+	//Logs in the user
 	rt.router.POST(r_login, rt.doLogin)
 
 	//list registred users
@@ -30,52 +37,48 @@ func (rt *_router) Handler() http.Handler {
 	// get specific user profile
 	rt.router.GET(r_user, rt.getUserProfile)
 
-	// Logout User
-	rt.router.DELETE(r_userlog, rt.doLogout)
+	// get all followers
+	rt.router.GET(r_followers, rt.listFollowers)
+
+	// unfollow user
+	rt.router.DELETE(r_follower, rt.unfollowUser)
+
+	//follow user
+	rt.router.PUT(r_follower, rt.followUser)
 
 	/*
-		// get all followers
-		rt.router.GET("/users/:uid/followers", rt.listFollowers)
-
-		// unfollow user
-		rt.router.DELETE("/users/:uid/followers/:followerId", rt.unfollowUser)
-
-		//follow user
-		rt.router.PUT("/users/:uid/followers/:followerId", rt.followUser)
-
-		// get following users
-		rt.router.GET("/users/:uid/following", rt.getFollowed)
 
 		// get followed user
 		rt.router.GET("/users/{uid}/following/:followingId", rt.getFollowing)
+	*/
 
-		// list personal stream photos
-		rt.router.GET("/users/:uid/myStream", rt.getMyStream)
+	// list personal stream photos
+	rt.router.GET(r_myStream, rt.getMyStream)
 
-		// get photo from stream
-		rt.router.GET("/users/:uid/myStream/:photoId", rt.getPhotoMyStream)
+	// get photo from stream
+	rt.router.GET(r_streamPhoto, rt.getPhotoMyStream)
 
-		// banned users
-		rt.router.GET("/users/:uid/banned/", rt.listBannedUser)
+	// banned users
+	rt.router.GET(r_banned, rt.listBannedUsers)
 
-		// ban user identificated by *uid*
-		rt.router.PUT("/users/:uid/banned/:bannedId", rt.banUser)
+	// ban user identificated by *uid*
+	rt.router.PUT(r_userBanned, rt.banUser)
 
-		// unban user identificated by uid
-		rt.router.DELETE("/users/:uid/banned/:bannedId", rt.unbanUser)
+	// unban user identificated by uid
+	rt.router.DELETE(r_userBanned, rt.unbanUser)
 
-		// update photo
-		rt.router.POST("/users/:uid/myPhotos", rt.uploadPhoto)
+	// update photo
+	rt.router.POST(r_myPhotos, rt.uploadPhoto)
 
-		// list stream photos updated
-		rt.router.GET("/users/:uid/myPhotos", rt.listPhoto)
+	// list stream photos updated
+	rt.router.GET(r_myPhotos, rt.listPhoto)
 
-		// delete photo updated
-		rt.router.DELETE("/users/:uid/myPhotos/:photoId/", rt.deletePhoto)
+	// delete photo updated
+	rt.router.DELETE(r_myPhoto, rt.deletePhoto)
 
-		// get photo
-		rt.router.GET("/users/:uid/myPhotos/:photoId/", rt.getPhoto)
-
+	// get photo
+	rt.router.GET(r_myPhoto, rt.getPhoto)
+	/*
 		// get likes collected by photo
 		rt.router.GET("/users/:uid/myPhotos/:photoId/likes/", rt.getLikes)
 
@@ -97,15 +100,10 @@ func (rt *_router) Handler() http.Handler {
 		// get comment on photo
 		rt.router.GET("/users/:uid/myPhotos/:photoId/comments/:commentId", rt.getComment)
 
-		// Logs in the user
-		rt.router.POST("/session", rt.doLogin)
 
 		// Special routes
 		rt.router.GET("/liveness", rt.liveness)
 	*/
-
-	// test method
-	rt.router.GET(r_root, rt.hello)
 	return rt.router
 
 }

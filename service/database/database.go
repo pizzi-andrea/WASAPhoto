@@ -38,10 +38,26 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	GetUser(uid Id) (User, error)
-	GetUsers(username Username) ([]User, error)
-	PostUser(user User) (newU User, _error error)
-
+	GetUserFromId(uid Id) (usr *User, err error) //
+	GetUserFromUser(Username Username) (usr *User, err error)
+	GetUsers(username Username, largeSearch bool) (users []User, err error)
+	PostUser(username Username) (usr *User, err error)
+	GetFollowers(uid Id, username Username, largeSearch bool) (followers []User, err error)
+	GetFollowing(uid Id, username Username, largeSearch bool) (following []User, err error)
+	GetMyStream(uid Id, username Username, largeSearch bool, by []OrderBy, ord ...Ordering) (photos StreamPhotos, err error)
+	GetPhotoStream(uid, photoId Id) (img *Photo, err error)
+	GetBanned(uid Id) (banned []User, err error)
+	SetUsername(uid Id, username string) (usr *User, err error)                       // update username of user associted to uid
+	GetPhotos(uid Id, by []OrderBy, ord ...Ordering) (photos StreamPhotos, err error) // give user id and put all photos posted by user associated to uid
+	IsBanned(from Id, to Id) (r bool, err error)
+	DelFollow(from, to Id) (r bool, err error)
+	IsFollower(from Id, to Id) (r bool, err error)
+	PutFollow(from Id, to Id) (r bool, err error)
+	PutBan(from, to Id) (r bool, err error)
+	DelBan(from, to Id) (r bool, err error)
+	PutPhoto(imgData []byte, desc string, owner Id) (photo *Photo, err error)
+	GetPhoto(id Id) (img *Photo, err error)
+	DelPhoto(id Id) (r bool, err error)
 	Ping() error
 }
 
@@ -122,7 +138,6 @@ func New(db *sql.DB) (AppDatabase, error) {
 	if db == nil {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
-
 	// Check if table exists. If not, the database is empty, and we need to create the structure
 	var tableName string
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='WASAPhoto';`).Scan(&tableName)

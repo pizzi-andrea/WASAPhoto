@@ -4,19 +4,22 @@ import (
 	"database/sql"
 )
 
-// get users, Users getted can filtered by  usrname.
-// With offset parameters is possible specify the number of rows to skip from the beginning of the table
-func (db *appdbimpl) GetUsers(username Username) ([]User, error) {
-	var users []User
-	var err error
+/*
+returns users based on the specified username.
+If largeSearch is false then the user who has exactly the specified username is returned,
+otherwise all users who have a similar username are returned.
+
+To return all users of the system set username="" and largeSearch=true
+*/
+func (db *appdbimpl) GetUsers(username Username, largeSearch bool) (users []User, err error) {
 	var rows *sql.Rows
 	var uid Id
 	var name Username
 
-	if username != "" {
-		rows, err = db.c.Query("SELECT * FROM Users WHERE username = ?", username)
+	if largeSearch {
+		rows, err = db.c.Query("SELECT * FROM Users WHERE username LIKE '%" + username + "%'")
 	} else {
-		rows, err = db.c.Query("SELECT * FROM Users")
+		rows, err = db.c.Query("SELECT * FROM Users WHERE username = ?", username)
 	}
 
 	if err != nil {
@@ -26,7 +29,6 @@ func (db *appdbimpl) GetUsers(username Username) ([]User, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-
 		if err := rows.Scan(&uid, &name); err != nil {
 			return users, err
 		}
@@ -36,10 +38,7 @@ func (db *appdbimpl) GetUsers(username Username) ([]User, error) {
 		})
 	}
 
-	if err = rows.Err(); err != nil {
-		return users, err
-	}
-
-	return users, nil
+	err = rows.Err()
+	return
 
 }

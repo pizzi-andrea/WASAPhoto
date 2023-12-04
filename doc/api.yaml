@@ -112,6 +112,8 @@ paths:
           $ref: "#/components/responses/UnauthorizedToken"
         "500":
           $ref: "#/components/responses/ServerError"
+        "400":
+          $ref: "#/components/responses/BadRequest"
 
     put:
       tags:
@@ -196,6 +198,9 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
 
+
+ 
+
   /users/{uid}/followers/{followerId}:
     summary: a follower
     description: >
@@ -221,7 +226,7 @@ paths:
             success , unfollow the user
         "404":
           description: >
-            just no follow user or user Id not exist
+            Not found, just no follow user or user Id not exist
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
@@ -261,111 +266,13 @@ paths:
                 $ref: "#/components/schemas/User"
         "204":
           description: >
-            just follow the user
+            Empty response, just follow the user
         "401":
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
         "500":
           $ref: "#/components/responses/ServerError"
-  
-  /users/{uid}/following/:
-    summary: users following by specific user
-    description: > 
-      this resource rappresent all users followed by user
-    
-    parameters:
-      - $ref: "#/components/parameters/Uid"
-            
-    get:
-      tags:
-        - user
-        - following
-      summary: get following users
-      description: >
-        given the *id* of the user who wants to see the users he follows he will get the list of followed users
-      
-      parameters:
-        - $ref: "#/components/parameters/QueryLimit"
-        - $ref: "#/components/parameters/UsernameFilter"
-      security:
-      - BearerAuth: []
-  
-      operationId: getFollowed
-      
-      responses:
-        "200":
-          description: >
-            success, get users followed
-          content:
-            application/json:
-              schema:
-                type: array
-                description: >
-                  list of followed
-                items:
-                  $ref: "#/components/schemas/User"
-                minItems: 1
-                maxItems: 1000
-        "404":
-          $ref: "#/components/responses/UserNotFound"
-        "204":
-          description: >
-            empty body, found nothing
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-        "403":
-          $ref: "#/components/responses/UnauthorizedToken"
-        "500":
-          $ref: "#/components/responses/ServerError"
-  
-  /users/{uid}/following/{followingId}:
-    summary: user following this user
-    description: >
-      this resource rappresent a followed user
-    
-    parameters:
-      - $ref: "#/components/parameters/Uid"
-      - $ref: "#/components/parameters/FollowingId"
-    
-    get:
-      tags:
-        - user
-        - following
-      summary: get followed user
-      description: >
-        given the *id* of the user and *id* following user and get it
-      
-      parameters:
-        - $ref: "#/components/parameters/QueryLimit"
-        - $ref: "#/components/parameters/UsernameFilter"
-      security:
-      - BearerAuth: []
-  
-      operationId: getFollowing
-      
-      responses:
-        "200":
-          description: >
-            success, get user following
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-                
-        "404":
-          $ref: "#/components/responses/UserNotFound"
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-        "403":
-          $ref: "#/components/responses/UnauthorizedToken"
-        "500":
-          $ref: "#/components/responses/ServerError"
-    
-    
-
-        
-    
     
   /users/{uid}/myStream:
     summary: user stream photos
@@ -396,7 +303,8 @@ paths:
             description: >
               options for sorting photos
             type: string
-            enum: ["dataUpdate", "size"]
+            enum: ["dataUpdate"]
+            default: "dataUpdate"
           description: >
             ordering photo getted by value
        
@@ -406,8 +314,10 @@ paths:
           schema:
             description: >
               type value ordering flag
-            type: boolean
-            default: true
+            type: string
+            enum: ["asc", "desc"]
+            default: "desc"
+            
           description: >
             order photo in reverse order
         
@@ -503,7 +413,7 @@ paths:
         - $ref: "#/components/parameters/QueryLimit"
         - $ref: "#/components/parameters/UsernameFilter"
       
-      operationId: listBannedUser
+      operationId: listBannedUsers
       
       responses:
         "200":
@@ -641,7 +551,7 @@ paths:
           description: >
             success, update photo
           content:
-            multipart/form-data:
+            application/json:
               schema: 
                 $ref: "#/components/schemas/Photo"
         "404":
@@ -671,17 +581,19 @@ paths:
             description: >
               options for sorting photos
             type: string
-            enum: ["dataUpdate", "size"]
+            enum: ["dataUpdate"]   # future updates [, "size", "likes", "comments"]
+            default: "dataUpdate"
           description: >
             ordering photo getted by value in enum
-        - name: reverse
+        - name: ordering
           in: query
           required: false
           schema:
             description: >
               flag for reverse sorting
-            type: boolean
-            default: true
+            type: string
+            enum: ["asc", "desc"]
+            default: "desc"
           description: >
             order photo in reverse order
       
@@ -1106,46 +1018,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Token"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/ServerError"
-    
-    
-  /session/{tokenId}:
 
-    description: >
-      This endpoint rappresent single user logged identificated from token
-    parameters:
-        - name: tokenId
-          description: >
-            Token id
-          in: path 
-          required: true
-          schema:
-            format: int64
-          example: 1
-
-    
-    delete:
-      tags:
-        - login
-      summary: Logout User
-      description: >
-        If the user is logged, it will be logout if user not logged
-        method to do nothing.
-      
-      operationId: doLogout
-
-      responses:
-        "204":
-          description: >
-            success, user logout action successful
-        "404":
-          description: >
-            not found, user not logged
-            
-
-
-        
 components:
 
   parameters:
@@ -1255,6 +1132,10 @@ components:
       description: >
         Not found, user not found
 
+    BadRequest:
+      description: >
+       Bad request, formating error 
+
   securitySchemes:
     
     BearerAuth:
@@ -1281,15 +1162,13 @@ components:
     Token: 
       description: >
         This object rappresent a token identification. The token will be used by users to authenticate to the system.
-        The token is composed from two fields: 
-          - tokenId: corresponding to uid of owner
-          - owner:   username of owner 
+        The token is composed from : 
+          - value,  secred token identifier  
       type: object
       properties:
-        tokenId:
+        value:
           $ref: "#/components/schemas/Id"
-        owner:
-          $ref: "#/components/schemas/Username"
+        
 
 
 

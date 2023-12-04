@@ -91,7 +91,7 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 
 	}
 
-	if limit == 0 {
+	if limit == 0 || limit > len(stream) {
 		limit = len(stream)
 	}
 
@@ -103,7 +103,7 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	//stream = stream[offset:min(len(stream), limit)]
+	stream = stream[offset:limit]
 
 	if len(stream) == 0 { // 204 response
 		fmt.Println("response: empty")

@@ -59,6 +59,7 @@ func (rt *_router) listUsers(w http.ResponseWriter, r *http.Request, ps httprout
 
 	//future dev-----------------------------------------
 	offset := 0
+	_ = offset
 	//-----------------------------------------------------------
 	// response object
 
@@ -66,7 +67,7 @@ func (rt *_router) listUsers(w http.ResponseWriter, r *http.Request, ps httprout
 		limit = len(users)
 	}
 	var usersOk []database.User
-	users = users[offset:min(len(users), limit)]
+	//users = users[offset:min(len(users), limit)]
 	// if response body is empty
 	if len(users) == 0 {
 		fmt.Println("empty body")

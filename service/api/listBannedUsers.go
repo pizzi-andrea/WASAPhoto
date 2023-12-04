@@ -99,7 +99,7 @@ func (rt *_router) listBannedUsers(w http.ResponseWriter, r *http.Request, ps ht
 		return
 	}
 
-	banned = banned[offset:min(len(banned), limit)]
+	//banned = banned[offset:min(len(banned), limit)]
 
 	if len(banned) == 0 { // 204 response
 		fmt.Println("response: empty")

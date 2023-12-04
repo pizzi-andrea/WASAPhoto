@@ -112,7 +112,7 @@ func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps http
 			return
 		}
 
-		followers = followers[offset:min(len(followers), limit)]
+		//followers = followers[offset:min(len(followers), limit)]
 
 		if len(followers) == 0 { // 204 response
 			fmt.Println("response: empty")

@@ -4,6 +4,9 @@ import (
 	"database/sql"
 )
 
+// GetBanned get the list of all users banned from "uid" user. If function term. with success return no.nil array of banned users
+// if occurent error while query working will return nil followers array and error value, id error occured while perform insert
+// values in the list will returning the list whit parzial values and error value.
 func (db *appdbimpl) GetBanned(uid Id) (followers []User, err error) {
 	var username Username
 	var rows *sql.Rows

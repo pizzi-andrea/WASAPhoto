@@ -7,19 +7,19 @@ import (
 
 type OrderBy int
 
-const (
+const ( // sort by value
 	timeUpdate OrderBy = iota
 )
 
 type Ordering int
 
-const (
+const ( // Ordering parameters
 	asc Ordering = iota
 	desc
 )
 
 /*
-Give uid in input and get all photos updated
+GetPhotos give in  in input user id (uid) and get all photos that users have updated
 */
 func (db *appdbimpl) GetPhotos(uid Id, by []OrderBy, ord ...Ordering) (photos StreamPhotos, err error) {
 	var photo Photo
@@ -49,7 +49,7 @@ func (db *appdbimpl) GetPhotos(uid Id, by []OrderBy, ord ...Ordering) (photos St
 
 	}
 
-	if rows, err = db.c.Query("SELECT * FROM Photos WHERE owner = ? ORDER BY ? ?", uid, ordy, oord); err != nil {
+	if rows, err = db.c.Query("SELECT * FROM Photos WHERE owner = ? ORDER BY ?, ?", uid, ordy, oord); err != nil {
 		return nil, err
 	}
 

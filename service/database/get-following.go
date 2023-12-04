@@ -2,6 +2,9 @@ package database
 
 import "database/sql"
 
+/*
+	GetFollowing return list users following by user.
+*/
 func (db *appdbimpl) GetFollowing(uid Id, username Username, largeSearch bool) (following []User, err error) {
 	var rows *sql.Rows
 	if largeSearch {

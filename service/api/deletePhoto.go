@@ -11,6 +11,7 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
+// deletePhoto permit to photo owner to delete updated photo
 func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	var uid int
@@ -20,7 +21,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	var photo *database.Photo
 	var tk *security.Token
 
-	// Parsing URL parameters
+	// Parsing URL parameters in path
 	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		fmt.Println(fmt.Errorf("get uid: %w", err))
 		w.Header().Set("content-type", "text/plain") // 400
@@ -61,7 +62,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	/*
-		Applay barrear authentication. only owner can post photo in his account
+		Applay barrear authentication.
 	*/
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
 		w.Header().Set("content-type", "text/plain") // 401
@@ -71,7 +72,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	/*
-		checks if the user who wants post photo is account owner
+		checks if the user who wants delete photo is the owner
 	*/
 	if tk.Value != uint64(uid) {
 		w.Header().Set("content-type", "text/plain") // 403
@@ -79,8 +80,8 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		io.WriteString(w, UnauthorizedToken.Status)
 		return
 	}
-	// parsing body values
 
+	// delete photo
 	if _, err = rt.db.DelPhoto(photo.PhotoId); err != nil {
 		fmt.Println(fmt.Errorf("user exist: %w", err))
 		w.Header().Set("content-type", "text/plain") // 500

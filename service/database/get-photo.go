@@ -1,5 +1,7 @@
 package database
 
+/*
+ */
 func (db *appdbimpl) GetPhoto(id Id) (img *Photo, err error) {
 	var photo Photo
 

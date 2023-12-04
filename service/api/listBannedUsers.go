@@ -12,6 +12,9 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
+/*
+given uid then list all user banned by user associated at *uid*
+*/
 func (rt *_router) listBannedUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	var uid int

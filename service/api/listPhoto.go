@@ -11,6 +11,9 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
+/*
+given *uid* get all photo has updated
+*/
 func (rt *_router) listPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var uid int
 	var err error

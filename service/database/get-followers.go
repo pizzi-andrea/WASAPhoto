@@ -2,8 +2,9 @@ package database
 
 import "database/sql"
 
-/*
- */
+// GetFollowers allow to list followers of user. When photo is deleted all comments and like associated will be deleted.
+// if photo deleted with success function return true and nil error for error if photo not exist function return false and nil value
+// if occured error function return false and not-nil error value.
 func (db *appdbimpl) GetFollowers(uid Id, username Username, largeSearch bool) (followers []User, err error) {
 	var rows *sql.Rows
 

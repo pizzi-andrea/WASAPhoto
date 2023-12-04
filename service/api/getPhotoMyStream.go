@@ -10,6 +10,9 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
+/*
+give *uid* and *photoId* and get photo associated
+*/
 func (rt *_router) getPhotoMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	var uid int

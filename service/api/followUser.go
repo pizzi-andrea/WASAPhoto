@@ -14,7 +14,9 @@ import (
 )
 
 /*
- */
+		gived uid and *followedId* then remove follower *followerId* from user followers
+	      security:
+*/
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	var from, to int
@@ -24,7 +26,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	var action bool
 	var user *database.User
 	/*
-		Parse URL parameters
+		Parse URL parameters in path
 	*/
 	if from, err = strconv.Atoi(ps.ByName("followerId")); err != nil {
 		w.Header().Set("content-type", "text/plain") // 400

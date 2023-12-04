@@ -11,6 +11,9 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
+/*
+given *uid* of user that who wants to get all photo in his stream
+*/
 func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	var uid int

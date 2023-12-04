@@ -1,7 +1,6 @@
 package database
 
 import (
-	"image"
 	"regexp"
 	"time"
 )
@@ -47,9 +46,4 @@ type Rule struct {
 	Min        int
 	Max        int
 	Pattern, _ regexp.Regexp
-}
-
-func (p *Photo) getImage() (img image.Image) {
-
-	return
 }

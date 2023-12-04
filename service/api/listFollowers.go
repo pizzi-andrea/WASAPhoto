@@ -14,7 +14,8 @@ import (
 )
 
 /*
- */
+give a UID return a list contanings all followers user
+*/
 func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	var uid int

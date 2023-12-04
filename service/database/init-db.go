@@ -7,6 +7,9 @@ import (
 	"path/filepath"
 )
 
+/*
+Init db schema loading sql script called createTable.sql
+*/
 func initDb(db *sql.DB) (_error error) {
 	path, _ := filepath.Abs("service/database/createTable.sql")
 

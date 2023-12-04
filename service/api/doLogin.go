@@ -12,16 +12,16 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
+type loginUser struct { // struct for json Marshaler
+	Name database.Username `json:"name"`
+}
+
 /*
 If the user does not exist, it will be created,
 
 	and an identifier is returned.
 	If the user exists, the user identifier is returned.
 */
-type loginUser struct {
-	Name database.Username `json:"name"`
-}
-
 func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var err error
 	var u loginUser
@@ -90,7 +90,6 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	security.RecordToken(token) // 201 code
 	w.Header().Add("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	//io.WriteString(w, "User create, log-in action successful\n")
 	json.NewEncoder(w).Encode(token)
 
 }

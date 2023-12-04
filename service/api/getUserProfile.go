@@ -35,7 +35,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		Parse URL parameters
 	*/
 	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
-		fmt.Println(fmt.Errorf("%w", err))
+		fmt.Println(fmt.Errorf("Atoi%w", err))
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(BadRequest.StatusCode)
 		io.WriteString(w, BadRequest.Status)
@@ -46,7 +46,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		if user id in URL path not exist, then user not found
 	*/
 	if user, err = rt.db.GetUserFromId(database.Id(uid)); err != nil {
-		fmt.Println(fmt.Errorf("%w", err))
+		fmt.Println(fmt.Errorf("GetUserFromId:%w", err))
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
@@ -64,7 +64,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		Applay barrear authentication. Only owner user and users not banned by owner can access
 	*/
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
-		fmt.Println(fmt.Errorf("%w", err))
+		fmt.Println(fmt.Errorf("auth:%w", err))
 		w.Header().Set("content-type", "text/plain") // 401
 		w.WriteHeader(UnauthorizedError.StatusCode)
 		io.WriteString(w, UnauthorizedError.Status)
@@ -76,7 +76,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	*/
 
 	if isBan, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {
-		fmt.Println(fmt.Errorf("%w", err))
+		fmt.Println(fmt.Errorf("IsBanned:%w", err))
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
@@ -93,7 +93,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		get follower of user
 	*/
 	if follower, err = rt.db.GetFollowers(database.Id(uid), "", true); err != nil {
-		fmt.Println(fmt.Errorf("%w", err))
+		fmt.Println(fmt.Errorf(" GetFollowers:%w", err))
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
@@ -104,7 +104,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		get users following by user
 	*/
 	if following, err = rt.db.GetFollowing(database.Id(uid), "", true); err != nil {
-		fmt.Println(fmt.Errorf("%w", err))
+		fmt.Println(fmt.Errorf("GetFollowing:%w", err))
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
@@ -115,7 +115,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		get photo stream. Photo stream is composed by photos of other followed users
 	*/
 	if photos, err = rt.db.GetPhotos(database.Id(uid), []database.OrderBy{}); err != nil {
-		fmt.Println(fmt.Errorf("%w", err))
+		fmt.Println(fmt.Errorf("GetPhotos:%w", err))
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)

@@ -23,7 +23,7 @@ func RecordToken(token Token) (status bool) {
 
 func GetTokensRec() (t []Token) {
 
-	for k, _ := range tokenRegistred {
+	for k := range tokenRegistred {
 		t = append(t, Token{
 			Value: uint64(k),
 		})

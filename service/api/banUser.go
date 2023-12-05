@@ -18,14 +18,14 @@ import (
 */
 func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	var result bool
-	var from, to int
+	var from_, to_ int
 	var err error
 	var tk *security.Token
 
 	/*
 		Parse parameters in path
 	*/
-	if from, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if from_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		fmt.Println(fmt.Errorf("atoi:%w", err))
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -33,29 +33,40 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	if to, err = strconv.Atoi(ps.ByName("bannedId")); err != nil {
+	if to_, err = strconv.Atoi(ps.ByName("bannedId")); err != nil {
 		fmt.Println(fmt.Errorf("atoi:%w", err))
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(BadRequest.StatusCode)
 		io.WriteString(w, BadRequest.Status)
 		return
 	}
+
+	from, to := database.Id(from_), database.Id(to_)
 
 	/*
 		Check if path is valid
 	*/
-	if _, err = rt.db.GetUserFromId(database.Id(from)); err != nil {
+	if _, err = rt.db.GetUserFromId(from); err != nil {
 		w.Header().Add("content-type", "text/plain") // 404
 		w.WriteHeader(http.StatusNotFound)
 		io.WriteString(w, "Not found, user not found")
 		return
 	}
 
-	if _, err = rt.db.GetUserFromId(database.Id(to)); err != nil {
+	if _, err = rt.db.GetUserFromId(to); err != nil {
 		fmt.Println(fmt.Errorf("GetUserFromId:%w", err))
 		w.Header().Add("content-type", "text/plain") // 404
 		w.WriteHeader(http.StatusNotFound)
 		io.WriteString(w, "Not found, user not found")
+		return
+	}
+
+	// validate format value
+	if !(database.ValidateId(from) && database.ValidateId(to)) {
+		fmt.Println(" format data not valid")
+		w.Header().Add("content-type", "text/plain") // 404
+		w.WriteHeader(http.StatusBadRequest)
+		io.WriteString(w, "Bad values, format values not allowed")
 		return
 	}
 
@@ -87,7 +98,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		Try to ban user, if queries fails server response with error message
 	*/
 
-	if result, err = rt.db.PutBan(database.Id(from), database.Id(to)); err != nil {
+	if result, err = rt.db.PutBan(from, to); err != nil {
 		fmt.Println(fmt.Errorf("PutBan:%w", err))
 		w.Header().Set("content-type", "text/plain")
 		w.WriteHeader(ServerError.StatusCode)
@@ -96,7 +107,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	if result { // check now if user follow other user
 		var u *database.User
-		if u, err = rt.db.GetUserFromId(database.Id(to)); u == nil || err != nil {
+		if u, err = rt.db.GetUserFromId(to); u == nil || err != nil {
 			fmt.Println(fmt.Errorf("GetUserFromId:%w", err))
 			w.Header().Set("content-type", "text/plain")
 			w.WriteHeader(ServerError.StatusCode)
@@ -104,7 +115,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 			return
 		}
 		/*Delete follows  beetween  users */
-		if _, err = rt.db.DelFollow(database.Id(from), database.Id(to)); err != nil {
+		if _, err = rt.db.DelFollow(from, to); err != nil {
 			fmt.Println(fmt.Errorf("DelFollow: %w", err))
 			w.Header().Set("content-type", "text/plain") // 500
 			w.WriteHeader(ServerError.StatusCode)
@@ -112,9 +123,9 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 			return
 
 		} // if user put ban auto. lost the follow
-		rt.db.DelFollow(database.Id(to), database.Id(from)) // if user recive ban auto. lost the follow
+		rt.db.DelFollow(to, from) // if user recive ban auto. lost the follow
 
-		if _, err = rt.db.DelFollow(database.Id(from), database.Id(to)); err != nil {
+		if _, err = rt.db.DelFollow(from, to); err != nil {
 			fmt.Println(fmt.Errorf("DelFollow: %w", err))
 			w.Header().Set("content-type", "text/plain") // 500
 			w.WriteHeader(ServerError.StatusCode)

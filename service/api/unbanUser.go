@@ -10,6 +10,9 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
+/*
+taken uid of the user who wants unbband id of user banned and delete last one
+*/
 func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	var from, to int
@@ -20,6 +23,8 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	/*
 		Parse URL parameters
 	*/
+
+	// get :uid parameter in path
 	if from, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -27,6 +32,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
+	// get :bannedId parameter in path
 	if to, err = strconv.Atoi(ps.ByName("bannedId")); err != nil {
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(BadRequest.StatusCode)

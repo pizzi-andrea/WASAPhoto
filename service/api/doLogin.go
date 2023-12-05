@@ -50,6 +50,8 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	}
 
+	// check format data
+
 	/*
 		If user registred, make logged
 	*/
@@ -68,6 +70,14 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	}
 	// check db query error
+
+	if !(database.ValidateUsername(u.Name)) {
+		fmt.Println("invalid format data")
+		w.Header().Set("content-type", "text/plain") //400
+		w.WriteHeader(BadRequest.Request.Response.StatusCode)
+		io.WriteString(w, BadRequest.Status)
+		return
+	}
 
 	if user, err = rt.db.PostUser(u.Name); err != nil || user == nil {
 

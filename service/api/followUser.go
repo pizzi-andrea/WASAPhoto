@@ -14,12 +14,11 @@ import (
 )
 
 /*
-		gived uid and *followedId* then remove follower *followerId* from user followers
-	      security:
+gived uid and *followedId* then remove follower *followerId* from user followers
 */
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
-	var from, to int
+	var from_, to_ int
 	var err error
 	var tk *security.Token
 	var isBan bool
@@ -28,17 +27,30 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	/*
 		Parse URL parameters in path
 	*/
-	if from, err = strconv.Atoi(ps.ByName("followerId")); err != nil {
+	if from_, err = strconv.Atoi(ps.ByName("followerId")); err != nil {
+		w.Header().Set("content-type", "text/plain") // 400
+		w.WriteHeader(BadRequest.StatusCode)
+		io.WriteString(w, BadRequest.Status)
+		return
+	}
+	if to_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(BadRequest.StatusCode)
 		io.WriteString(w, BadRequest.Status)
 		return
 	}
 
-	if to, err = strconv.Atoi(ps.ByName("uid")); err != nil {
-		w.Header().Set("content-type", "text/plain") // 400
-		w.WriteHeader(BadRequest.StatusCode)
-		io.WriteString(w, BadRequest.Status)
+	to := database.Id(to_)
+	from := database.Id(from_)
+
+	/*
+		Check if value in parameters are valid values in accord to type definittiion
+	*/
+	if !(database.ValidateId(from) && database.ValidateId(to)) {
+		fmt.Println(" format data not valid")
+		w.Header().Add("content-type", "text/plain") // 404
+		w.WriteHeader(http.StatusBadRequest)
+		io.WriteString(w, "Bad values, format values not allowed")
 		return
 	}
 
@@ -46,7 +58,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		if user id in URL path not exist, then user not found
 	*/
 
-	if user, err = rt.db.GetUserFromId(database.Id(to)); err != nil {
+	if user, err = rt.db.GetUserFromId(to); err != nil {
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
@@ -71,7 +83,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	if tk.Value != uint64(from) {
+	if tk.Value != from {
 		w.Header().Set("content-type", "text/plain") // 403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
 		io.WriteString(w, UnauthorizedToken.Status)
@@ -83,7 +95,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		get banned user and check if not banned
 	*/
 
-	if isBan, err = rt.db.IsBanned(database.Id(to), database.Id(from)); isBan {
+	if isBan, err = rt.db.IsBanned(to, from); isBan {
 		w.Header().Set("content-type", "text/plain") // 403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
 		io.WriteString(w, UnauthorizedToken.Status)
@@ -107,7 +119,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	if action {
 
 		var u *database.User
-		if u, err = rt.db.GetUserFromId(database.Id(to)); u != nil || err == nil {
+		if u, err = rt.db.GetUserFromId(to); u != nil || err == nil {
 			w.Header().Set("content-type", "text/plain") // 500
 			w.WriteHeader(ServerError.StatusCode)
 			io.WriteString(w, ServerError.Status)

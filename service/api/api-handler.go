@@ -23,7 +23,7 @@ const r_streamPhoto = r_myStream + ":photoId"
 func (rt *_router) Handler() http.Handler {
 	// Register routes
 
-	rt.router.GET(r_root, rt.hello)
+	rt.router.GET(r_root, rt.wrap(rt.getContextReply))
 
 	//Logs in the user
 	rt.router.POST(r_login, rt.doLogin)
@@ -100,10 +100,10 @@ func (rt *_router) Handler() http.Handler {
 		// get comment on photo
 		rt.router.GET("/users/:uid/myPhotos/:photoId/comments/:commentId", rt.getComment)
 
-
-		// Special routes
-		rt.router.GET("/liveness", rt.liveness)
 	*/
+	// Special routes
+	rt.router.GET("/liveness", rt.liveness)
+
 	return rt.router
 
 }

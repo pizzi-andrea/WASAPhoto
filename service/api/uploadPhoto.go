@@ -13,6 +13,9 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
+/*
+give photo and update it
+*/
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	var uid int
@@ -103,6 +106,17 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		io.WriteString(w, ServerError.Status)
 		return
 	}
+
+	/* check if format photo in conform to APIs specifications */
+	if !photo.Verify() {
+		fmt.Println(fmt.Errorf("photo not conform to APIs specifications): %w", err))
+		w.Header().Set("content-type", "text/plain") // 400
+		w.WriteHeader(http.StatusBadRequest)
+		io.WriteString(w, BadRequest.Status)
+		return
+
+	}
+
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	photo.ImageData = nil // discard img data

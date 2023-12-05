@@ -10,6 +10,9 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
+/*
+gived uid and *followedId* then remove follower *followerId* from user followers
+*/
 func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	var uid int

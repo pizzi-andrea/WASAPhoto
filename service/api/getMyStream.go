@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
@@ -44,6 +45,15 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		io.WriteString(w, BadRequest.Status)
 		return
 
+	}
+
+	rr, err := regexp.MatchString("^.*?$", pUsername)
+	if !(len(pUsername) >= 1 && rr && err == nil && len(pUsername) <= 16) {
+		fmt.Println("username format error")
+		w.Header().Set("content-type", "text/plain") // 400
+		w.WriteHeader(BadRequest.StatusCode)
+		io.WriteString(w, BadRequest.Status)
+		return
 	}
 
 	/*

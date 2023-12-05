@@ -67,6 +67,17 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	}
 
 	/*
+		Validate username to update
+	*/
+	if !(database.ValidateUsername(u)) {
+		fmt.Println("invalid format data")
+		w.Header().Set("content-type", "text/plain") //400
+		w.WriteHeader(BadRequest.Request.Response.StatusCode)
+		io.WriteString(w, BadRequest.Status)
+		return
+	}
+
+	/*
 		Applay barrear authentication. Username can update only his username
 	*/
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {

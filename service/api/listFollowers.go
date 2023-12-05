@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 
 	"strconv"
 
@@ -37,7 +38,16 @@ func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
+	// validate username format
 	username = r.URL.Query().Get("username")
+	rr, err := regexp.MatchString("^.*?$", username)
+	if !(len(username) >= 1 && rr && err == nil && len(username) <= 16) {
+		fmt.Println("username format error")
+		w.Header().Set("content-type", "text/plain") // 400
+		w.WriteHeader(BadRequest.StatusCode)
+		io.WriteString(w, BadRequest.Status)
+		return
+	}
 
 	if limit, err = strconv.Atoi(r.URL.Query().Get("limit")); err != nil && r.URL.Query().Get("limit") != "" {
 		w.Header().Set("content-type", "text/plain") // 400

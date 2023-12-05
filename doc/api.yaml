@@ -1044,11 +1044,15 @@ components:
     UsernameFilter:
       description: >
         research in list of users by username 
-      type: string
-      pattern: '^.*?$'
-      minLength: 1
-      maxLength: 16
-      example: "marioross"
+      name: username
+      in: query
+      required: false
+      schema:
+        type: string
+        pattern: '^.*?$'
+        minLength: 1
+        maxLength: 16
+        example: "marioross"
     
     Uid:
       name: uid

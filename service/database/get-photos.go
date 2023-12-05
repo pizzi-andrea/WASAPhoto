@@ -19,7 +19,9 @@ const ( // Ordering parameters
 )
 
 /*
-GetPhotos give in  in input user id (uid) and get all photos that users have updated
+GetPhotos accepts the user ID (uid) as input and extracts all photos uploaded by users. Users can charge up or more
+photos (deleted photos will not be listed), in fact the photo stream may be returned empty. If a value of zero is returned
+for photos, an error occurred
 */
 func (db *appdbimpl) GetPhotos(uid Id, by []OrderBy, ord ...Ordering) (photos StreamPhotos, err error) {
 	var photo Photo

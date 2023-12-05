@@ -5,7 +5,7 @@ import (
 )
 
 /*
-Check if user "from" put like to "to"
+The IsFollower function allow to verify if user from follow user to.
 */
 func (db *appdbimpl) IsFollower(from Id, to Id) (res bool, err error) {
 

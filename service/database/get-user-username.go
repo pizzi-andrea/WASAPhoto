@@ -2,7 +2,8 @@ package database
 
 import "database/sql"
 
-// GetUserFromUser give username of user and get user if exist or nil if not exist
+// GetUserFromUser give username  and get user that use username if exist. If username not used function
+// return nil value and not nil error value for err
 func (db *appdbimpl) GetUserFromUser(username Username) (usr *User, err error) {
 	var u User
 	err = db.c.QueryRow(`

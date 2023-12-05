@@ -28,9 +28,10 @@ func (rt *_router) listUsers(w http.ResponseWriter, r *http.Request, ps httprout
 
 	pLimit := r.URL.Query().Get("limit")
 	pUsername := r.URL.Query().Get("username")
+
 	// validate username in query
 	rr, err := regexp.MatchString("^.*?$", pUsername)
-	if !(len(pUsername) >= 1 && rr && err == nil && len(pUsername) <= 16) {
+	if !(rr && err == nil && len(pUsername) <= 16) {
 		fmt.Println("username format error")
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(BadRequest.StatusCode)

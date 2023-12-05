@@ -48,7 +48,7 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	rr, err := regexp.MatchString("^.*?$", pUsername)
-	if !(len(pUsername) >= 1 && rr && err == nil && len(pUsername) <= 16) {
+	if !(rr && err == nil && len(pUsername) <= 16) {
 		fmt.Println("username format error")
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(BadRequest.StatusCode)

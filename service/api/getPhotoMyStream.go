@@ -15,9 +15,9 @@ give *uid* and *photoId* and get photo associated
 */
 func (rt *_router) getPhotoMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
-	var uid int
+	var uid_ int
 	var err error
-	var photoId int
+	var photoId_ int
 	var photo *database.Photo
 	var user *database.User
 	var tk *security.Token
@@ -25,30 +25,34 @@ func (rt *_router) getPhotoMyStream(w http.ResponseWriter, r *http.Request, ps h
 	/*
 		Parse URL parameters
 	*/
-	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(BadRequest.StatusCode)
 		io.WriteString(w, BadRequest.Status)
 		return
 	}
 
-	if photoId, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
+	uid := database.Id(uid_)
+
+	if photoId_, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(BadRequest.StatusCode)
 		io.WriteString(w, BadRequest.Status)
 		return
 	}
+
+	photoId := database.Id(photoId_)
 
 	/*
 		if user id in URL path not exist, then user not found
 	*/
-	if user, err = rt.db.GetUserFromId(database.Id(uid)); err != nil {
+	if user, err = rt.db.GetUserFromId(uid); err != nil {
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
 	}
 
-	if photo, err = rt.db.GetPhotoStream(database.Id(uid), database.Id(photoId)); err != nil {
+	if photo, err = rt.db.GetPhotoStream(uid, photoId); err != nil {
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)

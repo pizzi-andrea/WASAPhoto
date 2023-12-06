@@ -55,7 +55,7 @@ curl -X 'POST' \
   -d '{
   "name": "timux"
 }'
-sleep 5
+sleep 2
 echo "\n=======end /session/ test=============\n"
 echo "\n=======start /users/ test=============\n"
 
@@ -79,7 +79,7 @@ curl -X 'GET' \
   'http://localhost:3000/users/?username=a' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer 1'
-sleep 5
+sleep 2
 echo "\n========end test /users/================\n"
 echo "\n========start test /users/:uid================\n"
 
@@ -104,7 +104,7 @@ curl -X 'GET' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer 4'
 echo "\t\n\t\n"
-sleep 5
+sleep 2
 echo "\n========end test /users/:uid/================\n"
 echo "\n========star test /users/:uid/followers/followerId================\n"
 
@@ -160,7 +160,7 @@ curl -X 'GET' \
   'http://localhost:3000/users/3/followers/' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer 4'
-sleep 5
+sleep 2
 echo "\n========end test /users/:uid/followers/================\n"
 echo "\n========start test /users/:uid/banned/:bannedId================\n"
 
@@ -214,8 +214,92 @@ curl -X 'DELETE' \
 
 
   
-echo "\n========end test /users/::uid/banned/:bannedId================\n"
 
-sleep 5
+echo "\n========start test /users/:uid/myPhotos/================\n"
+
+curl --output outFile -X 'POST' \
+  'http://localhost:3000/users/2/myPhotos/' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer 2' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'imageData=@big.png;type=image/png'\
+  -F 'descriptionImg="Foto spaziale!'\
+
+curl  -X 'POST' \
+  'http://localhost:3000/users/3/myPhotos/' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer 3' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'imageData=@tiny.png;type=image/png'\
+  -F 'descriptionImg="Foto spaziale!'\
+
+#curl --output outFile -X 'POST' \
+#  'http://localhost:3000/users/5/myPhotos/' \
+#  -H 'accept: application/json' \
+#  -H 'Authorization: Bearer 4' \
+#  -H 'Content-Type: multipart/form-data' \
+#  -F 'imageData=@tiny.png;type=image/png'\
+#  -F 'descriptionImg="Foto spaziale!'\
+
+sleep 2
+echo \n=============================\(start test /users/:uid/myPhotos/ \)===============================\n 
 
 
+curl -X 'GET' \
+  'http://localhost:3000/users/3/myPhotos/?limit=50&sortBy=dataUpdate&ordering=desc' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer 2'
+
+
+  sleep 2 
+
+
+  echo \n=============================\(start test /users/:uid/myPhotos/:photoId/comments/ \)===============================\n 
+
+  curl -X 'POST' \
+  'http://localhost:3000/users/1/myPhotos/1/comments/' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer 2' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": {
+    "username": "markus"
+  },
+  "text": "😀 i like you photo! 😀"
+}'
+
+curl -X 'POST' \
+  'http://localhost:3000/users/1/myPhotos/1/comments/' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer 4' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": {
+    "username": "opensuse"
+  },
+  "text": "😀"
+}'
+
+curl -X 'POST' \
+  'http://localhost:3000/users/1/myPhotos/1/comments/' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer 7' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": {
+    "username": "timux"
+  },
+  "text": "Go😀d"
+}'
+
+curl -X 'POST' \
+  'http://localhost:3000/users/1/myPhotos/1/comments/' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer 5' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "user": {
+    "username": "marioross"
+  },
+  "text": "best photo"
+}'

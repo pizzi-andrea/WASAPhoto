@@ -48,7 +48,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	*/
 	if !(database.ValidateId(from) && database.ValidateId(to)) {
 		fmt.Println(" format data not valid")
-		w.Header().Add("content-type", "text/plain") // 404
+		w.Header().Add("content-type", "text/plain") // 400
 		w.WriteHeader(http.StatusBadRequest)
 		io.WriteString(w, "Bad values, format values not allowed")
 		return
@@ -59,6 +59,22 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	*/
 
 	if user, err = rt.db.GetUserFromId(to); err != nil {
+		w.Header().Set("content-type", "text/plain") // 500
+		w.WriteHeader(ServerError.StatusCode)
+		io.WriteString(w, ServerError.Status)
+		return
+	}
+
+	if user == nil {
+		fmt.Println(fmt.Errorf("not found %w", err))
+		w.Header().Add("content-type", "text/plain") // 404
+		w.WriteHeader(http.StatusNotFound)
+		io.WriteString(w, "Not Found, User not found")
+		return
+
+	}
+
+	if user, err = rt.db.GetUserFromId(from); err != nil {
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
@@ -110,8 +126,9 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	if action, err = rt.db.PutFollow(database.Id(from), database.Id(to)); err != nil {
-		w.Header().Set("content-type", "text/plain") // 204
-		w.WriteHeader(http.StatusNoContent)
+		fmt.Println(fmt.Errorf("internal error: %w", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		io.WriteString(w, ServerError.Status)
 		return
 
 	}
@@ -119,7 +136,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	if action {
 
 		var u *database.User
-		if u, err = rt.db.GetUserFromId(to); u != nil || err == nil {
+		if u, err = rt.db.GetUserFromId(from); u != nil || err == nil {
 			w.Header().Set("content-type", "text/plain") // 500
 			w.WriteHeader(ServerError.StatusCode)
 			io.WriteString(w, ServerError.Status)

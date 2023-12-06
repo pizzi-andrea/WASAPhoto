@@ -56,8 +56,11 @@ type AppDatabase interface {
 	PutBan(from, to Id) (r bool, err error)
 	DelBan(from, to Id) (r bool, err error)
 	PutPhoto(imgData []byte, desc string, owner Id) (photo *Photo, err error)
+	PostComment(from Id, text string, to Id) (com *Comment, err error)
 	GetPhoto(id Id) (img *Photo, err error)
 	DelPhoto(id Id) (r bool, err error)
+	GetComments(photoId Id, username Username, largeSearch bool) (comments []Comment, err error)
+	GetComment(commentId Id) (comment *Comment, err error)
 	Ping() error
 }
 

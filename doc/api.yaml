@@ -274,7 +274,7 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
     
-  /users/{uid}/myStream:
+  /users/{uid}/myStream/:
     summary: user stream photos
     description: >
       this resource rappresent stream of photos associated a user.
@@ -461,14 +461,6 @@ paths:
       description: >
         taken uid of the user who wants to ban and uid of the user to be banned, 
         bans the user(BannedID)
-
-      requestBody:
-        description: >
-          information about user to ban
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
               
       security:
         - BearerAuth: []
@@ -521,7 +513,7 @@ paths:
           $ref: "#/components/responses/ServerError"
     
   
-  /users/{uid}/myPhotos: 
+  /users/{uid}/myPhotos/: 
     
     parameters:
       - $ref: "#/components/parameters/Uid"
@@ -750,14 +742,6 @@ paths:
       description: >
         provide photo id and owner id. 
         The like is identified by the *uid* of the user who likes it.
-      
-      requestBody:
-        description: >
-          information about user that put like
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
       
       operationId: likePhoto
       
@@ -1022,6 +1006,8 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/ServerError"
+
+
 
 components:
 

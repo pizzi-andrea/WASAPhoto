@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,31 +16,36 @@ import (
 give *uid* and *photoId* and get photo associated
 */
 func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var uid int
+	var uid_ int
 	var err error
 	var user *database.User
 	var tk *security.Token
 	var isBan bool
-	var photoId int
+	var photoId_ int
 	var photo *database.Photo
 
 	// Parsing URL parameters
-	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+
+	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		fmt.Println(fmt.Errorf("get uid: %w", err))
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(http.StatusBadRequest)
 		io.WriteString(w, BadRequest.Status)
 		return
 	}
-	if photoId, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
+	if photoId_, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
 		fmt.Println(fmt.Errorf("get uid: %w", err))
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(http.StatusBadRequest)
 		io.WriteString(w, BadRequest.Status)
 		return
 	}
+
+	photoId := database.Id(photoId_)
+	uid := database.Id(uid_)
+
 	// check if path exist
-	if user, err = rt.db.GetUserFromId(database.Id(uid)); err != nil {
+	if user, err = rt.db.GetUserFromId(uid); err != nil {
 		fmt.Println(fmt.Errorf("user exist: %w", err))
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
@@ -47,8 +53,8 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	if photo, err = rt.db.GetPhoto(database.Id(photoId)); err != nil {
-		fmt.Println(fmt.Errorf("user exist: %w", err))
+	if photo, err = rt.db.GetPhoto(photoId); err != nil {
+		fmt.Println(fmt.Errorf("error GetPhoto: %w", err))
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
@@ -73,11 +79,11 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	if isBan, err = rt.db.PutBan(user.Uid, tk.Value); err != nil {
+	if isBan, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {
 		fmt.Println(fmt.Errorf(" %w", err))
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+		io.WriteString(w, ServerError.Status+"TOKKOT")
 		return
 	}
 
@@ -88,7 +94,7 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	_ = photo
-	/*TODO: response value missing*/
-
+	w.Header().Set("content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(*photo)
 }

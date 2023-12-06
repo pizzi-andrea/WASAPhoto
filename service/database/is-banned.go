@@ -5,7 +5,7 @@ import (
 )
 
 /*
-check if user "from" banned  user "to"
+The IsBanned function allows you to check whether user from has banned user a.
 */
 func (db *appdbimpl) IsBanned(from Id, to Id) (res bool, err error) {
 	res = false

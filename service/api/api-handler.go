@@ -18,6 +18,8 @@ const r_myPhotos = r_user + "myPhotos/"
 const r_myPhoto = r_myPhotos + ":photoId/"
 const r_myStream = r_user + "myStream/"
 const r_streamPhoto = r_myStream + ":photoId"
+const r_comments = r_myPhoto + "comments/"
+const r_comment = r_comments + ":commentId"
 
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) Handler() http.Handler {
@@ -87,20 +89,20 @@ func (rt *_router) Handler() http.Handler {
 
 		// remove like a photo
 		rt.router.DELETE("/users/:uid/myPhotos/:photoId/likes/:likeUserId:", rt.unlikePhoto)
+	*/
+	// add comment a photo
+	rt.router.POST(r_comment, rt.commentPhoto)
 
-		// add comment a photo
-		rt.router.POST("/users/:uid/myPhotos/:photoId/comments/", rt.commentPhoto)
-
-		// get comments on photo
-		rt.router.GET("/users/:uid/myPhotos/:photoId/comments/", rt.getComments)
-
+	// get comments on photo
+	rt.router.GET(r_comments, rt.getComments)
+	/*
 		// delete comment on photo
 		rt.router.DELETE("/users/:uid/myPhotos/:photoId/comments/:commentId", rt.uncommentPhoto)
-
-		// get comment on photo
-		rt.router.GET("/users/:uid/myPhotos/:photoId/comments/:commentId", rt.getComment)
-
 	*/
+
+	// get comment on photo
+	rt.router.GET(r_comment, rt.getComment)
+
 	// Special routes
 	rt.router.GET("/liveness", rt.liveness)
 

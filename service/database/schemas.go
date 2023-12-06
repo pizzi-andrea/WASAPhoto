@@ -45,7 +45,9 @@ type StreamPhotos = []Photo //model of stream of photos
 
 /*this object rappresent a comment on a photo.*/
 type Comment struct {
-	User      User      // this object rappresent a user
+	CommentId Id
+	Author    User // this object rappresent a user
+	Photo     Id
 	Text      string    // comment text encoded in UNICODE format
 	TimeStamp TimeStamp // this components describe timestamp value conform to RFC3339 specification
 
@@ -115,5 +117,5 @@ func (p *Profile) Verify() bool {
 
 func (c *Comment) Verify() bool {
 	r, err := regexp.MatchString("^.*$", c.Text)
-	return c.User.Verify() && ValidateTimeStamp(c.TimeStamp.Format(time.RFC3339)) && len(c.Text) >= 1 && len(c.Text) <= 250 && r && err == nil
+	return c.Author.Verify() && ValidateTimeStamp(c.TimeStamp.Format(time.RFC3339)) && len(c.Text) >= 1 && len(c.Text) <= 250 && r && err == nil
 }

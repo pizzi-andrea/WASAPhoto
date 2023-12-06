@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 
@@ -14,7 +15,9 @@ import (
 )
 
 /*
-give photo and update it
+UploadPhoto method allow users to update their photos in WASAPhoto system. Request MUST formatted like
+multipart/form-data. It will parserd values and stored its in db. The photo will be encoding in base64 format
+and stored in db.
 */
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
@@ -22,6 +25,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	var err error
 	var user *database.User
 	var tk *security.Token
+	var file multipart.File
 
 	// Parsing URL parameters
 	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
@@ -33,17 +37,18 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 	// check if path exist
 	if user, err = rt.db.GetUserFromId(database.Id(uid)); err != nil {
-		fmt.Println(fmt.Errorf("user exist: %w", err))
+		fmt.Println(fmt.Errorf("get exist: %w", err))
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
 		return
 	}
 
+	// if user not exist path is not valid
 	if user == nil {
 		w.Header().Add("content-type", "text/plain") // 404
 		w.WriteHeader(http.StatusNotFound)
-		io.WriteString(w, "user not found")
+		io.WriteString(w, "Not found, user not found")
 		return
 
 	}
@@ -67,7 +72,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		io.WriteString(w, UnauthorizedToken.Status)
 		return
 	}
-	// parsing body values
+	// parsing body values (image upload operation)
 	var photo *database.Photo = &database.Photo{
 		ImageData: make([]byte, MaxBytePhoto),
 	}
@@ -80,11 +85,21 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	photo.ImageData = []byte(r.PostFormValue("imageData"))
+	if file, _, err = r.FormFile("imageData"); err != nil {
+		fmt.Println(fmt.Errorf("query error: %w", err))
+		w.Header().Set("content-type", "text/plain") // 500
+		w.WriteHeader(ServerError.StatusCode)
+		io.WriteString(w, ServerError.Status)
+		return
+
+	}
+
+	photo.ImageData, _ = io.ReadAll(file)
+
 	photo.DescriptionImg = r.PostFormValue("descriptionImg")
 
-	if photo.ImageData == nil || len(photo.ImageData) == 0 {
-		fmt.Println(fmt.Errorf("multipart(photo): %w", err))
+	if photo.ImageData == nil || len(photo.DescriptionImg) == 0 {
+		fmt.Println("error field multipart request empty")
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(http.StatusBadRequest)
 		io.WriteString(w, BadRequest.Status)
@@ -107,9 +122,9 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	/* check if format photo in conform to APIs specifications */
+	// check if format photo in conform to APIs specifications */
 	if !photo.Verify() {
-		fmt.Println(fmt.Errorf("photo not conform to APIs specifications): %w", err))
+		fmt.Println("Photo not conform to APIs specification")
 		w.Header().Set("content-type", "text/plain") // 400
 		w.WriteHeader(http.StatusBadRequest)
 		io.WriteString(w, BadRequest.Status)

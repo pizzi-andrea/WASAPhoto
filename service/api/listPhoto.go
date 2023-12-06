@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -39,6 +40,7 @@ func (rt *_router) listPhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
+	// if user not exist the path is not valid
 	if user == nil {
 		w.Header().Add("content-type", "text/plain") // 404
 		w.WriteHeader(http.StatusNotFound)
@@ -77,9 +79,16 @@ func (rt *_router) listPhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		w.Header().Set("content-type", "text/plain") // 500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
+		return
 	}
 
-	_ = stream
-	/*TODO: response value missing*/
+	if err = json.NewEncoder(w).Encode(stream); err != nil {
+		fmt.Println(fmt.Errorf(": %w", err))
+		w.Header().Set("content-type", "text/plain") // 500
+		w.WriteHeader(ServerError.StatusCode)
+		io.WriteString(w, ServerError.Status)
+		return
+
+	}
 
 }

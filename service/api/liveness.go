@@ -1,7 +1,6 @@
 package api
 
 import (
-	"io"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
@@ -13,10 +12,10 @@ func (rt *_router) liveness(w http.ResponseWriter, r *http.Request, ps httproute
 	/* Example of liveness check:*/
 	if err := rt.db.Ping(); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		io.WriteString(w, "<h1 style='color:red;'> All system components are active with success </h1> ")
+
 		return
 	}
 
 	w.Header().Set("content-type", "text/html")
-	io.WriteString(w, "<h1 style='color:green;'> All system components are active with success </h1> ")
+
 }

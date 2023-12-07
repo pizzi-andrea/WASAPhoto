@@ -1,6 +1,9 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
+)
 
 // GetUserFromId give uid  and get user that have it, if exist. If uid not used function
 // return nil value and not nil error value for err
@@ -13,7 +16,7 @@ func (db *appdbimpl) GetUserFromId(uid Id) (usr *User, err error) {
 	if err == nil {
 		usr = &u
 	}
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		err = nil
 	}
 	return

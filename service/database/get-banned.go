@@ -16,6 +16,8 @@ func (db *appdbimpl) GetBanned(uid Id) (followers []User, err error) {
 		return
 	}
 
+	defer rows.Close()
+
 	for rows.Next() {
 		if err = rows.Scan(&uid, &username); err != nil {
 			return

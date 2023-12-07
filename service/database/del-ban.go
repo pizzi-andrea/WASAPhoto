@@ -1,6 +1,9 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
+)
 
 // DelBan allow to remove ban on user to. When banned is removed user banned will research and watch all information about from user.
 // if ban deleted with success function return true and nil error for error if ban not exist function return false and nil value
@@ -13,7 +16,7 @@ func (db *appdbimpl) DelBan(from, to Id) (r bool, err error) {
 		r = true
 		return
 	}
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		err = nil
 		r = false
 	}

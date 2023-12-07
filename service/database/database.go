@@ -14,7 +14,7 @@ main.WebAPIConfiguration structure):
 
 This is an example on how to migrate the DB and connect to it:
 
-	// Start Database
+	//  Start Database
 	logger.Println("initializing database support")
 	db, err := sql.Open("sqlite3", "./foo.db")
 	if err != nil {
@@ -47,8 +47,8 @@ type AppDatabase interface {
 	GetMyStream(uid Id, username Username, largeSearch bool, by []OrderBy, ord ...Ordering) (photos StreamPhotos, err error)
 	GetPhotoStream(uid, photoId Id) (img *Photo, err error)
 	GetBanned(uid Id) (banned []User, err error)
-	SetUsername(uid Id, username string) (usr *User, err error)                       // update username of user associted to uid
-	GetPhotos(uid Id, by []OrderBy, ord ...Ordering) (photos StreamPhotos, err error) // give user id and put all photos posted by user associated to uid
+	SetUsername(uid Id, username string) (usr *User, err error)                       //  update username of user associted to uid
+	GetPhotos(uid Id, by []OrderBy, ord ...Ordering) (photos StreamPhotos, err error) //  give user id and put all photos posted by user associated to uid
 	IsBanned(from Id, to Id) (r bool, err error)
 	DelFollow(from, to Id) (r bool, err error)
 	IsFollower(from Id, to Id) (r bool, err error)
@@ -65,80 +65,13 @@ type appdbimpl struct {
 	c *sql.DB
 }
 
-/*
-var (
-	t_user = Table{
-		NameTable: "user",
-
-		Fields: Field{
-
-			"uid": {
-				Ftype:      SQLITE_INTEGER,
-				PrimaryKey: true,
-				Unique:     true,
-				NotNull:    true,
-			},
-
-			"username": {
-				Ftype:      SQLITE_TEXT,
-				PrimaryKey: false,
-				Unique:     true,
-				NotNull:    true,
-				Check:      "",
-			},
-		},
-	}
-
-	t_photo = Table{
-		NameTable: "photo",
-
-		Fields: Field{
-
-			"photoId": {
-				Ftype:      SQLITE_INTEGER,
-				PrimaryKey: true,
-				Unique:     true,
-				NotNull:    true,
-			},
-
-			"imageData": {
-				Ftype:      SQLITE_BLOB,
-				PrimaryKey: false,
-				Unique:     false,
-				NotNull:    true,
-			},
-
-			"timeUpdate": {
-				Ftype:      SQLITE_TIME,
-				PrimaryKey: false,
-				Unique:     false,
-				NotNull:    true,
-			},
-
-			"descriptionImg": {
-				Ftype:      SQLITE_TEXT,
-				PrimaryKey: false,
-				Unique:     false,
-				NotNull:    true,
-			},
-
-			"Owner": {
-				Ftype:      SQLITE_INTEGER,
-				PrimaryKey: false,
-				Unique:     false,
-				NotNull:    true,
-			},
-		},
-	}
-)
-*/
 // New returns a new instance of AppDatabase based on the SQLite connection `db`.
 // `db` is required - an error will be returned if `db` is `nil`.
 func New(db *sql.DB) (AppDatabase, error) {
 	if db == nil {
 		return nil, errors.New("database is required when building a AppDatabase")
 	}
-	// Check if table exists. If not, the database is empty, and we need to create the structure
+	//  Check if table exists. If not, the database is empty, and we need to create the structure
 	var tableName string
 	err := db.QueryRow(`SELECT name FROM sqlite_master WHERE type='table' AND name='WASAPhoto';`).Scan(&tableName)
 	if errors.Is(err, sql.ErrNoRows) {

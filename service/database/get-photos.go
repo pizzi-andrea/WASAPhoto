@@ -7,13 +7,13 @@ import (
 
 type OrderBy int
 
-const ( // sort by value
+const ( //  sort by value
 	timeUpdate OrderBy = iota
 )
 
 type Ordering int
 
-const ( // Ordering parameters
+const ( //  Ordering parameters
 	asc Ordering = iota
 	desc
 )

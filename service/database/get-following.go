@@ -20,8 +20,7 @@ func (db *appdbimpl) GetFollowing(uid Id, username Username, largeSearch bool) (
 	defer rows.Close()
 
 	for rows.Next() {
-		if _err := rows.Scan(&uid, &username); _err != nil {
-			err = _err
+		if err = rows.Scan(&uid, &username); err != nil {
 			return
 		}
 

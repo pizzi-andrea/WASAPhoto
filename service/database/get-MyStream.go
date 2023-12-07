@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 /*
@@ -74,12 +73,10 @@ WHERE myf.uid = p.owner;
 	`, uid)
 
 	if err != nil {
-		fmt.Println(fmt.Errorf("%w", err))
 		return
 	}
 
 	if rows, err = db.c.Query("SELECT * FROM MyStream ORDER BY ? ?", ordy, oord); err != nil {
-		fmt.Println(fmt.Errorf("%w", err))
 		return nil, err
 	}
 

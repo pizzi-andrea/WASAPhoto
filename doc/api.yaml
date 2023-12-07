@@ -1085,15 +1085,6 @@ components:
       description: >
         user to unfollow
     
-    FollowingId:
-      name: followingId
-      required: true
-      in: path
-      description: >
-        user id to following
-      schema:
-        $ref: "#/components/schemas/Id"
-    
     BannedId:
       name: bannedId
       in: path
@@ -1307,9 +1298,6 @@ tags:
   - name: comment
     description: >
       Manage comments gived to photos
-  - name: following
-    description: >
-      Manage user that followings
   - name: login
     description: >
       log-in function for users

@@ -1,6 +1,9 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
+)
 
 // GetUserFromUser give username  and get user that use username if exist. If username not used function
 // return nil value and not nil error value for err
@@ -13,7 +16,7 @@ func (db *appdbimpl) GetUserFromUser(username Username) (usr *User, err error) {
 	if err == nil {
 		usr = &u
 	}
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		err = nil
 	}
 	return

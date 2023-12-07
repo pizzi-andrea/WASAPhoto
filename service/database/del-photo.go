@@ -1,6 +1,9 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
+)
 
 // DelPhoto allow to delete photo update in the system. When photo is deleted all comments and like associated will be deleted.
 // if photo deleted with success function return true and nil error for error if photo not exist function return false and nil value
@@ -13,7 +16,7 @@ func (db *appdbimpl) DelPhoto(id Id) (r bool, err error) {
 		r = true
 		return
 	}
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		err = nil
 		r = false
 	}

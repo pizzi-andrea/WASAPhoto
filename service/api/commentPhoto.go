@@ -2,18 +2,18 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"pizzi1995517.it/WASAPhoto/service/api/reqcontext"
 	"pizzi1995517.it/WASAPhoto/service/api/security"
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
 // /users/{uid}/myPhotos/{photoId}/comments/
-func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var photo_, uid_ int
 	var err error
@@ -24,14 +24,14 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	var rr bool
 
 	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
-		w.Header().Set("content-type", "text/plain") // 400
+		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
 		io.WriteString(w, BadRequest.Status)
 		return
 	}
 
 	if photo_, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
-		w.Header().Set("content-type", "text/plain") // 400
+		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
 		io.WriteString(w, BadRequest.Status)
 		return
@@ -43,7 +43,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	json.NewDecoder(r.Body).Decode(msg)
 
 	if !(database.ValidateId(photoId) && database.ValidateId(uid) && msg.Verify()) {
-		w.Header().Set("content-type", "text/plain") // 400
+		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
 		io.WriteString(w, BadRequest.Status)
 		return
@@ -51,7 +51,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	if user, err = rt.db.GetUserFromId(uid); err != nil {
-		w.Header().Set("content-type", "text/plain") // 500
+		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
 		return
@@ -59,7 +59,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	if photo, err = rt.db.GetPhoto(photoId); err != nil {
-		w.Header().Set("content-type", "text/plain") // 500
+		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
 		return
@@ -67,8 +67,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	if photo == nil || user == nil {
-		fmt.Println(fmt.Errorf("not found %w", err))
-		w.Header().Add("content-type", "text/plain") // 404
+		w.Header().Add("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
 		io.WriteString(w, "Not Found, User not found")
 		return
@@ -78,14 +77,14 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		Check if user that wont put follows can do it
 	*/
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
-		w.Header().Set("content-type", "text/plain") // 401
+		w.Header().Set("content-type", "text/plain") //  401
 		w.WriteHeader(UnauthorizedError.StatusCode)
 		io.WriteString(w, UnauthorizedError.Status)
 		return
 	}
 
 	if rr, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {
-		w.Header().Set("content-type", "text/plain") // 500
+		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
 		return
@@ -93,14 +92,14 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	if rr {
-		w.Header().Set("content-type", "text/plain") // 403
+		w.Header().Set("content-type", "text/plain") //  403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
 		io.WriteString(w, UnauthorizedToken.Status)
 		return
 	}
 
 	if user, err = rt.db.GetUserFromUser(msg.Author.Username); err != nil {
-		w.Header().Set("content-type", "text/plain") // 500
+		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
 		return
@@ -108,7 +107,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	if msg, err = rt.db.PostComment(user.Uid, msg.Text, photo.PhotoId); err != nil {
-		w.Header().Set("content-type", "text/plain") // 500
+		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
 		return
@@ -116,7 +115,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	if msg == nil {
-		w.Header().Set("content-type", "text/plain") // 500
+		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 		io.WriteString(w, ServerError.Status)
 		return

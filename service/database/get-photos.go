@@ -2,18 +2,17 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 type OrderBy int
 
-const ( // sort by value
+const ( //   sort by value
 	timeUpdate OrderBy = iota
 )
 
 type Ordering int
 
-const ( // Ordering parameters
+const ( //   Ordering parameters
 	asc Ordering = iota
 	desc
 )
@@ -59,7 +58,6 @@ func (db *appdbimpl) GetPhotos(uid Id, by []OrderBy, ord ...Ordering) (photos St
 
 	for rows.Next() {
 		if err = rows.Scan(&photo.PhotoId, &uid, &photo.DescriptionImg, &photo.ImageData, &photo.TimeUpdate); err != nil {
-			fmt.Println(fmt.Errorf("%w", err))
 			return
 		}
 

@@ -9,9 +9,9 @@ import (
 	"time"
 )
 
-type Id = uint64           // Identificator at 64-bit
-type TimeStamp = time.Time // this components describe timestamp value conform to [RFC3339](https://datatracker.ietf.org/doc/html/rfc3339#section-5.6) specification
-type Username = string     // username of a user
+type Id = uint64           //   Identificator at 64-bit
+type TimeStamp = time.Time //   this components describe timestamp value conform to [RFC3339](https://  datatracker.ietf.org/doc/html/rfc3339#section-5.6) specification
+type Username = string     //   username of a user
 
 type Validator interface {
 	Verify() bool
@@ -21,8 +21,8 @@ type Validator interface {
 type Photo struct {
 	PhotoId        Id
 	TimeUpdate     TimeStamp
-	ImageData      []byte // data
-	DescriptionImg string // image description
+	ImageData      []byte //   data
+	DescriptionImg string //   image description
 }
 
 /*this object rappresent a user*/
@@ -35,21 +35,21 @@ type User struct {
 type Profile struct {
 	User      User
 	Stream    StreamPhotos
-	Follower  int //number user that follow a specific user
-	Following int //numer of users following by specific user
+	Follower  int //  number user that follow a specific user
+	Following int //  numer of users following by specific user
 
 }
 
 /*this object rappresent a photo*/
-type StreamPhotos = []Photo //model of stream of photos
+type StreamPhotos = []Photo //  model of stream of photos
 
 /*this object rappresent a comment on a photo.*/
 type Comment struct {
 	CommentId Id
-	Author    User // this object rappresent a user
+	Author    User //  this object rappresent a user
 	Photo     Id
-	Text      string    // comment text encoded in UNICODE format
-	TimeStamp TimeStamp // this components describe timestamp value conform to RFC3339 specification
+	Text      string    //  comment text encoded in UNICODE format
+	TimeStamp TimeStamp //  this components describe timestamp value conform to RFC3339 specification
 
 }
 
@@ -69,7 +69,7 @@ func ValidateUsername(u string) bool {
 
 func ValidateStream(s StreamPhotos) bool {
 
-	r := len(s) >= 0 && len(s) <= 100
+	r := len(s) <= 100
 	if r {
 		for _, p := range s {
 			if !p.Verify() {
@@ -84,8 +84,7 @@ func ValidateStream(s StreamPhotos) bool {
 
 func (p *Photo) Verify() bool {
 	r, err := regexp.MatchString("^.*?$", p.DescriptionImg)
-	return len(p.ImageData) >= 0 &&
-		len(p.ImageData) <= 5000000 &&
+	return len(p.ImageData) <= 5000000 &&
 		p.GetImg() == nil &&
 		ValidateTimeStamp(p.TimeUpdate.Local().Format(time.RFC3339)) &&
 		ValidateId(p.PhotoId) &&

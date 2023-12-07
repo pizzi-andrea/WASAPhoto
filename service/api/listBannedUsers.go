@@ -2,12 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"pizzi1995517.it/WASAPhoto/service/api/reqcontext"
 	"pizzi1995517.it/WASAPhoto/service/api/security"
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
@@ -15,9 +14,9 @@ import (
 /*
 given uid then list all user banned by user associated at *uid*
 */
-func (rt *_router) listBannedUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) listBannedUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var uid int
+	var uid_ int
 	var err error
 	var banned []database.User
 	var user *database.User
@@ -28,34 +27,38 @@ func (rt *_router) listBannedUsers(w http.ResponseWriter, r *http.Request, ps ht
 	/*
 		Parse URL parameters
 	*/
-	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
-		w.Header().Set("content-type", "text/plain") // 400
+	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
-		io.WriteString(w, BadRequest.Status)
+
 		return
 	}
 
 	if limit, err = strconv.Atoi(r.URL.Query().Get("limit")); err != nil && r.URL.Query().Get("limit") != "" {
-		w.Header().Set("content-type", "text/plain") // 400
-		fmt.Println(fmt.Errorf("query error: %w", err))
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(http.StatusBadRequest)
-		io.WriteString(w, "Bad request, formating error") // 400 response
+
 		return
 	}
+
+	uid := database.Id(uid_)
 
 	/*
 		if user id in URL path not exist, then user not found
 	*/
-	if user, err = rt.db.GetUserFromId(database.Id(uid)); err != nil {
-		w.Header().Set("content-type", "text/plain") // 500
+	if user, err = rt.db.GetUserFromId(uid); err != nil {
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+
 	}
 
 	if user == nil {
-		w.Header().Add("content-type", "text/plain") // 404
+		w.Header().Add("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusNotFound)
-		io.WriteString(w, "user not found")
+
 		return
 	}
 
@@ -63,9 +66,10 @@ func (rt *_router) listBannedUsers(w http.ResponseWriter, r *http.Request, ps ht
 
 	 */
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
-		w.Header().Set("content-type", "text/plain") // 401
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //   401
 		w.WriteHeader(UnauthorizedError.StatusCode)
-		io.WriteString(w, UnauthorizedError.Status)
+
 		return
 	}
 
@@ -73,16 +77,16 @@ func (rt *_router) listBannedUsers(w http.ResponseWriter, r *http.Request, ps ht
 		get banned user and check if not banned
 	*/
 	if tk.Value != user.Uid {
-		w.Header().Set("content-type", "text/plain") // 403
+		w.Header().Set("content-type", "text/plain") //   403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
-		io.WriteString(w, UnauthorizedToken.Status)
+
 		return
 	}
 
-	if banned, err = rt.db.GetBanned(database.Id(uid)); err != nil {
-		fmt.Println(fmt.Errorf("internal error: %w", err))
+	if banned, err = rt.db.GetBanned(uid); err != nil {
+		ctx.Logger.Errorf("%w", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		io.WriteString(w, ServerError.Status)
+
 		return
 
 	}
@@ -91,27 +95,30 @@ func (rt *_router) listBannedUsers(w http.ResponseWriter, r *http.Request, ps ht
 		limit = len(banned)
 	}
 
-	if offset > len(banned) { //500 response
-		fmt.Println("offser: no offset valid")
+	if offset > len(banned) { //  500 response
 		w.Header().Set("content-type", "text/plain")
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+
 		return
 	}
 
 	banned = banned[offset:limit]
 
-	if len(banned) == 0 { // 204 response
-		fmt.Println("response: empty")
+	if len(banned) == 0 { //   204 response
 		w.Header().Set("content-type", "text/plain")
 		w.WriteHeader(http.StatusNoContent)
-		io.WriteString(w, "empty body, found nothing")
+
 		return
 
-	} else { //200 repsonse
+	} else { //  200 repsonse
 		w.Header().Set("content-type", "application/json")
-		// w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(banned)
+		//   w.WriteHeader(http.StatusOK)
+		if err = json.NewEncoder(w).Encode(banned); err != nil {
+			ctx.Logger.Errorf("%w", err)
+			w.Header().Set("content-type", "text/plain") //   500
+			w.WriteHeader(ServerError.StatusCode)
+
+		}
 	}
 
 }

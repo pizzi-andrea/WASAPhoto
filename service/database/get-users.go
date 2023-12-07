@@ -29,7 +29,7 @@ func (db *appdbimpl) GetUsers(username Username, largeSearch bool) (users []User
 	defer rows.Close()
 
 	for rows.Next() {
-		if err := rows.Scan(&uid, &name); err != nil {
+		if err = rows.Scan(&uid, &name); err != nil {
 			return users, err
 		}
 		users = append(users, User{

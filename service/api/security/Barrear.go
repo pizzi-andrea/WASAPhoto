@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var tokenRegistred map[uint64]bool = make(map[uint64]bool) // list token registred in the system. The token is registred in login action and deleted in logout action
+var tokenRegistred map[uint64]bool = make(map[uint64]bool) //   list token registred in the system. The token is registred in login action and deleted in logout action
 
 func RecordToken(token Token) (status bool) {
 
@@ -23,9 +23,9 @@ func RecordToken(token Token) (status bool) {
 
 func GetTokensRec() (t []Token) {
 
-	for k, _ := range tokenRegistred {
+	for k := range tokenRegistred {
 		t = append(t, Token{
-			Value: uint64(k),
+			Value: k,
 		})
 
 	}
@@ -35,7 +35,7 @@ func GetTokensRec() (t []Token) {
 func GetToken(val uint64) *Token {
 	if _, ok := tokenRegistred[val]; ok {
 		return &Token{
-			Value: uint64(val),
+			Value: val,
 		}
 
 	}

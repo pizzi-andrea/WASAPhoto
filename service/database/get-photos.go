@@ -2,24 +2,25 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 )
 
 type OrderBy int
 
-const ( // sort by value
+const ( //   sort by value
 	timeUpdate OrderBy = iota
 )
 
 type Ordering int
 
-const ( // Ordering parameters
+const ( //   Ordering parameters
 	asc Ordering = iota
 	desc
 )
 
 /*
-GetPhotos give in  in input user id (uid) and get all photos that users have updated
+GetPhotos accepts the user ID (uid) as input and extracts all photos uploaded by users. Users can charge up or more
+photos (deleted photos will not be listed), in fact the photo stream may be returned empty. If a value of zero is returned
+for photos, an error occurred
 */
 func (db *appdbimpl) GetPhotos(uid Id, by []OrderBy, ord ...Ordering) (photos StreamPhotos, err error) {
 	var photo Photo
@@ -57,7 +58,6 @@ func (db *appdbimpl) GetPhotos(uid Id, by []OrderBy, ord ...Ordering) (photos St
 
 	for rows.Next() {
 		if err = rows.Scan(&photo.PhotoId, &uid, &photo.DescriptionImg, &photo.ImageData, &photo.TimeUpdate); err != nil {
-			fmt.Println(fmt.Errorf("%w", err))
 			return
 		}
 

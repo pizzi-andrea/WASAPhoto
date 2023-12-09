@@ -1,7 +1,7 @@
 package api
 
 const (
-	MaxByteFormData    = MaxBytePhoto + MaxByteDescription // byte
+	MaxByteFormData    = MaxBytePhoto + MaxByteDescription //   byte
 	MaxSizeStream      = 100
 	MaxByteDescription = 250
 	MaxBytePhoto       = 5000000

@@ -2,13 +2,12 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
 
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"pizzi1995517.it/WASAPhoto/service/api/reqcontext"
 	"pizzi1995517.it/WASAPhoto/service/api/security"
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
@@ -22,8 +21,8 @@ all information on user, in particular:
   - number of followers
   - number of following
 */
-func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var uid int
+func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	var uid_ int
 	var err error
 	var user *database.User
 	var isBan bool
@@ -34,29 +33,31 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	/*
 		Parse URL parameters
 	*/
-	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
-		fmt.Println(fmt.Errorf("Atoi%w", err))
-		w.Header().Set("content-type", "text/plain") // 400
+	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+		ctx.Logger.Errorf("Atoi::%w", err)
+		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
-		io.WriteString(w, BadRequest.Status)
+
 		return
 	}
 
+	uid := database.Id(uid_)
 	/*
 		if user id in URL path not exist, then user not found
 	*/
-	if user, err = rt.db.GetUserFromId(database.Id(uid)); err != nil {
-		fmt.Println(fmt.Errorf("GetUserFromId:%w", err))
-		w.Header().Set("content-type", "text/plain") // 500
+	if user, err = rt.db.GetUserFromId(uid); err != nil {
+		ctx.Logger.Errorf("GetUserFromId::%w", err)
+		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+		return
+
 	}
 
+	// if user not exist path is invalid
 	if user == nil {
-		fmt.Println(fmt.Errorf("%w", err))
-		w.Header().Add("content-type", "text/plain") // 404
+		w.Header().Add("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusNotFound)
-		io.WriteString(w, "user not found")
+
 		return
 	}
 
@@ -64,10 +65,9 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		Applay barrear authentication. Only owner user and users not banned by owner can access
 	*/
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
-		fmt.Println(fmt.Errorf("auth:%w", err))
-		w.Header().Set("content-type", "text/plain") // 401
+		w.Header().Set("content-type", "text/plain") //   401
 		w.WriteHeader(UnauthorizedError.StatusCode)
-		io.WriteString(w, UnauthorizedError.Status)
+
 		return
 	}
 
@@ -76,49 +76,51 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	*/
 
 	if isBan, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {
-		fmt.Println(fmt.Errorf("IsBanned:%w", err))
-		w.Header().Set("content-type", "text/plain") // 500
+		ctx.Logger.Errorf("IsBanned::%w", err)
+		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+		return
+
 	}
 
+	// if user that would see profile is banned by owner profile user can not access to it.
 	if isBan {
-		w.Header().Set("content-type", "text/plain") // 403
+		w.Header().Set("content-type", "text/plain") //   403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
-		io.WriteString(w, UnauthorizedToken.Status)
+
 		return
 	}
 
 	/*
-		get follower of user
+		get followers of user
 	*/
-	if follower, err = rt.db.GetFollowers(database.Id(uid), "", true); err != nil {
-		fmt.Println(fmt.Errorf(" GetFollowers:%w", err))
-		w.Header().Set("content-type", "text/plain") // 500
+	if follower, err = rt.db.GetFollowers(uid, "", true); err != nil {
+		ctx.Logger.Errorf("GetFollowers::%w", err)
+		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+
 		return
 	}
 
 	/*
 		get users following by user
 	*/
-	if following, err = rt.db.GetFollowing(database.Id(uid), "", true); err != nil {
-		fmt.Println(fmt.Errorf("GetFollowing:%w", err))
-		w.Header().Set("content-type", "text/plain") // 500
+	if following, err = rt.db.GetFollowed(uid, "", true); err != nil {
+		ctx.Logger.Errorf("GetFollowed::%w", err)
+		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+
 		return
 	}
 
 	/*
 		get photo stream. Photo stream is composed by photos of other followed users
 	*/
-	if photos, err = rt.db.GetPhotos(database.Id(uid), []database.OrderBy{}); err != nil {
-		fmt.Println(fmt.Errorf("GetPhotos:%w", err))
-		w.Header().Set("content-type", "text/plain") // 500
+	if photos, err = rt.db.GetPhotos(uid, []database.OrderBy{}); err != nil {
+		ctx.Logger.Errorf("GetPhotos::%w", err)
+		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+
 		return
 
 	}
@@ -127,13 +129,18 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		put in response body user profile rappresentation
 	*/
 	w.Header().Add("content-type", "application/json")
-	w.WriteHeader(http.StatusOK) // 200
-	//io.WriteString(w, "get user profile corresponding to *uid*")
-	json.NewEncoder(w).Encode(database.Profile{
+	w.WriteHeader(http.StatusOK) //   200
+	// encode in json format the response
+	if err = json.NewEncoder(w).Encode(database.Profile{
 		User:      *user,
 		Stream:    photos,
 		Follower:  len(follower),
 		Following: len(following),
-	})
+	}); err != nil {
+		ctx.Logger.Errorf("Encode::%w", err)
+		w.Header().Set("content-type", "text/plain") //   500
+		return
+
+	}
 
 }

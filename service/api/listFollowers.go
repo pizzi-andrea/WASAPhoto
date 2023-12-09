@@ -2,13 +2,13 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
+	"regexp"
 
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
+	"pizzi1995517.it/WASAPhoto/service/api/reqcontext"
 	"pizzi1995517.it/WASAPhoto/service/api/security"
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
@@ -16,9 +16,9 @@ import (
 /*
 give a UID return a list contanings all followers user
 */
-func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var uid int
+	var uid_ int
 	var err error
 	var isBan bool
 	var user *database.User
@@ -30,47 +30,58 @@ func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps http
 	/*
 		Parse URL parameters
 	*/
-	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
-		w.Header().Set("content-type", "text/plain") // 400
+	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
-		io.WriteString(w, BadRequest.Status)
+
+		return
+	}
+	uid := database.Id(uid_)
+	//   validate username format
+	username = r.URL.Query().Get("username")
+	rr, err := regexp.MatchString("^.*?$", username)
+
+	if !(rr && err == nil && len(username) <= 16) {
+		w.Header().Set("content-type", "text/plain") //   400
+		w.WriteHeader(BadRequest.StatusCode)
+
 		return
 	}
 
-	username = r.URL.Query().Get("username")
-
 	if limit, err = strconv.Atoi(r.URL.Query().Get("limit")); err != nil && r.URL.Query().Get("limit") != "" {
-		w.Header().Set("content-type", "text/plain") // 400
-		fmt.Println(fmt.Errorf("query error: %w", err))
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(http.StatusBadRequest)
-		io.WriteString(w, "Bad request, formating error")
+
 		return
 	}
 
 	/*
 		if user id in URL path not exist, then user not found
 	*/
-	if user, err = rt.db.GetUserFromId(database.Id(uid)); err != nil {
-		w.Header().Set("content-type", "text/plain") // 500
+	if user, err = rt.db.GetUserFromId(uid); err != nil {
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+
 		return
 	}
 
 	if user == nil {
-		w.Header().Add("content-type", "text/plain") // 404
+		w.Header().Add("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusNotFound)
-		io.WriteString(w, "user not found")
+
 		return
 	}
 
 	/*
-
-	 */
+		check if token is given and it user is currently logged
+	*/
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
-		w.Header().Set("content-type", "text/plain") // 401
+		w.Header().Set("content-type", "text/plain") //   401
 		w.WriteHeader(UnauthorizedError.StatusCode)
-		io.WriteString(w, UnauthorizedError.Status)
+
 		return
 	}
 
@@ -79,51 +90,53 @@ func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps http
 	*/
 
 	if isBan, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {
-		w.Header().Set("content-type", "text/plain") // 500
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+
 		return
 	}
 
 	if isBan {
-		w.Header().Set("content-type", "text/plain") // 403
+		w.Header().Set("content-type", "text/plain") //   403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
-		io.WriteString(w, UnauthorizedToken.Status)
+
 		return
 	}
 
-	if followers, err := rt.db.GetFollowers(database.Id(uid), username, true); err != nil {
-		fmt.Println(fmt.Errorf("internal error: %w", err))
+	if followers, err := rt.db.GetFollowers(uid, username, true); err != nil {
+		ctx.Logger.Errorf("%w", err)
 		w.WriteHeader(http.StatusInternalServerError)
-		io.WriteString(w, ServerError.Status)
+
 		return
 
 	} else {
 
-		if limit == 0 {
+		if limit == 0 || limit > len(followers) {
 			limit = len(followers)
 		}
 
-		if offset > len(followers) { //500 response
-			fmt.Println("offser: no offset valid")
+		if offset > len(followers) { //  500 response
 			w.Header().Set("content-type", "text/plain")
 			w.WriteHeader(ServerError.StatusCode)
-			io.WriteString(w, ServerError.Status)
+
 			return
 		}
 
-		followers = followers[offset:min(len(followers), limit)]
+		followers = followers[offset:limit]
 
-		if len(followers) == 0 { // 204 response
-			fmt.Println("response: empty")
+		if len(followers) == 0 { //   204 response
 			w.Header().Set("content-type", "text/plain")
 			w.WriteHeader(http.StatusNoContent)
-			io.WriteString(w, "empty body, found nothing")
 
-		} else { //200 repsonse
+		} else { //  200 repsonse
 			w.Header().Set("content-type", "application/json")
-			// w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(followers)
+			if err = json.NewEncoder(w).Encode(followers); err != nil {
+				ctx.Logger.Errorf("%w", err)
+				w.Header().Set("content-type", "text/plain") //   500
+				w.WriteHeader(ServerError.StatusCode)
+
+			}
 		}
 
 	}

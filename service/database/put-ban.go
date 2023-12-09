@@ -1,6 +1,9 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
+)
 
 // PutBan allow user "from" banned user "to". User "from" not ban his infact "from" will be different from "to".
 // If ban ended with success, function return true and nil values, if ban value is just present function return false and nil otherwise
@@ -14,7 +17,7 @@ func (db *appdbimpl) PutBan(from, to Id) (r bool, err error) {
 		return
 	}
 
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		err = nil
 		return
 	}

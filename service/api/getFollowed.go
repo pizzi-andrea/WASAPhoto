@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"regexp"
+
 	"strconv"
 
 	"github.com/julienschmidt/httprouter"
@@ -13,16 +14,16 @@ import (
 )
 
 /*
-given *uid* of user that who wants to get all photo in his stream
+give a UID return a list contanings all followers user
 */
-func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getFollowed(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var uid_ int
 	var err error
-	var stream []database.Post
 	var user *database.User
 	var tk *security.Token
 	var limit int
+	var username database.Username
 	offset := 0
 
 	/*
@@ -36,23 +37,20 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 	uid := database.Id(uid_)
-	pLimit := r.URL.Query().Get("limit")
-	pUsername := r.URL.Query().Get("username")
 
-	if limit, err = strconv.Atoi(pLimit); pLimit != "" && err != nil {
-		ctx.Logger.Errorf("%w", err)
+	//   validate username format
+	username = r.URL.Query().Get("username")
+	rr, err := regexp.MatchString("^.*?$", username)
+	if !(rr && err == nil && len(username) <= 16) {
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
-
 		return
-
 	}
 
-	rr, err := regexp.MatchString("^.*?$", pUsername)
-	if !(rr && err == nil && len(pUsername) <= 16) {
+	if limit, err = strconv.Atoi(r.URL.Query().Get("limit")); err != nil && r.URL.Query().Get("limit") != "" {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
-		w.WriteHeader(BadRequest.StatusCode)
+		w.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
@@ -65,6 +63,7 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
 
+		return
 	}
 
 	if user == nil {
@@ -75,8 +74,8 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	/*
-
-	 */
+		check if token is given and it user is currently logged
+	*/
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
 		w.Header().Set("content-type", "text/plain") //   401
 		w.WriteHeader(UnauthorizedError.StatusCode)
@@ -85,48 +84,52 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	/*
-		The stream is personal only owner user can see it
+		get banned user and check if not banned
 	*/
+
 	if tk.Value != user.Uid {
-		w.Header().Set("content-type", "text/plain") //   403
-		w.WriteHeader(UnauthorizedToken.StatusCode)
-
-		return
-	}
-
-	if stream, err = rt.db.GetMyStream(user.Uid, pUsername, true, []database.OrderBy{}); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
 
 		return
-
 	}
 
-	if limit == 0 || limit > len(stream) {
-		limit = len(stream)
-	}
-
-	if offset > len(stream) { //  500 response
-		w.Header().Set("content-type", "text/plain")
-		w.WriteHeader(ServerError.StatusCode)
-
-		return
-	}
-
-	stream = stream[offset:limit]
-
-	if len(stream) == 0 { //   204 response
-		w.Header().Set("content-type", "text/plain")
-		w.WriteHeader(http.StatusNoContent)
+	if followed, err := rt.db.GetFollowed(uid, username, true); err != nil {
+		ctx.Logger.Errorf("%w", err)
+		w.WriteHeader(http.StatusInternalServerError)
 
 		return
 
 	} else {
-		if err = json.NewEncoder(w).Encode(stream); err != nil {
+
+		if limit == 0 || limit > len(followed) {
+			limit = len(followed)
+		}
+
+		if offset > len(followed) { //  500 response
 			w.Header().Set("content-type", "text/plain")
 			w.WriteHeader(ServerError.StatusCode)
+
+			return
 		}
+
+		followed = followed[offset:limit]
+
+		if len(followed) == 0 { //   204 response
+			w.Header().Set("content-type", "text/plain")
+			w.WriteHeader(http.StatusNoContent)
+
+		} else { //  200 repsonse
+			w.Header().Set("content-type", "application/json")
+			if err = json.NewEncoder(w).Encode(followed); err != nil {
+				ctx.Logger.Errorf("%w", err)
+				w.Header().Set("content-type", "text/plain") //   500
+				w.WriteHeader(ServerError.StatusCode)
+
+			}
+		}
+
 	}
 
 }

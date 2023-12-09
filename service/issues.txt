@@ -1,0 +1,14 @@
+ 23: put a space between `//  ` and comment text OK
+  1: Error return value of `rt.db.DelFollow` is not checked
+  1: `r_followed` is unused OK
+  7: rows.Err must be checked
+  1: const `r_followed` is unused
+  1: We found some dead code. If it's not an error, remove the code. OK
+138: Error return value of `io.WriteString` is not checked OK
+ 72: Do not use fmt.Print (or its variant), use the logger. OK
+  1: len(s) >= 0 is always true OK
+  9: We found some unnecessary type casting (casting from a type to the same type), e.g.: `var x int` and `p = int(x)`
+  9: Error return value of `(*encoding/json.Encoder).Encode` is not checked OK
+  1: len(p.ImageData) >= 0 is always true OK
+  1: comparing with == will fail on wrapped errors. Use errors.Is to check for a specific error OK
+ 16: Some APIs endpoints have been defined in the OpenAPI document, but the implementation is missing.

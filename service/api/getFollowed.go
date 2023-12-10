@@ -88,7 +88,7 @@ func (rt *_router) getFollowed(w http.ResponseWriter, r *http.Request, ps httpro
 	*/
 
 	if tk.Value != user.Uid {
-		ctx.Logger.Errorf("%w", err)
+		ctx.Logger.Errorf("User <%d> not owner. Owner is <%v>\n", tk.Value, user)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
 

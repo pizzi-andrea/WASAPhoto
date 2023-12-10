@@ -123,14 +123,19 @@ curl -X 'PUT' \
   'http://localhost:3000/users/1/followers/2' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer 2'
-echo "\t\n\t\n"
+
 curl -X 'PUT' \
-  'http://localhost:3000/users/3/followers/4' \
+  'http://localhost:3000/users/5/followers/2' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer 4'
- 
- echo \n dell \n 
-  
+  -H 'Authorization: Bearer 2'
+
+curl -X 'PUT' \
+  'http://localhost:3000/users/3/followers/2' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer 2'
+
+
+
 curl -X 'DELETE' \
   'http://localhost:3000/users/1/followers/2' \
   -H 'accept: */*' \
@@ -142,14 +147,14 @@ curl -X 'DELETE' \
 echo "\n========end test /users/:uid/followers/followerId================\n"
 echo "\n========start test /users/:uid/followers================\n"
 curl -X 'GET' \
-  'http://localhost:3000/users/2/followers/' \
+  'http://localhost:3000/users/1/followers/' \
   -H 'accept: application/json' \
   -H 'Authorization: Bearer 1'
 echo "\t\n\t\n"
 curl -X 'GET' \
-  'http://localhost:3000/users/3/followers/' \
+  'http://localhost:3000/users/2/followers/' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer 1'
+  -H 'Authorization: Bearer 2'
 echo "\t\n\t\n"
 curl -X 'GET' \
   'http://localhost:3000/users/1/followers/' \
@@ -159,36 +164,11 @@ echo "\t\n\t\n"
 curl -X 'GET' \
   'http://localhost:3000/users/3/followers/' \
   -H 'accept: application/json' \
-  -H 'Authorization: Bearer 4'
+  -H 'Authorization: Bearer 3'
 sleep 5
 echo "\n========end test /users/:uid/followers/================\n"
 echo "\n========start test /users/:uid/banned/:bannedId================\n"
 
-curl -X 'PUT' \
-  'http://localhost:3000/users/2/banned/3' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer 2'\
-  -d '{
-  "username": "marioross"
-}'
-curl -X 'PUT' \
-  'http://localhost:3000/users/2/banned/5' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer 2'\
-  -d '{
-  "username": "marioross"
-}'
-
-curl -X 'PUT' \
-  'http://localhost:3000/users/3/banned/1' \
-  -H 'accept: application/json' \
-  -H 'Content-Type: application/json' \
-  -H 'Authorization: Bearer 3'\
-  -d '{
-  "username": "marioross"
-}'
 
 curl -X 'PUT' \
   'http://localhost:3000/users/5/banned/4' \
@@ -199,13 +179,11 @@ curl -X 'PUT' \
   "username": "marioross"
 }'
 
-echo \nput\n
-curl -X 'GET' \
-  'http://localhost:3000/users/2/banned/?limit=50' \
-  -H 'accept: application/json' \
-  -H 'Authorization: Bearer 2'
 
-echo \ndel\n
+curl -X 'GET' \
+  'http://localhost:3000/users/5/banned/?limit=50' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer 5'
 
 curl -X 'DELETE' \
   'http://localhost:3000/users/3/banned/1' \
@@ -213,9 +191,42 @@ curl -X 'DELETE' \
   -H 'Authorization: Bearer 3'
 
 
-  
-echo "\n========end test /users/::uid/banned/:bannedId================\n"
+
+echo "\n========end test /users/:uid/banned/:bannedId================\n"
+
+echo "\n=======Start upload Photo ===================================\n"
+
+
+curl -X 'POST' \
+  'http://localhost:3000/users/1/myPhotos/' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: multipart/form-data' \
+  -H 'Authorization: Bearer 1' \
+  -F 'descriptionImg="Una foto spazialeeeee!" '\
+  -F 'imageData=@big.png'
 
 sleep 5
 
+echo "\n========start test /users/:uid/MyPhotos/:photoId/comments/=====\n"
 
+curl -X 'POST' \
+  'http://localhost:3000/users/1/myPhotos/1/comments/' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "author": {
+    "username": "marioross"
+  },
+  "text": "😀 i like you photo! 😀"
+}'
+
+curl -X 'POST' \
+  'http://localhost:3000/users/1/myPhotos/1/comments/' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "author": {
+    "username": "marioross"
+  },
+  "text": "😀 i like you photo! 😀"
+}'

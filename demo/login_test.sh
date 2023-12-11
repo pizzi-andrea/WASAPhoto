@@ -1,5 +1,12 @@
 #!/bin/bash
-clear
+
+
+clear # Elimina output dei precedenti comandi
+
+# start server 
+# go build ../cmd/webapi && go run webapi
+
+# Test API doLogin()
 username=("debian" "kali" "opensuse" "ubuntu" "fedora" "mangeia" "knopix" "garuda")
 echo	"[Login Test]"
 for u in "${username[@]}"
@@ -11,12 +18,10 @@ do
 		-d '{"name": "'"$u"'"}'
 	echo ":$u"
 done
-
 echo "[end Login test]"
 
+# Test API followingUser()
 echo "[start following test]"
-
-
 for i in {1..10}
 do
 	from=$(expr 1 + $RANDOM % "${#username[@]}")
@@ -35,7 +40,7 @@ echo "[end following test]"
 
 echo "[start post photo]"
 
-for i in {1..120}
+for i in {1..60}
 do
 	from=$(expr 1 + $RANDOM % "${#username[@]}")
 
@@ -48,5 +53,83 @@ do
 	-F 'imageData=@tiny.png'
 done
 
+echo "[end post photo]"
+echo "[start comment photo]"
+for i in {1..20}
+do
+    
+    from=$(expr 1 + $RANDOM % "${#username[@]}")
+    to=$(expr 1 + $RANDOM % "${#username[@]}")
+    photo=$(expr 1 + $RANDOM % 60)
+    curl -X 'POST' \
+	"http://localhost:3000/users/$to/myPhotos/$photo/comments/" \
+	-H 'accept: application/json' \
+	-H "Authorization: Bearer $from " \
+	-H 'Content-Type: application/json' \
+	-d "{
+	\"author\": {
+		\"username\": \"${username[$from]}\"
+	},
+	\"text\": \"😀 i like you photo! 😀\"
+	}"
+    
+    
+done
 
+echo "[end comment photo]"
+
+echo "[start like photo]"
+for i in {1..50}
+do
+    
+    from=$(expr 1 + $RANDOM % "${#username[@]}")
+    to=$(expr 1 + $RANDOM % "${#username[@]}")
+    photo=$(expr 1 + $RANDOM % 60)
+    curl -X 'PUT' \
+	"http://localhost:3000/users/$to/myPhotos/$photo/likes/$from"\
+	-H 'accept: application/json' \
+	-H "Authorization: Bearer $from"
+    
+    
+done
+echo "[end like photo]"
+
+
+echo "[start list users]"
+
+curl -X 'GET' \
+	"http://localhost:3000/users/?limit=&username=" \
+	-H 'accept: application/json' \
+	-H "Authorization: Bearer 1"
+
+for i in {1..10}
+do
+    
+    from=$(expr 1 + $RANDOM % "${#username[@]}")
+    usr=$(expr 1 + $RANDOM % "${#username[@]}")
+    limit=$(expr 1 + $RANDOM % 10)
+	curl -X 'GET' \
+	"http://localhost:3000/users/?limit=$limit&username=${username[$usr]}" \
+	-H 'accept: application/json' \
+	-H "Authorization: Bearer $from"
+    
+    
+done
+echo "[end list users]"
+
+echo "[start show user profile]"
+
+for i in {1..10}
+do
+    
+   
+    usr=$(expr 1 + $RANDOM % "${#username[@]}")
+	curl -X 'GET' \
+		"http://localhost:3000/users/$usr/" \
+		-H 'accept: application/json' \
+		-H "Authorization: Bearer $usr"
+    
+done
+
+echo "[end show user profile]"
 

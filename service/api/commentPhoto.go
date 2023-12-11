@@ -11,12 +11,11 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
-// /users/{uid}/myPhotos/{photoId}/comments/
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var photo_, uid_ int
 	var err error
-	var msg *database.Comment
+	var msg *database.Comment = &database.Comment{}
 	var tk *security.Token
 	var user *database.User
 	var photo *database.Photo
@@ -37,10 +36,9 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 		return
 	}
-
+	// problem ================================================
 	photoId := database.Id(photo_)
 	uid := database.Id(uid_)
-
 	if err = json.NewDecoder(r.Body).Decode(msg); err != nil {
 		ctx.Logger.Errorf("Decode::%w\n", err)
 		w.Header().Set("content-type", "text/plain") //  400
@@ -48,6 +46,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 
 	}
+	// =========================================================
 	/*
 		if !(database.ValidateId(photoId) && database.ValidateId(uid) && msg.Verify()) {
 			ctx.Logger.Errorln("Invalid data input")
@@ -77,6 +76,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	if photo == nil || user == nil {
+		ctx.Logger.Error("Photo/user not found", err)
 		w.Header().Add("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
 
@@ -122,7 +122,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	if msg, err = rt.db.PostComment(user.Uid, msg.Text, photo.PhotoId); err != nil {
 		ctx.Logger.Errorf("PostComment::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
-		w.WriteHeader(ServerError.StatusCode)
+		w.WriteHeader(http.StatusInternalServerError)
 
 		return
 

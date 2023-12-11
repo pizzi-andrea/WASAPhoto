@@ -12,7 +12,7 @@ The function will return unsuccessfully if an error occurs
 */
 func (db *appdbimpl) PutLike(uid Id, photoId Id) (r bool, err error) {
 
-	if err = db.c.QueryRow("INSERT OR IGNORE INTO  Likes(user, photo) INTO (?, ?) RETURNING *", uid, photoId).Scan(&uid, &photoId); err != nil {
+	if err = db.c.QueryRow("INSERT OR IGNORE INTO  Likes(user, photo)  VALUES(?, ?) RETURNING *", uid, photoId).Scan(&uid, &photoId); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			err = nil
 			r = true

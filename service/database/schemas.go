@@ -19,24 +19,24 @@ type Validator interface {
 
 /*this object rappresent a photo*/
 type Photo struct {
-	PhotoId        Id
-	TimeUpdate     TimeStamp
-	ImageData      []byte //   data
-	DescriptionImg string //   image description
+	PhotoId        Id        `json:"photoId"`
+	TimeUpdate     TimeStamp `json:"timeUpdate"`
+	ImageData      []byte    `json:"imageData"`      //   data
+	DescriptionImg string    `json:"descriptionImg"` //   image description
 }
 
 /*this object rappresent a user*/
 type User struct {
-	Uid      Id
-	Username Username
+	Uid      Id       `json:"uid"`
+	Username Username `json:"username"`
 }
 
 /*user profile rappresentation*/
 type Profile struct {
-	User      User
-	Stream    StreamPhotos
-	Follower  int //  number user that follow a specific user
-	Following int //  numer of users following by specific user
+	User      User         `json:"user"`
+	Stream    StreamPhotos `json:"stream"`
+	Follower  int          `json:"follower"`  //number user that follow a specific user
+	Following int          `json:"following"` //  numer of users following by specific user
 
 }
 
@@ -45,9 +45,9 @@ this object rappresent a post.
 A post is provided to photo and list of like and comments that recived.
 */
 type Post struct {
-	Photo    Photo
-	Likes    []User
-	Comments []Comment
+	Photo    Photo     `json:"photo"`
+	Likes    []User    `json:"likes"`
+	Comments []Comment `json:"comments"`
 }
 
 /*this object rappresent a photo*/

@@ -21,6 +21,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	var rr bool
 
 	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+		ctx.Logger.Errorf("Atoi::%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
 
@@ -28,6 +29,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	if photo_, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
+		ctx.Logger.Errorf("Atoi::%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
 
@@ -35,6 +37,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	if likeId_, err = strconv.Atoi(ps.ByName("likeId")); err != nil {
+		ctx.Logger.Errorf("Atoi::%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
 
@@ -54,6 +57,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	if user, err = rt.db.GetUserFromId(uid); err != nil {
+		ctx.Logger.Errorf("GetUserFromId::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 
@@ -62,6 +66,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	if photo, err = rt.db.GetPhoto(photoId); err != nil {
+		ctx.Logger.Errorf("GetPhoto::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 
@@ -87,6 +92,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	if rr, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {
+		ctx.Logger.Errorf("IsBanned::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 
@@ -101,7 +107,8 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	if _, err = rt.db.PutLike(photoId, likeId); err != nil {
+	if _, err = rt.db.PutLike(likeId, photoId); err != nil {
+		ctx.Logger.Errorf("PutLike::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 

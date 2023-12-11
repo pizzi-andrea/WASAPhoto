@@ -13,5 +13,4 @@ func (db *appdbimpl) SetUsername(uid Id, username string) (usr *User, err error)
 
 	return
 
-
 }

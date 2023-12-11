@@ -22,7 +22,7 @@ const r_streamPhoto = r_myStream + ":photoId"
 const r_comments = r_myPhoto + "comments/"
 const r_comment = r_comments + ":commentId"
 const r_likes = r_myPhoto + "likes/"
-const r_like = r_likes + "likeId"
+const r_like = r_likes + ":likeId"
 
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) Handler() http.Handler {

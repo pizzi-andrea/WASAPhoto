@@ -14,13 +14,15 @@ const r_login = r_root + "session"
 const r_banned = r_user + "banned/"
 const r_userBanned = r_banned + ":bannedId"
 
-// const r_followed = r_user + "followed"
+const r_followed = r_user + "followed"
 const r_myPhotos = r_user + "myPhotos/"
 const r_myPhoto = r_myPhotos + ":photoId/"
 const r_myStream = r_user + "myStream/"
 const r_streamPhoto = r_myStream + ":photoId"
 const r_comments = r_myPhoto + "comments/"
 const r_comment = r_comments + ":commentId"
+const r_likes = r_myPhoto + "likes/"
+const r_like = r_likes + ":likeId"
 
 // Handler returns an instance of httprouter.Router that handle APIs registered here
 func (rt *_router) Handler() http.Handler {
@@ -49,11 +51,8 @@ func (rt *_router) Handler() http.Handler {
 	//  follow user
 	rt.router.PUT(r_follower, rt.wrap(rt.followUser))
 
-	/*
-
-		//   get followed user
-		rt.router.GET("/users/{uid}/following/:followingId", rt.getFollowing)
-	*/
+	//   get followed user
+	rt.router.GET(r_followed, rt.wrap(rt.getFollowed))
 
 	//   list personal stream photos
 	rt.router.GET(r_myStream, rt.wrap(rt.getMyStream))
@@ -81,25 +80,24 @@ func (rt *_router) Handler() http.Handler {
 
 	//   get photo
 	rt.router.GET(r_myPhoto, rt.wrap(rt.getPhoto))
-	/*
-		//   get likes collected by photo
-		rt.router.GET("/users/:uid/myPhotos/:photoId/likes/", rt.getLikes)
 
-		//   put like a photo
-		rt.router.PUT("/users/:uid/myPhotos/:photoId/likes/:likeUserId:", rt.likePhoto)
+	//   get likes collected by photo
+	rt.router.GET(r_likes, rt.wrap(rt.getLikes))
 
-		//   remove like a photo
-		rt.router.DELETE("/users/:uid/myPhotos/:photoId/likes/:likeUserId:", rt.unlikePhoto)
-	*/
+	//   put like a photo
+	rt.router.PUT(r_like, rt.wrap(rt.likePhoto))
+
+	//   remove like a photo
+	rt.router.DELETE(r_like, rt.wrap(rt.unlikePhoto))
+
 	//  add comment a photo
-	rt.router.POST(r_comment, rt.wrap(rt.commentPhoto))
+	rt.router.POST(r_comments, rt.wrap(rt.commentPhoto))
 
 	//  get comments on photo
 	rt.router.GET(r_comments, rt.wrap(rt.getComments))
-	/*
-		//  delete comment on photo
-		rt.router.DELETE("/users/:uid/myPhotos/:photoId/comments/:commentId", rt.uncommentPhoto)
-	*/
+
+	//  delete comment on photo
+	rt.router.DELETE(r_comment, rt.wrap(rt.uncommentPhoto))
 
 	//  get comment on photo
 	rt.router.GET(r_comment, rt.wrap(rt.getComment))

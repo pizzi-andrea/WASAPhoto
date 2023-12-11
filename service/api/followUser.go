@@ -117,7 +117,6 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-
 		return
 	}
 
@@ -130,24 +129,26 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	if action {
-
-		var u *database.User
-		if u, err = rt.db.GetUserFromId(to); u != nil || err == nil {
+		if user, err = rt.db.GetUserFromId(from); err != nil {
 			ctx.Logger.Errorf("%w", err)
 			w.Header().Set("content-type", "text/plain") //   500
 			w.WriteHeader(ServerError.StatusCode)
+			return
 
+		}
+
+		if err = json.NewEncoder(w).Encode(*user); err != nil {
+			ctx.Logger.Errorf("%w", err)
+			w.Header().Set("content-type", "text/plain") //   500
+			w.WriteHeader(ServerError.StatusCode)
 			return
 		}
+
 		w.Header().Set("content-type", "application/json") //  201
 		w.WriteHeader(http.StatusCreated)
-		if err = json.NewEncoder(w).Encode(*u); err != nil {
-			ctx.Logger.Errorf("%w", err)
-			w.Header().Set("content-type", "text/plain") //   500
-			w.WriteHeader(ServerError.StatusCode)
 
-		}
 	} else {
+		ctx.Logger.Infoln("user just follow")
 		w.Header().Set("content-type", "text/plain") //  204
 		w.WriteHeader(http.StatusNoContent)
 

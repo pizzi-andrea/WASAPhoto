@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"strconv"
 
@@ -12,7 +11,6 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
-// /users/{uid}/myPhotos/{photoId}/comments/
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var photo_, uid_ int
@@ -24,52 +22,64 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	var rr bool
 
 	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+		ctx.Logger.Errorf("Atoi::%w\n", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
-		io.WriteString(w, BadRequest.Status)
+
 		return
 	}
 
 	if photo_, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
+		ctx.Logger.Errorf("Atoi::%w\n", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
-		io.WriteString(w, BadRequest.Status)
+
 		return
 	}
-
+	// problem ================================================
 	photoId := database.Id(photo_)
 	uid := database.Id(uid_)
-
-	json.NewDecoder(r.Body).Decode(msg)
-
-	if !(database.ValidateId(photoId) && database.ValidateId(uid) && msg.Verify()) {
+	if err = json.NewDecoder(r.Body).Decode(msg); err != nil {
+		ctx.Logger.Errorf("Decode::%w\n", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
-		io.WriteString(w, BadRequest.Status)
 		return
 
 	}
+	// =========================================================
+	/*
+		if !(database.ValidateId(photoId) && database.ValidateId(uid) && msg.Verify()) {
+			ctx.Logger.Errorln("Invalid data input")
+			w.Header().Set("content-type", "text/plain") //  404
+			w.WriteHeader(http.StatusNotFound)
+			return
+
+		}
+	*/
 
 	if user, err = rt.db.GetUserFromId(uid); err != nil {
+		ctx.Logger.Errorf("GetUserFromId::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+
 		return
 
 	}
 
 	if photo, err = rt.db.GetPhoto(photoId); err != nil {
+		ctx.Logger.Errorf("GetPhoto::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+
 		return
 
 	}
 
 	if photo == nil || user == nil {
+		ctx.Logger.Error("Photo/user not found", err)
 		w.Header().Add("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
-		io.WriteString(w, "Not Found, User not found")
+
 		return
 	}
 
@@ -77,16 +87,18 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		Check if user that wont put follows can do it
 	*/
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
+		ctx.Logger.Errorln("Token missing or invalid")
 		w.Header().Set("content-type", "text/plain") //  401
 		w.WriteHeader(UnauthorizedError.StatusCode)
-		io.WriteString(w, UnauthorizedError.Status)
+
 		return
 	}
 
 	if rr, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {
+		ctx.Logger.Errorf("IsBanned::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+
 		return
 
 	}
@@ -94,35 +106,43 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	if rr {
 		w.Header().Set("content-type", "text/plain") //  403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
-		io.WriteString(w, UnauthorizedToken.Status)
 		return
 	}
 
 	if user, err = rt.db.GetUserFromUser(msg.Author.Username); err != nil {
+		ctx.Logger.Errorf("Atoi::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+
 		return
 
 	}
 
 	if msg, err = rt.db.PostComment(user.Uid, msg.Text, photo.PhotoId); err != nil {
+		ctx.Logger.Errorf("PostComment::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
-		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+		w.WriteHeader(http.StatusInternalServerError)
+
 		return
 
 	}
 
 	if msg == nil {
+		ctx.Logger.Errorln("Post not created")
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
+
 		return
 	}
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(*msg)
+	if err = json.NewEncoder(w).Encode(*msg); err != nil {
+		ctx.Logger.Errorf("Encode::%w", err)
+		w.Header().Set("content-type", "text/plain") //  500
+		w.WriteHeader(ServerError.StatusCode)
+
+	}
+	ctx.Logger.Infof("New comment add to <%v> by <%v> ", user, photo)
 
 }

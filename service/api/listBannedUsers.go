@@ -66,7 +66,6 @@ func (rt *_router) listBannedUsers(w http.ResponseWriter, r *http.Request, ps ht
 
 	 */
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
-		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   401
 		w.WriteHeader(UnauthorizedError.StatusCode)
 

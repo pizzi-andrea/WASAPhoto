@@ -14,7 +14,10 @@ Example:
 	})
 	if err != nil {
 		logger.WithError(err).Error("error creating the API server instance")
-		return fmt.Errorf("error creating the API server instance: %w", err)
+		return fmt.Errorf("error creating the API server instance: %w")
+
+", err)
+
 	}
 	router := apirouter.Handler()
 

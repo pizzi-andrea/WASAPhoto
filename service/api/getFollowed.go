@@ -16,11 +16,10 @@ import (
 /*
 give a UID return a list contanings all followers user
 */
-func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getFollowed(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var uid_ int
 	var err error
-	var isBan bool
 	var user *database.User
 	var tk *security.Token
 	var limit int
@@ -38,13 +37,13 @@ func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 	uid := database.Id(uid_)
+
 	//   validate username format
 	username = r.URL.Query().Get("username")
 	rr, err := regexp.MatchString("^.*?$", username)
 	if !(rr && err == nil && len(username) <= 16) {
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
-
 		return
 	}
 
@@ -88,22 +87,15 @@ func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps http
 		get banned user and check if not banned
 	*/
 
-	if isBan, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {
-		ctx.Logger.Errorf("%w", err)
+	if tk.Value != user.Uid {
+		ctx.Logger.Errorf("User <%d> not owner. Owner is <%v>\n", tk.Value, user)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
 
 		return
 	}
 
-	if isBan {
-		w.Header().Set("content-type", "text/plain") //   403
-		w.WriteHeader(UnauthorizedToken.StatusCode)
-
-		return
-	}
-
-	if followers, err := rt.db.GetFollowers(uid, username, true); err != nil {
+	if followed, err := rt.db.GetFollowed(uid, username, true); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.WriteHeader(http.StatusInternalServerError)
 
@@ -111,26 +103,26 @@ func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps http
 
 	} else {
 
-		if limit == 0 || limit > len(followers) {
-			limit = len(followers)
+		if limit == 0 || limit > len(followed) {
+			limit = len(followed)
 		}
 
-		if offset > len(followers) { //  500 response
+		if offset > len(followed) { //  500 response
 			w.Header().Set("content-type", "text/plain")
 			w.WriteHeader(ServerError.StatusCode)
 
 			return
 		}
 
-		followers = followers[offset:limit]
+		followed = followed[offset:limit]
 
-		if len(followers) == 0 { //   204 response
+		if len(followed) == 0 { //   204 response
 			w.Header().Set("content-type", "text/plain")
 			w.WriteHeader(http.StatusNoContent)
 
 		} else { //  200 repsonse
 			w.Header().Set("content-type", "application/json")
-			if err = json.NewEncoder(w).Encode(followers); err != nil {
+			if err = json.NewEncoder(w).Encode(followed); err != nil {
 				ctx.Logger.Errorf("%w", err)
 				w.Header().Set("content-type", "text/plain") //   500
 				w.WriteHeader(ServerError.StatusCode)

@@ -49,6 +49,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		return
 	}
 
+	// if user not exist ...
 	if user == nil {
 		w.Header().Add("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusNotFound)
@@ -85,17 +86,15 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
 		w.Header().Set("content-type", "text/plain") //   401
 		w.WriteHeader(UnauthorizedError.StatusCode)
-
 		return
 	}
 
 	/*
 		checks if the user who wants to change username is the owner
 	*/
-	if tk.Value != uint64(uid) {
+	if tk.Value != uid {
 		w.Header().Set("content-type", "text/plain") //   403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
-
 		return
 	}
 
@@ -106,7 +105,6 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
-
 		return
 	}
 

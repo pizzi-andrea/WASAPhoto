@@ -29,8 +29,9 @@ func (rt *_router) wrap(fn httpRouterHandler) func(http.ResponseWriter, *http.Re
 
 		//   Create a request-specific logger
 		ctx.Logger = rt.baseLogger.WithFields(logrus.Fields{
-			"reqid":     ctx.ReqUUID.String(),
-			"remote-ip": r.RemoteAddr,
+			"reqid":       ctx.ReqUUID.String(),
+			"remote-ip":   r.RemoteAddr,
+			"URL-request": r.RequestURI,
 		})
 
 		//   Call the next handler in chain (usually, the handler function for the path)

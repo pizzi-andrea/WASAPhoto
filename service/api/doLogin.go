@@ -33,7 +33,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 	if err = json.NewDecoder(r.Body).Decode(&u); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
-		w.WriteHeader(BadRequest.Request.Response.StatusCode)
+		w.WriteHeader(BadRequest.StatusCode)
 
 		return
 
@@ -65,6 +65,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 			ctx.Logger.Errorf("%w", err)
 			w.Header().Set("content-type", "text/plain") //   500
 			w.WriteHeader(ServerError.StatusCode)
+			return
 
 		}
 		w.Header().Set("content-type", "application/json") //  201 code
@@ -76,7 +77,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	if !(database.ValidateUsername(u.Name)) {
 		w.Header().Set("content-type", "text/plain") //  400
-		w.WriteHeader(BadRequest.Request.Response.StatusCode)
+		w.WriteHeader(BadRequest.StatusCode)
 
 		return
 	}

@@ -18,7 +18,7 @@ func (rt *_router) getPhotoMyStream(w http.ResponseWriter, r *http.Request, ps h
 	var uid_ int
 	var err error
 	var photoId_ int
-	var photo *database.Photo
+	var post *database.Post
 	var user *database.User
 	var tk *security.Token
 
@@ -55,14 +55,14 @@ func (rt *_router) getPhotoMyStream(w http.ResponseWriter, r *http.Request, ps h
 
 	}
 
-	if photo, err = rt.db.GetPhotoStream(uid, photoId); err != nil {
+	if post, err = rt.db.GetPhotoStream(uid, photoId); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
 
 	}
 
-	if user == nil || photo == nil {
+	if user == nil || post == nil {
 		w.Header().Add("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusNotFound)
 

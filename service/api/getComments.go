@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"strconv"
 
@@ -33,14 +32,12 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(http.StatusBadRequest)
-		io.WriteString(w, BadRequest.Status)
 		return
 	}
 	if photoId_, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(http.StatusBadRequest)
-		io.WriteString(w, BadRequest.Status)
 		return
 	}
 
@@ -48,13 +45,11 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(http.StatusBadRequest)
-		io.WriteString(w, BadRequest.Status)
 		return
 	}
 	if username = r.URL.Query().Get("username"); database.ValidateUsername(username) {
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(http.StatusBadRequest)
-		io.WriteString(w, BadRequest.Status)
 		return
 	}
 
@@ -64,7 +59,6 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	if !(database.ValidateId(photoId) && database.ValidateId(uid)) {
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(http.StatusBadRequest)
-		io.WriteString(w, BadRequest.Status)
 		return
 
 	}
@@ -74,7 +68,6 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
 		return
 	}
 
@@ -82,14 +75,12 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
 		return
 	}
 
 	if user == nil || photo == nil {
 		w.Header().Add("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
-		io.WriteString(w, "user not found")
 		return
 
 	}
@@ -100,7 +91,6 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
 		w.Header().Set("content-type", "text/plain") //  401
 		w.WriteHeader(UnauthorizedError.StatusCode)
-		io.WriteString(w, UnauthorizedError.Status)
 		return
 	}
 
@@ -108,14 +98,12 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
 		return
 	}
 
 	if isBan {
 		w.Header().Set("content-type", "text/plain") //  403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
-		io.WriteString(w, UnauthorizedToken.Status)
 		return
 	}
 
@@ -123,7 +111,6 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
 		return
 
 	}
@@ -135,7 +122,6 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	if offset > len(comments) { // 500 response
 		w.Header().Set("content-type", "text/plain")
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
 		return
 	}
 

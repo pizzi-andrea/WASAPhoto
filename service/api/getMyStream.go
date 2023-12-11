@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -18,7 +19,7 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 
 	var uid_ int
 	var err error
-	var stream database.StreamPhotos
+	var stream []database.Post
 	var user *database.User
 	var tk *security.Token
 	var limit int
@@ -67,7 +68,6 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	if user == nil {
-		ctx.Logger.Errorf("%w", err)
 		w.Header().Add("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusNotFound)
 
@@ -96,7 +96,7 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 
 	if stream, err = rt.db.GetMyStream(user.Uid, pUsername, true, []database.OrderBy{}); err != nil {
 		ctx.Logger.Errorf("%w", err)
-		w.Header().Set("content-type", "text/plain")
+		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
 
 		return
@@ -123,7 +123,10 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 
 	} else {
-		_ = stream /*TODO: misssing response for photo stream*/
+		if err = json.NewEncoder(w).Encode(stream); err != nil {
+			w.Header().Set("content-type", "text/plain")
+			w.WriteHeader(ServerError.StatusCode)
+		}
 	}
 
 }

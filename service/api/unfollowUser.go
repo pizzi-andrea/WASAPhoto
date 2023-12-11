@@ -20,6 +20,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	var uidUnfoll_ int
 	var isFollower bool
 	var tk *security.Token
+
 	/*
 		Parse URL parameters
 	*/
@@ -49,7 +50,6 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   500 code
 		w.WriteHeader(ServerError.StatusCode)
-
 		return
 
 	}

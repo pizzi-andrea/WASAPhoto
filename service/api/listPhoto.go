@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"strconv"
 
@@ -61,7 +60,7 @@ func (rt *_router) listPhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	if isBan, err = rt.db.PutBan(user.Uid, tk.Value); err != nil {
+	if isBan, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
@@ -86,7 +85,6 @@ func (rt *_router) listPhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
-		io.WriteString(w, ServerError.Status)
 		return
 
 	}

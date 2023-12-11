@@ -19,25 +19,35 @@ type Validator interface {
 
 /*this object rappresent a photo*/
 type Photo struct {
-	PhotoId        Id
-	TimeUpdate     TimeStamp
-	ImageData      []byte //   data
-	DescriptionImg string //   image description
+	PhotoId        Id        `json:"photoId"`
+	TimeUpdate     TimeStamp `json:"timeUpdate"`
+	ImageData      []byte    `json:"imageData"`      //   data
+	DescriptionImg string    `json:"descriptionImg"` //   image description
 }
 
 /*this object rappresent a user*/
 type User struct {
-	Uid      Id
-	Username Username
+	Uid      Id       `json:"uid"`
+	Username Username `json:"username"`
 }
 
 /*user profile rappresentation*/
 type Profile struct {
-	User      User
-	Stream    StreamPhotos
-	Follower  int //  number user that follow a specific user
-	Following int //  numer of users following by specific user
+	User      User         `json:"user"`
+	Stream    StreamPhotos `json:"stream"`
+	Follower  int          `json:"follower"`  //number user that follow a specific user
+	Following int          `json:"following"` //  numer of users following by specific user
 
+}
+
+/*
+this object rappresent a post.
+A post is provided to photo and list of like and comments that recived.
+*/
+type Post struct {
+	Photo    Photo     `json:"photo"`
+	Likes    []User    `json:"likes"`
+	Comments []Comment `json:"comments"`
 }
 
 /*this object rappresent a photo*/
@@ -45,11 +55,10 @@ type StreamPhotos = []Photo //  model of stream of photos
 
 /*this object rappresent a comment on a photo.*/
 type Comment struct {
-	CommentId Id
-	Author    User //  this object rappresent a user
-	Photo     Id
-	Text      string    //  comment text encoded in UNICODE format
-	TimeStamp TimeStamp //  this components describe timestamp value conform to RFC3339 specification
+	CommentId Id        `json:"commentId"`
+	Author    User      `json:"author"`    //  this object rappresent a user
+	Text      string    `json:"text"`      //  comment text encoded in UNICODE format
+	TimeStamp TimeStamp `json:"timeStamp"` //  this components describe timestamp value conform to RFC3339 specification
 
 }
 
@@ -117,4 +126,8 @@ func (p *Profile) Verify() bool {
 func (c *Comment) Verify() bool {
 	r, err := regexp.MatchString("^.*$", c.Text)
 	return c.Author.Verify() && ValidateTimeStamp(c.TimeStamp.Format(time.RFC3339)) && len(c.Text) >= 1 && len(c.Text) <= 250 && r && err == nil
+}
+
+func (p *Post) Verify() bool {
+	return p.Photo.Verify()
 }

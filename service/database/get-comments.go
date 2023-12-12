@@ -7,9 +7,9 @@ func (db *appdbimpl) GetComments(photoId Id, username Username, largeSearch bool
 	var c Comment
 
 	if largeSearch {
-		rows, err = db.c.Query("SELECT commentId, author, photo, text_, timeStamp_, uid, username FROM Users u, Comments c WHERE u.uid = c.author AND  c.photo = ? AND  u.username LIKE '%" + username + "%'")
+		rows, err = db.c.Query("SELECT commentId, author, photo, text_, timeStamp_, uid, username FROM Users u, Comments c WHERE u.uid = c.author AND  c.photo = ? AND  u.username LIKE '%"+username+"%'", photoId)
 	} else {
-		rows, err = db.c.Query("SELECT commentId, author, photo, text_, timeStamp_, uid, username FROM Users u, Comments c  WHERE u.uid = c.author AND  c.photo = ? AND u.username = ?", username)
+		rows, err = db.c.Query("SELECT commentId, author, photo, text_, timeStamp_, uid, username FROM Users u, Comments c  WHERE u.uid = c.author AND  c.photo = ? AND u.username = ?", photoId, username)
 	}
 
 	if err != nil {

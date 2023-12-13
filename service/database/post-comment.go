@@ -8,6 +8,7 @@ import (
 // otherwise will return nil value and error not nil.
 func (db *appdbimpl) PostComment(from Id, text string, to Id) (com *Comment, err error) {
 	var c Comment
+	com = &Comment{} // TODO
 	if err = db.c.QueryRow("INSERT INTO Comments(author, photo, text_, timeStamp_) VALUES (?, ?, ?, ?) RETURNING *", from, to, text, time.Now().Format(time.RFC3339)).Scan(&c.CommentId, &c.Author.Uid, &to, &c.Text, &c.TimeStamp); err != nil {
 		return
 	}

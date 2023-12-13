@@ -40,7 +40,7 @@ echo "[end following test]"
 
 echo "[start post photo]"
 
-for i in {1..60}
+for i in {1..5}
 do
 	from=$(expr 1 + $RANDOM % "${#username[@]}")
 
@@ -55,12 +55,12 @@ done
 
 echo "[end post photo]"
 echo "[start comment photo]"
-for i in {1..20}
+for i in {1..5}
 do
     
     from=$(expr 1 + $RANDOM % "${#username[@]}")
     to=$(expr 1 + $RANDOM % "${#username[@]}")
-    photo=$(expr 1 + $RANDOM % 60)
+    photo=$(expr 1 + $RANDOM % 4)
     curl -X 'POST' \
 	"http://localhost:3000/users/$to/myPhotos/$photo/comments/" \
 	-H 'accept: application/json' \
@@ -79,12 +79,12 @@ done
 echo "[end comment photo]"
 
 echo "[start like photo]"
-for i in {1..50}
+for i in {1..4}
 do
     
     from=$(expr 1 + $RANDOM % "${#username[@]}")
     to=$(expr 1 + $RANDOM % "${#username[@]}")
-    photo=$(expr 1 + $RANDOM % 60)
+    photo=$(expr 1 + $RANDOM % 4)
     curl -X 'PUT' \
 	"http://localhost:3000/users/$to/myPhotos/$photo/likes/$from"\
 	-H 'accept: application/json' \
@@ -102,7 +102,7 @@ curl -X 'GET' \
 	-H 'accept: application/json' \
 	-H "Authorization: Bearer 1"
 
-for i in {1..10}
+for i in {1..5}
 do
     
     from=$(expr 1 + $RANDOM % "${#username[@]}")
@@ -119,7 +119,7 @@ echo "[end list users]"
 
 echo "[start show user profile]"
 
-for i in {1..10}
+for i in {1..5}
 do
     
    

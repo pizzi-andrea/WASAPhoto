@@ -75,7 +75,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	}
 
-	if photo == nil || user == nil || msg == nil {
+	if photo == nil {
 		ctx.Logger.Error("Photo/user not found", err)
 		w.Header().Add("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
@@ -113,6 +113,15 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		ctx.Logger.Errorf("Atoi::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
+
+		return
+
+	}
+
+	if user == nil {
+		ctx.Logger.Error("Photo/user not found", err)
+		w.Header().Add("content-type", "text/plain") //  404
+		w.WriteHeader(http.StatusNotFound)
 
 		return
 

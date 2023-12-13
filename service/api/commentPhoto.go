@@ -75,7 +75,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	}
 
-	if photo == nil || user == nil {
+	if photo == nil || user == nil || msg == nil {
 		ctx.Logger.Error("Photo/user not found", err)
 		w.Header().Add("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
@@ -143,6 +143,6 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		w.WriteHeader(ServerError.StatusCode)
 
 	}
-	ctx.Logger.Infof("New comment add to <%v> by <%v> ", user, photo)
+	ctx.Logger.Infof("New comment added ")
 
 }

@@ -27,7 +27,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	var user *database.User
 	var isBan bool
 	var follower, following []database.User
-	var photos database.StreamPhotos
+	var photos database.Stream
 	var tk *security.Token
 
 	/*
@@ -116,7 +116,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	/*
 		get photo stream. Photo stream is composed by photos of other followed users
 	*/
-	if photos, err = rt.db.GetPhotos(uid, []database.OrderBy{}); err != nil {
+	if photos, err = rt.db.GetPosts(uid, []database.OrderBy{}); err != nil {
 		ctx.Logger.Errorf("GetPhotos::%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)

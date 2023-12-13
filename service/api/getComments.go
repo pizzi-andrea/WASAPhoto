@@ -11,9 +11,7 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
-/*
-give *uid* and *photoId* and get photo associated
-*/
+// give *uid* and *photoId* and get photo associated
 func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	var uid_ int
 	var err error

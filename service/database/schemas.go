@@ -1,10 +1,7 @@
 package database
 
 import (
-	"bytes"
 	"image"
-	"image/jpeg"
-	"image/png"
 	"regexp"
 	"time"
 )
@@ -12,17 +9,14 @@ import (
 type Id = uint64           //   Identificator at 64-bit
 type TimeStamp = time.Time //   this components describe timestamp value conform to [RFC3339](https://  datatracker.ietf.org/doc/html/rfc3339#section-5.6) specification
 type Username = string     //   username of a user
-
 type Validator interface {
 	Verify() bool
 }
 
 /*this object rappresent a photo*/
 type Photo struct {
-	PhotoId        Id        `json:"photoId"`
-	TimeUpdate     TimeStamp `json:"timeUpdate"`
-	ImageData      []byte    `json:"imageData"`      //   data
-	DescriptionImg string    `json:"descriptionImg"` //   image description
+	PhotoId   Id     `json:"photoId"`
+	ImageData []byte `json:"imageData"` //   data
 }
 
 /*this object rappresent a user*/
@@ -31,27 +25,34 @@ type User struct {
 	Username Username `json:"username"`
 }
 
-/*user profile rappresentation*/
+// user profile rappresentation
 type Profile struct {
-	User      User         `json:"user"`
-	Stream    StreamPhotos `json:"stream"`
-	Follower  int          `json:"follower"`  //number user that follow a specific user
-	Following int          `json:"following"` //  numer of users following by specific user
+	User      User   `json:"user"`
+	Stream    Stream `json:"stream"`
+	Follower  int    `json:"follower"`  //number user that follow a specific user
+	Following int    `json:"following"` //  numer of users following by specific user
 
 }
 
-/*
-this object rappresent a post.
-A post is provided to photo and list of like and comments that recived.
-*/
+// this object rappresent a Image update from user
+type Image struct {
+	PhotoId Id     `json:"photoId"`
+	Data    []byte `json:"data"` // binary string rappresenting the data of image
+}
+
+// this object rappresent a post.
+// A post is provided to photo and list of like and comments that recived.
 type Post struct {
-	Photo    Photo     `json:"photo"`
-	Likes    []User    `json:"likes"`
-	Comments []Comment `json:"comments"`
+	Refer          Id
+	Location       string    `json:"location"`
+	Likes          []User    `json:"likes"`
+	Comments       []Comment `json:"comments"`
+	TimeUpdate     TimeStamp `json:"timeUpdate"`
+	DescriptionImg string    `json:"descriptionImg"`
 }
 
 /*this object rappresent a photo*/
-type StreamPhotos = []Photo //  model of stream of photos
+type Stream = []Post //  model of stream of photos
 
 /*this object rappresent a comment on a photo.*/
 type Comment struct {
@@ -76,7 +77,7 @@ func ValidateUsername(u string) bool {
 	return len(u) >= 3 && len(u) <= 16 && s && err == nil
 }
 
-func ValidateStream(s StreamPhotos) bool {
+func ValidateStream(s Stream) bool {
 
 	r := len(s) <= 100
 	if r {
@@ -92,27 +93,11 @@ func ValidateStream(s StreamPhotos) bool {
 }
 
 func (p *Photo) Verify() bool {
-	r, err := regexp.MatchString("^.*?$", p.DescriptionImg)
-	return len(p.ImageData) <= 5000000 &&
-		p.GetImg() == nil &&
-		ValidateTimeStamp(p.TimeUpdate.Local().Format(time.RFC3339)) &&
-		ValidateId(p.PhotoId) &&
-		len(p.DescriptionImg) >= 1 &&
-		len(p.DescriptionImg) <= 250 &&
-		r && err == nil
+	return true
 }
 
 func (p *Photo) GetImg() (img *image.Image) {
-	i := bytes.NewBuffer(p.ImageData)
-	if pn, err := png.Decode(i); err == nil {
-		img = &pn
-	} else {
-		if jp, err := jpeg.Decode(i); err == nil {
-			img = &jp
-		}
-	}
-
-	return
+	return nil
 }
 
 func (u *User) Verify() bool {
@@ -129,5 +114,5 @@ func (c *Comment) Verify() bool {
 }
 
 func (p *Post) Verify() bool {
-	return p.Photo.Verify()
+	return true
 }

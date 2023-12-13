@@ -48,8 +48,8 @@ type AppDatabase interface {
 	GetLikes(photoId Id) (likes []User, err error)
 	GetPhotoStream(uid, photoId Id) (img *Post, err error)
 	GetBanned(uid Id) (banned []User, err error)
-	SetUsername(uid Id, username string) (usr *User, err error)                       //   update username of user associted to uid
-	GetPhotos(uid Id, by []OrderBy, ord ...Ordering) (photos StreamPhotos, err error) //   give user id and put all photos posted by user associated to uid
+	SetUsername(uid Id, username string) (usr *User, err error)               //   update username of user associted to uid
+	GetPosts(uid Id, by []OrderBy, ord ...Ordering) (posts Stream, err error) //   give user id and put all photos posted by user associated to uid
 	IsBanned(from Id, to Id) (r bool, err error)
 	DelFollow(from, to Id) (r bool, err error)
 	IsFollower(from Id, to Id) (r bool, err error)
@@ -58,8 +58,9 @@ type AppDatabase interface {
 	PutBan(from, to Id) (r bool, err error)
 	PutLike(uid Id, photoId Id) (r bool, err error)
 	DelBan(from, to Id) (r bool, err error)
-	PostPhoto(imgData []byte, desc string, owner Id) (photo *Photo, err error)
+	CreatePost(owner Id, img []byte, description string) (post *Post, err error)
 	PostComment(from Id, text string, to Id) (com *Comment, err error)
+	GetPost(photoId Id) (post *Post, err error)
 	GetPhoto(id Id) (img *Photo, err error)
 	DelPhoto(id Id) (r bool, err error)
 	DelComment(commentId Id) (r bool, err error)

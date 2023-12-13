@@ -17,7 +17,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	var err error
 	var tk *security.Token
 	var user *database.User
-	var photo *database.Photo
+	var post *database.Post
 	var rr bool
 
 	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
@@ -65,8 +65,8 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 	}
 
-	if photo, err = rt.db.GetPhoto(photoId); err != nil {
-		ctx.Logger.Errorf("GetPhoto::%w", err)
+	if post, err = rt.db.GetPost(photoId); err != nil {
+		ctx.Logger.Errorf("GetPost::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 
@@ -74,7 +74,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 	}
 
-	if photo == nil || user == nil {
+	if post == nil || user == nil {
 		w.Header().Add("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
 

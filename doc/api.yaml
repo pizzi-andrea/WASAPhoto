@@ -103,7 +103,7 @@ paths:
       security:
         - BearerAuth: []
         
-      operationId: getUserProfile # OK
+      operationId: getUserProfile # required
       
       responses:
         "200":
@@ -143,7 +143,7 @@ paths:
           new username
         required: true
       
-      operationId: setMyUserName # OK
+      operationId: setMyUserName # required
       
       security:
         - BearerAuth: []
@@ -234,7 +234,7 @@ paths:
       security:
         - BearerAuth: []
         
-      operationId: unfollowUser # OK
+      operationId: unfollowUser # required
       
       responses:
         "204":
@@ -265,7 +265,7 @@ paths:
       security:
         - BearerAuth: []
       
-      operationId: followUser # OK
+      operationId: followUser # required
       
       responses:
         "201": 
@@ -393,7 +393,7 @@ paths:
         
       security:
         - BearerAuth: []
-      operationId: getMyStream # TITO
+      operationId: getMyStream # required
       
       responses:
         "200":
@@ -504,7 +504,7 @@ paths:
       security:
         - BearerAuth: []
       
-      operationId: banUser
+      operationId: banUser # required
       
       responses:
         "201":
@@ -539,7 +539,7 @@ paths:
       security:
         - BearerAuth: []
         
-      operationId: unbanUser
+      operationId: unbanUser # required
       
       responses:
         "204":
@@ -581,9 +581,18 @@ paths:
         content:
           multipart/form-data:
             schema:
-              $ref: "#/components/schemas/Photo"
+              type: object
+              properties:
+                img:
+                  $ref: "#/components/schemas/Image"
+                description:
+                  type: string
+                  example: "a good photo!"
+                  minLength: 1
+                  maxLength: 250
+                  pattern: "^.*?$"
       
-      operationId: uploadPhoto
+      operationId: uploadPhoto # required
       
       responses:
         "201":
@@ -592,7 +601,7 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: "#/components/schemas/Photo"
+                $ref: "#/components/schemas/Post"
         "400":
           $ref: "#/components/responses/BadRequest"
         
@@ -637,7 +646,7 @@ paths:
             enum: ["asc", "desc"]
             default: "desc"
 
-      operationId: listPhoto
+      operationId: listPost
       
       responses:
         "200":
@@ -646,7 +655,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/StreamPhotos"
+                $ref: "#/components/schemas/Stream"
         
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -677,7 +686,7 @@ paths:
       description: >
         provide uid and photoID and delete the photo corresponding to photoID
     
-      operationId: deletePhoto
+      operationId: deletePhoto # required
       security:
         - BearerAuth: []
         
@@ -710,7 +719,7 @@ paths:
         the post associated with the photo. the post will contain all comments
         the photo and the list of users liked it.
         
-      operationId: getPhoto
+      operationId: getPost
       
       responses:
         "200": 
@@ -810,7 +819,7 @@ paths:
         provide photo id and owner id. 
         The like is identified by the *uid* of the user who likes it.
       
-      operationId: likePhoto
+      operationId: likePhoto # required
       
       security:
         - BearerAuth: []
@@ -850,7 +859,7 @@ paths:
         and remove like given user identificated by
         *likeUserId*
         
-      operationId: unlikePhoto
+      operationId: unlikePhoto # required
       security:
         - BearerAuth: []
       responses:
@@ -897,7 +906,7 @@ paths:
       
       security:
         - BearerAuth: []
-      operationId: commentPhoto
+      operationId: commentPhoto # required
       
       responses:
         "201":
@@ -997,7 +1006,7 @@ paths:
       security:
         - BearerAuth: []
         
-      operationId: uncommentPhoto
+      operationId: uncommentPhoto # required
       responses:
         "204":
           description: >
@@ -1064,7 +1073,7 @@ paths:
         and an identifier is returned.
         If the user exists, the user identifier is returned.
       
-      operationId: doLogin
+      operationId: doLogin # required
      
       requestBody:
         description: >
@@ -1092,7 +1101,66 @@ paths:
           
         "500":
           $ref: "#/components/responses/ServerError"
+  
+  /images/{photoId}:
+    description: >
+      Specific endpoint useful to access the photos data stored.
+      Only photos are identificated by id. thanks to the ID it is possible to request 
+      the photo from the system.
+    summary: specific endpoint used for get photo data
+    
+    parameters:
+      - name: photoId
+        schema:
+          type: integer
+          format: int64
+        in: path
+        required: true
+        description: photo id
+        example: 5
+    
+    get:
+      summary: get the data of photo
+      tags:
+        - photo
+    
+      description: >
+        returns the data of the specific request hole ID of the photo
+      
+      security:
+        - BearerAuth: []
+      operationId: getImage
+      responses:
+        "200":
+          description: "Photo founded, get it"
+          content:
+            image/*:
+              schema:
+                description: >
+                  binary string rappresenting the data of image
+                type: string
+                format: binary
+                minLength: 0
+                maxLength: 5000000
+    
+        "400":
+          description: >
+            Bad request, photo id not valid
         
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
+        
+        
+        "404":
+          description: >
+            Not found, photo not found
+      
+      
+    
+  
 components:
 
   parameters:
@@ -1187,9 +1255,6 @@ components:
       schema:
         $ref: "#/components/schemas/Id"
     
-    
-    
-    
   responses:
     UnauthorizedError:
       description: >
@@ -1260,7 +1325,7 @@ components:
         user:
           $ref: "#/components/schemas/User"
         stream:
-          $ref: "#/components/schemas/StreamPhotos"
+          $ref: "#/components/schemas/Stream"
         follower:
           type: integer
           minimum: 0
@@ -1281,8 +1346,10 @@ components:
         
       type: object
       properties:
-        photo:
-          $ref: "#/components/schemas/Photo"
+        refer:
+          $ref: "#/components/schemas/Id"
+        location:
+          $ref: "#/components/schemas/URL"
         likes:
           type: array
           items: 
@@ -1294,28 +1361,9 @@ components:
           items:
             $ref: "#/components/schemas/Comment"
           minItems: 0
-          
-    
-    
-    Photo:
-      description: >
-        this object rappresent a photo
-      type: object
-      properties:
-        photoId:
-          $ref: "#/components/schemas/Id"
+        
         timeUpdate:
           $ref: "#/components/schemas/TimeStamp"
-
-        imageData:
-          description: >
-            data
-          type: string
-          format: binary
-          minLength: 0
-          maxLength: 5000000
-          
-
         
         descriptionImg:
           description: >
@@ -1325,17 +1373,40 @@ components:
           minLength: 1
           maxLength: 250
           pattern: "^.*?$"
-      required:
-        - imageData
-        - timeUpdate
           
     
-    StreamPhotos:
+    
+    Image:
+      description: >
+        this object rappresent a Image update from user
+      type: object
+      properties:
+        photoId:
+          $ref: "#/components/schemas/Id"
+  
+        data:
+          description: >
+            binary string rappresenting the data of image
+          type: string
+          format: binary
+          minLength: 0
+          maxLength: 5000000
+    
+    URL: 
+      description: >
+        String that uniquely identifies a resource on the network
+      type: string
+      pattern: '^(?:(?:https?):\/\/)?(?:\w[\w\-.]+(?:\.\w[\w\-.]+)+)(?::\d{1,5})?(?:\/\S*)?$'
+      minLength: 1
+      maxLength: 2048
+      example: http://myExample.com::3030/5
+
+    Stream:
       description: >
         model of stream of photos
       type: array
       items:
-        $ref: "#/components/schemas/Photo"
+        $ref: "#/components/schemas/Post"
       minItems: 0
       maxItems: 100
       

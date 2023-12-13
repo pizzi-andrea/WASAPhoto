@@ -289,7 +289,7 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
   
-  /users/{uid}/followed/:
+  /users/{uid}/followed:
     summary: users following by specific user
     description: > 
       this resource rappresent all users followed by user
@@ -345,7 +345,7 @@ paths:
           $ref: "#/components/responses/ServerError"
   
     
-  /users/{uid}/myStream:
+  /users/{uid}/myStream/:
     summary: user stream photos
     description: >
       this resource rappresent stream of photos associated a user.
@@ -558,7 +558,7 @@ paths:
           $ref: "#/components/responses/ServerError"
     
   
-  /users/{uid}/myPhotos: 
+  /users/{uid}/myPhotos/: 
     description: >
       this resource rappresent the streams of photos update by user in time
     

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 	"pizzi1995517.it/WASAPhoto/service/api/reqcontext"
@@ -14,13 +15,13 @@ import (
 /*
 given *uid* get all photo has updated
 */
-func (rt *_router) listPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) listPost(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	var uid_ int
 	var err error
 	var user *database.User
 	var tk *security.Token
 	var isBan bool
-	var stream database.StreamPhotos
+	var stream database.Stream
 
 	//   Parsing URL parameters
 	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
@@ -75,10 +76,14 @@ func (rt *_router) listPhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	if stream, err = rt.db.GetPhotos(user.Uid, []database.OrderBy{}); err != nil {
+	if stream, err = rt.db.GetPosts(user.Uid, []database.OrderBy{}); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
+	}
+
+	for i, _ := range stream {
+		stream[i].Location = strings.TrimRight(r_image, ":") + strconv.Itoa(int(stream[i].Refer))
 	}
 
 	if err = json.NewEncoder(w).Encode(stream); err != nil {

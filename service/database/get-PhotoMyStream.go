@@ -11,9 +11,11 @@ func (db *appdbimpl) GetPhotoStream(uid, photoId Id) (img *Post, err error) {
 	}
 
 	for _, p := range photo {
-		if p.Photo.PhotoId == photoId {
+		if p.Refer == photoId && err == nil {
 			img = &p
-			return
+
+		} else {
+			return nil, err
 		}
 
 	}

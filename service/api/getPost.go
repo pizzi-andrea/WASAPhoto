@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 	"pizzi1995517.it/WASAPhoto/service/api/reqcontext"
@@ -14,14 +15,14 @@ import (
 /*
 give *uid* and *photoId* and get photo associated
 */
-func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	var uid_ int
 	var err error
 	var user *database.User
 	var tk *security.Token
 	var isBan bool
 	var photoId_ int
-	var photo *database.Photo
+	var post *database.Post
 
 	//   Parsing URL parameters
 	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
@@ -39,36 +40,6 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	uid := database.Id(uid_)
-	photoId := database.Id(photoId_)
-	//   check if path exist
-	if user, err = rt.db.GetUserFromId(uid); err != nil {
-		ctx.Logger.Errorf("%w", err)
-		w.Header().Set("content-type", "text/plain") //   500
-		w.WriteHeader(ServerError.StatusCode)
-
-		return
-	}
-
-	if photo, err = rt.db.GetPhoto(photoId); err != nil {
-		ctx.Logger.Errorf("%w", err)
-		w.Header().Set("content-type", "text/plain") //   500
-		w.WriteHeader(ServerError.StatusCode)
-
-		return
-	}
-
-	if user == nil || photo == nil {
-		w.Header().Add("content-type", "text/plain") //   404
-		w.WriteHeader(http.StatusNotFound)
-
-		return
-
-	}
-
-	/*
-		Applay barrear authentication. A user can see photos of another user as long as they have not been banned
-	*/
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
 		w.Header().Set("content-type", "text/plain") //   401
 		w.WriteHeader(UnauthorizedError.StatusCode)
@@ -91,7 +62,40 @@ func (rt *_router) getPhoto(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
+	uid := database.Id(uid_)
+	photoId := database.Id(photoId_)
+	//   check if path exist
+	if user, err = rt.db.GetUserFromId(uid); err != nil {
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //   500
+		w.WriteHeader(ServerError.StatusCode)
+
+		return
+	}
+
+	if post, err = rt.db.GetPost(photoId); err != nil {
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //   500
+		w.WriteHeader(ServerError.StatusCode)
+
+		return
+	}
+
+	if user == nil || post == nil {
+		w.Header().Add("content-type", "text/plain") //   404
+		w.WriteHeader(http.StatusNotFound)
+
+		return
+
+	}
+
+	post.Location = strings.TrimRight(r_image, ":") + strconv.Itoa(int(post.Refer))
+
+	/*
+		Applay barrear authentication. A user can see photos of another user as long as they have not been banned
+	*/
+
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(*photo)
+	json.NewEncoder(w).Encode(*post)
 }

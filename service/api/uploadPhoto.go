@@ -26,6 +26,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	var user *database.User
 	var tk *security.Token
 	var file multipart.File
+	var newPost *database.Post = &database.Post{}
 
 	//   Parsing URL parameters
 	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
@@ -98,7 +99,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		w.WriteHeader(ServerError.StatusCode)
 	}
 
-	photo.DescriptionImg = r.PostFormValue("descriptionImg")
+	newPost.DescriptionImg = r.PostFormValue("descriptionImg")
 
 	if photo.ImageData == nil || len(photo.ImageData) == 0 {
 		ctx.Logger.Errorf("photo <%v> not valid", photo)
@@ -110,8 +111,8 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	//  check if format photo in conform to APIs specifications */
 
-	if photo, err = rt.db.PostPhoto(photo.ImageData, photo.DescriptionImg, user.Uid); err != nil {
-		ctx.Logger.Errorf("%w", err)
+	if newPost, err = rt.db.CreatePost(user.Uid, photo.ImageData, newPost.DescriptionImg); err != nil {
+		ctx.Logger.Errorf("CreatePost::%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
 
@@ -119,7 +120,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 	/*TODO: missing validate methods*/
 
-	if photo == nil {
+	if newPost == nil {
 		ctx.Logger.Errorf("photo <%v> not updated", photo)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
@@ -130,7 +131,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	photo.ImageData = nil //   discard img data
-	if err = json.NewEncoder(w).Encode(photo); err != nil {
+	if err = json.NewEncoder(w).Encode(*newPost); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)

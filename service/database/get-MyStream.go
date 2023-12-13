@@ -2,19 +2,21 @@ package database
 
 import (
 	"database/sql"
+	"time"
 )
 
 /*
 GetMyStream return user's stream or part of this. The function allow to search photos in stream by username owner, is largeSearch flag is true
 will get all photos of users that have similiar username. If flag is false will return photos of users exactly username gived in input.
 */
-func (db *appdbimpl) GetMyStream(uid Id, username Username, largeSearch bool, by []OrderBy, ord ...Ordering) (photos []Post, err error) {
-	var photo Photo
+func (db *appdbimpl) GetMyStream(uid Id, username Username, largeSearch bool, by []OrderBy, ord ...Ordering) (posts []Post, err error) {
+	var post Post
 	var c []Comment
 	var likes []User
 	var rows *sql.Rows
 	var ordy string
 	var oord string
+	var t string
 	if len(by) == 0 {
 		by = append(by, OrderBy(timeUpdate))
 	}
@@ -42,7 +44,7 @@ func (db *appdbimpl) GetMyStream(uid Id, username Username, largeSearch bool, by
 				
 			CREATE TEMP TABLE IF NOT EXISTS FollowersUser AS
 			SELECT uid 
-			FROM Followers
+			FROM Followers, Users
 			WHERE from_ = ? AND to_ = uid AND username LIKE'%`+username+`%';
 			`, uid); err != nil {
 			return nil, err
@@ -53,7 +55,7 @@ func (db *appdbimpl) GetMyStream(uid Id, username Username, largeSearch bool, by
 			PRAGMA temp_store = 3;
 			CREATE TEMP TABLE IF NOT EXISTS FollowersUser AS
 			SELECT uid 
-			FROM Followers
+			FROM Followers, Users
 			WHERE from_ = ? AND to_ = uid AND username LIKE `+username+`;
 			`, uid); err != nil {
 			return nil, err
@@ -61,10 +63,10 @@ func (db *appdbimpl) GetMyStream(uid Id, username Username, largeSearch bool, by
 	}
 	_, err = db.c.Exec(`
 	CREATE TEMP TABLE IF NOT EXISTS PhotoStream AS
-	SELECT photoId, owner, descriptionImg, imageData, timeUpdate
+	SELECT photoId, owner, descriptionImg, timeUpdate
 	FROM FollowersUser, Photos
 	WHERE owner = uid
-	ORDER BY ? ?;
+	ORDER BY ?, ?;
 	`, ordy, oord)
 
 	if err != nil {
@@ -78,27 +80,27 @@ func (db *appdbimpl) GetMyStream(uid Id, username Username, largeSearch bool, by
 	defer rows.Close()
 
 	for rows.Next() {
-		if err = rows.Scan(&photo.PhotoId, &uid, &photo.DescriptionImg, &photo.ImageData, &photo.TimeUpdate); err != nil {
+		if err = rows.Scan(&post.Refer, &uid, &post.DescriptionImg, &t); err != nil {
+			return
+		}
+		if post.TimeUpdate, err = time.Parse(time.RFC3339, t); err != nil {
+			return
+		}
+		if c, err = db.GetComments(post.Refer, username, true); err != nil {
 			return
 		}
 
-		if c, err = db.GetComments(photo.PhotoId, username, true); err != nil {
+		if likes, err = db.GetLikes(post.Refer); err != nil {
 			return
 		}
 
-		if likes, err = db.GetLikes(photo.PhotoId); err != nil {
-			return
-		}
-
-		photos = append(photos, Post{
-			Photo:    photo,
-			Likes:    likes,
-			Comments: c,
-		})
+		post.Likes = likes
+		post.Comments = c
+		posts = append(posts, post)
 
 	}
 
-	_, err = db.c.Exec("DROP TABLE FollowersUser; DROP TABLE  MyFollowers; DROP TABLE PhotoStream;")
+	_, err = db.c.Exec("DROP TABLE FollowersUser; DROP TABLE PhotoStream;")
 	return
 
 }

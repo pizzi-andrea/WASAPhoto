@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 	"pizzi1995517.it/WASAPhoto/service/api/reqcontext"
@@ -89,6 +90,6 @@ func (rt *_router) getPhotoMyStream(w http.ResponseWriter, r *http.Request, ps h
 		return
 	}
 
-	/* missing replay message */
+	post.Location = strings.TrimRight(r_image, ":") + strconv.Itoa(int(post.Refer))
 
 }

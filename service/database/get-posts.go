@@ -22,8 +22,9 @@ GetPhotos accepts the user ID (uid) as input and extracts all photos uploaded by
 photos (deleted photos will not be listed), in fact the photo stream may be returned empty. If a value of zero is returned
 for photos, an error occurred
 */
-func (db *appdbimpl) GetPhotos(uid Id, by []OrderBy, ord ...Ordering) (photos StreamPhotos, err error) {
+func (db *appdbimpl) GetPosts(uid Id, by []OrderBy, ord ...Ordering) (posts Stream, err error) {
 	var photo Photo
+	var postPhoto *Post
 
 	var rows *sql.Rows
 	var ordy string
@@ -50,18 +51,22 @@ func (db *appdbimpl) GetPhotos(uid Id, by []OrderBy, ord ...Ordering) (photos St
 
 	}
 
-	if rows, err = db.c.Query("SELECT * FROM Photos WHERE owner = ? ORDER BY ?, ?", uid, ordy, oord); err != nil {
+	if rows, err = db.c.Query("SELECT photoId FROM Photos WHERE owner = ? ORDER BY ?, ?", uid, ordy, oord); err != nil {
 		return nil, err
 	}
 
 	defer rows.Close()
 
 	for rows.Next() {
-		if err = rows.Scan(&photo.PhotoId, &uid, &photo.DescriptionImg, &photo.ImageData, &photo.TimeUpdate); err != nil {
+		if err = rows.Scan(&photo.PhotoId); err != nil {
 			return
 		}
 
-		photos = append(photos, photo)
+		if postPhoto, err = db.GetPost(photo.PhotoId); err != nil {
+			return
+		}
+
+		posts = append(posts, *postPhoto)
 
 	}
 	return

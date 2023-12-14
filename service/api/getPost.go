@@ -97,5 +97,9 @@ func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(*post)
+	if json.NewEncoder(w).Encode(*post); err != nil {
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //   500
+		w.WriteHeader(ServerError.StatusCode)
+	}
 }

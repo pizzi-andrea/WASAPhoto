@@ -23,6 +23,9 @@ func (db *appdbimpl) GetFollowers(uid Id, username Username, largeSearch bool) (
 	defer rows.Close()
 
 	for rows.Next() {
+		if rows.Err() != nil {
+			return
+		}
 		if err = rows.Scan(&uid, &username); err != nil {
 			return
 		}

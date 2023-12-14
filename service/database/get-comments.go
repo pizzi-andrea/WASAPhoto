@@ -19,6 +19,10 @@ func (db *appdbimpl) GetComments(photoId Id, username Username, largeSearch bool
 	defer rows.Close()
 
 	for rows.Next() {
+		if rows.Err() != nil {
+			return comments, err
+		}
+
 		if err := rows.Scan(&c.CommentId, &c.Author.Uid, &photoId, &c.Text, &c.TimeStamp, &c.Author.Username); err != nil {
 			return comments, err
 		}

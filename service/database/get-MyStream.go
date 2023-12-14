@@ -80,6 +80,9 @@ func (db *appdbimpl) GetMyStream(uid Id, username Username, largeSearch bool, by
 	defer rows.Close()
 
 	for rows.Next() {
+		if rows.Err() != nil {
+			return
+		}
 		if err = rows.Scan(&post.Refer, &uid, &post.DescriptionImg, &t); err != nil {
 			return
 		}

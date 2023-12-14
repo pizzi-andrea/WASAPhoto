@@ -112,7 +112,7 @@ paths:
           content:
             application/json:
               schema:
-                {$ref: "#/components/schemas/Profile"}
+                $ref: "#/components/schemas/Profile"
         
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -408,6 +408,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/Post"
                 minItems: 0
+                maxItems: 250
         
         "400":
           $ref: "#/components/responses/BadRequest"
@@ -585,7 +586,9 @@ paths:
               properties:
                 img:
                   $ref: "#/components/schemas/Image"
-                description:
+                desc:
+                  description: >
+                    description on image
                   type: string
                   example: "a good photo!"
                   minLength: 1
@@ -1116,7 +1119,8 @@ paths:
           format: int64
         in: path
         required: true
-        description: photo id
+        description: >
+          photo id
         example: 5
     
     get:
@@ -1186,6 +1190,8 @@ components:
       in: query
       required: false
       schema:
+        description: >
+          format username parameter
         type: string
         pattern: '^.*?$'
         minLength: 1
@@ -1236,15 +1242,6 @@ components:
         $ref: "#/components/schemas/Id"
       description: >
         user to unfollow
-    
-    FollowingId:
-      name: followingId
-      required: true
-      in: path
-      description: >
-        user id to following
-      schema:
-        $ref: "#/components/schemas/Id"
     
     BannedId:
       name: bannedId
@@ -1351,16 +1348,20 @@ components:
         location:
           $ref: "#/components/schemas/URL"
         likes:
+          description: >
+            list of users who have liked it
           type: array
           items: 
             $ref: "#/components/schemas/Id"
           minItems: 0
+          maxItems: 250 # da rivedere
         
         comments:
           type: array
           items:
             $ref: "#/components/schemas/Comment"
           minItems: 0
+          maxItems: 250 # okok
         
         timeUpdate:
           $ref: "#/components/schemas/TimeStamp"
@@ -1396,10 +1397,10 @@ components:
       description: >
         String that uniquely identifies a resource on the network
       type: string
-      pattern: '^(?:(?:https?):\/\/)?(?:\w[\w\-.]+(?:\.\w[\w\-.]+)+)(?::\d{1,5})?(?:\/\S*)?$'
+      pattern: '^.*?$' # TODO
       minLength: 1
       maxLength: 2048
-      example: http://myExample.com::3030/5
+      example: "http://myExample.com::3030/5"
 
     Stream:
       description: >
@@ -1455,7 +1456,7 @@ components:
         timeStamp:
           $ref: "#/components/schemas/TimeStamp"
       required:
-        - user
+        - author
         - text
         - timeStamp
 

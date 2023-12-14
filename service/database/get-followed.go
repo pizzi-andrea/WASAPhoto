@@ -21,6 +21,9 @@ func (db *appdbimpl) GetFollowed(uid Id, username Username, largeSearch bool) (f
 	defer rows.Close()
 
 	for rows.Next() {
+		if rows.Err() != nil {
+			return
+		}
 		if err = rows.Scan(&uid, &username); err != nil {
 			return
 		}

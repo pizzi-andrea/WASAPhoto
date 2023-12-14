@@ -11,9 +11,7 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
-/*
-give *uid* and *photoId* and get photo associated
-*/
+// give *uid* and *photoId* and get photo associated
 func (rt *_router) getComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	var uid_ int
 	var err error
@@ -101,6 +99,12 @@ func (rt *_router) getComment(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(comment)
+	if err = json.NewEncoder(w).Encode(comment); err != nil {
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //  500
+		w.WriteHeader(ServerError.StatusCode)
+		return
+
+	}
 
 }

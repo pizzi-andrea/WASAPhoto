@@ -17,6 +17,10 @@ func (db *appdbimpl) GetLikes(photoId Id) (likes []User, err error) {
 	defer rows.Close()
 
 	for rows.Next() {
+		if rows.Err() != nil {
+			return
+		}
+
 		if err = rows.Scan(&u.Uid, &u.Username); err != nil {
 			return
 		}

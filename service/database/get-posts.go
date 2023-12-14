@@ -58,6 +58,9 @@ func (db *appdbimpl) GetPosts(uid Id, by []OrderBy, ord ...Ordering) (posts Stre
 	defer rows.Close()
 
 	for rows.Next() {
+		if rows.Err() != nil {
+			return
+		}
 		if err = rows.Scan(&photo.PhotoId); err != nil {
 			return
 		}

@@ -29,6 +29,9 @@ func (db *appdbimpl) GetUsers(username Username, largeSearch bool) (users []User
 	defer rows.Close()
 
 	for rows.Next() {
+		if rows.Err() != nil {
+			return
+		}
 		if err = rows.Scan(&uid, &name); err != nil {
 			return users, err
 		}

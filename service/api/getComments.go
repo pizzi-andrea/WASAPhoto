@@ -126,6 +126,11 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	comments = comments[offset:limit]
 
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(comments)
+	if err = json.NewEncoder(w).Encode(comments); err != nil {
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //  500
+		w.WriteHeader(ServerError.StatusCode)
+		return
+	}
 
 }

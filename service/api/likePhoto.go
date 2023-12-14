@@ -118,6 +118,11 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(*user)
+	if err = json.NewEncoder(w).Encode(*user); err != nil {
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //  500
+		w.WriteHeader(ServerError.StatusCode)
+		return
+	}
 
 }

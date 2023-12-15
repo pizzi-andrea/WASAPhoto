@@ -811,7 +811,7 @@ paths:
     parameters:
         - $ref: "#/components/parameters/Uid"
         - $ref: "#/components/parameters/PhotoId"
-        - $ref: "#/components/parameters/LikeId"
+        - $ref: "#/components/parameters/likeUserId"
     put:
       
       tags:
@@ -1225,7 +1225,7 @@ components:
       schema:
         $ref: "#/components/schemas/Id"
     
-    LikeId:
+    likeUserId:
       name: likeUserId
       in: path
       required: true

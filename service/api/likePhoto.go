@@ -36,7 +36,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	if likeId_, err = strconv.Atoi(ps.ByName("likeId")); err != nil {
+	if likeId_, err = strconv.Atoi(ps.ByName("likeUserId")); err != nil {
 		ctx.Logger.Errorf("Atoi::%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -46,7 +46,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 
 	photoId := database.Id(photo_)
 	uid := database.Id(uid_)
-	likeId := database.Id(likeId_)
+	likeUserId := database.Id(likeId_)
 
 	if !(database.ValidateId(photoId) && database.ValidateId(uid)) {
 		w.Header().Set("content-type", "text/plain") //  400
@@ -107,7 +107,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	if _, err = rt.db.PutLike(likeId, photoId); err != nil {
+	if _, err = rt.db.PutLike(likeUserId, photoId); err != nil {
 		ctx.Logger.Errorf("PutLike::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)

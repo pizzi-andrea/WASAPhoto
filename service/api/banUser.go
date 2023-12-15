@@ -11,10 +11,8 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
-/*
-		taken uid of the user who wants to ban and uid of the user to be banned,
-	    bans the user(BannedID)
-*/
+// taken uid of the user who wants to ban and uid of the user to be banned,
+// bans the user(BannedID)
 func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	var result bool
 	var from_, to_ int

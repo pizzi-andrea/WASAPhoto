@@ -6,24 +6,24 @@ import (
 
 // endpoints path
 const (
-	r_root        = "/"
-	r_users       = r_root + "users/"           //   Endpoint rappresent the list of WasaPhoto users
-	r_user        = r_users + ":uid/"           //   Endpont rappresent a WasaPhoto user
-	r_followers   = r_user + "followers/"       //   Endpoint rappresent the followers of specific user
-	r_follower    = r_followers + ":followerId" //   Endpont rappresent follower a user
-	r_login       = r_root + "session"          // Endpoint rappresent login API
-	r_banned      = r_user + "banned/"          // Endpoint rappresent users banned another user
-	r_userBanned  = r_banned + ":bannedId"      // Endpoint rappresent the specific user banned another user
-	r_followed    = r_user + "followed"
-	r_myPhotos    = r_user + "myPhotos/"
-	r_myPhoto     = r_myPhotos + ":photoId/"
-	r_myStream    = r_user + "myStream/"
-	r_streamPhoto = r_myStream + ":photoId"
-	r_comments    = r_myPhoto + "comments/"
-	r_comment     = r_comments + ":commentId"
-	r_likes       = r_myPhoto + "likes/"
-	r_like        = r_likes + ":likeId"
-	r_image       = r_root + "images/:photoId"
+	r_root        = "/"                         // "/"
+	r_users       = r_root + "users/"           // "/users/"
+	r_user        = r_users + ":uid/"           // "/users/{uid}/"
+	r_followers   = r_user + "followers/"       // "/users/{uid}/followers/"
+	r_follower    = r_followers + ":followerId" // "/users/{uid}/followers/{followerId}"
+	r_login       = r_root + "session"          // "/session
+	r_banned      = r_user + "banned/"          // "/users/{uid}/banned/"
+	r_userBanned  = r_banned + ":bannedId"      // "/users/{uid}/banned/{bannedId}"
+	r_followed    = r_user + "followed"         // "/users/{uid}/followed"
+	r_myPhotos    = r_user + "myPhotos/"        // "/users/{uid}/myPhotos/"
+	r_myPhoto     = r_myPhotos + ":photoId/"    // "/users/{uid}/myPhotos/{photoId}/"
+	r_myStream    = r_user + "myStream/"        // "/users/{uid}/myStream/"
+	r_streamPhoto = r_myStream + ":photoId"     // "/users/{uid}/myStream/{photoId}"
+	r_comments    = r_myPhoto + "comments/"     // "/users/{uid}/myPhotos/{photoId}/comments/"
+	r_comment     = r_comments + ":commentId"   // "/users/{uid}/myPhotos/{photoId}/comments/{commentId}"
+	r_likes       = r_myPhoto + "likes/"        // "/users/{uid}/myPhotos/{photoId}/likes/"
+	r_like        = r_likes + ":likeUserId"     // "/users/{uid}/myPhotos/{photoId}/likes/{likeUserId}"
+	r_image       = r_root + "images/:photoId"  // "/images/{photoId}"
 )
 
 // Handler returns an instance of httprouter.Router that handle APIs registered here
@@ -59,11 +59,8 @@ func (rt *_router) Handler() http.Handler {
 	//   list personal stream photos
 	rt.router.GET(r_myStream, rt.wrap(rt.getMyStream)) // required
 
-	//   get photo from stream
-	rt.router.GET(r_streamPhoto, rt.wrap(rt.getPhotoMyStream))
-
 	//   banned users
-	rt.router.GET(r_banned, rt.wrap(rt.listBannedUsers))
+	rt.router.GET(r_banned, rt.wrap(rt.listBannedUsers)) // fixed
 
 	//   ban user identificated by *uid*
 	rt.router.PUT(r_userBanned, rt.wrap(rt.banUser)) // required

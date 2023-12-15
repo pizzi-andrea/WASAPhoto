@@ -36,7 +36,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	if likeId_, err = strconv.Atoi(ps.ByName("likeId")); err != nil {
+	if likeId_, err = strconv.Atoi(ps.ByName("likeUserId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -44,7 +44,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	likeId := database.Id(likeId_)
+	likeUserId := database.Id(likeId_)
 	photoId := database.Id(photo_)
 	uid := database.Id(uid_)
 
@@ -66,7 +66,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	}
 
-	if like, err = rt.db.GetUserFromId(likeId); err != nil {
+	if like, err = rt.db.GetUserFromId(likeUserId); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)

@@ -82,7 +82,7 @@ func (rt *_router) listPost(w http.ResponseWriter, r *http.Request, ps httproute
 		w.WriteHeader(ServerError.StatusCode)
 	}
 
-	for i, _ := range stream {
+	for i := range stream {
 		stream[i].Location = strings.TrimRight(r_image, ":") + strconv.Itoa(int(stream[i].Refer))
 	}
 

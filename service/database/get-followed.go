@@ -2,7 +2,7 @@ package database
 
 import "database/sql"
 
-// GetFollowed allow to list followed by user.
+// GetFollowed allow to list followed by user. Is possible to reserach followed with similar username
 func (db *appdbimpl) GetFollowed(uid Id, username Username, largeSearch bool) (followed []User, err error) {
 	var rows *sql.Rows
 

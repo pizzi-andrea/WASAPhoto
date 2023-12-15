@@ -2,6 +2,7 @@ package database
 
 import "database/sql"
 
+// GetComment allow to get post specificated it id
 func (db *appdbimpl) GetComment(commentId Id) (comment *Comment, err error) {
 	var c Comment
 

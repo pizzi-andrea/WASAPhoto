@@ -2,6 +2,7 @@ package database
 
 import "database/sql"
 
+// GetComments allow to get all comments on photo and filter comments in order to specific username
 func (db *appdbimpl) GetComments(photoId Id, username Username, largeSearch bool) (comments []Comment, err error) {
 	var rows *sql.Rows
 	var c Comment

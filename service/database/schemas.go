@@ -29,7 +29,7 @@ type User struct {
 type Profile struct {
 	User      User   `json:"user"`
 	Stream    Stream `json:"stream"`
-	Follower  int    `json:"follower"`  //number user that follow a specific user
+	Follower  int    `json:"follower"`  // number user that follow a specific user
 	Following int    `json:"following"` //  numer of users following by specific user
 
 }

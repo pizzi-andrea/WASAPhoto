@@ -41,23 +41,9 @@ func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
+		ctx.Logger.Errorln("token invalid or missing")
 		w.Header().Set("content-type", "text/plain") //   401
 		w.WriteHeader(UnauthorizedError.StatusCode)
-
-		return
-	}
-
-	if isBan, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {
-		ctx.Logger.Errorf("%w", err)
-		w.Header().Set("content-type", "text/plain") //   500
-		w.WriteHeader(ServerError.StatusCode)
-
-		return
-	}
-
-	if isBan {
-		w.Header().Set("content-type", "text/plain") //   403
-		w.WriteHeader(UnauthorizedToken.StatusCode)
 
 		return
 	}
@@ -73,7 +59,7 @@ func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	if post, err = rt.db.GetPost(photoId); err != nil {
+	if isBan, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
@@ -87,6 +73,21 @@ func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter
 
 		return
 
+	}
+
+	if isBan {
+		w.Header().Set("content-type", "text/plain") //   403
+		w.WriteHeader(UnauthorizedToken.StatusCode)
+
+		return
+	}
+
+	if post, err = rt.db.GetPost(photoId); err != nil {
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //   500
+		w.WriteHeader(ServerError.StatusCode)
+
+		return
 	}
 
 	post.Location = strings.TrimRight(r_image, ":") + strconv.Itoa(int(post.Refer))

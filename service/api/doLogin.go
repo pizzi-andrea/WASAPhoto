@@ -68,7 +68,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 			return
 
 		}
-		w.Header().Set("content-type", "application/json") //  201 code
+		w.Header().Set("content-type", "application/json") //  200 code
 		//  w.WriteHeader(http.StatusCreated)
 		return
 
@@ -99,14 +99,15 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 		Value: user.Uid,
 	}
 
-	security.RecordToken(token) //   201 code
-	w.Header().Add("content-type", "application/json")
-	w.WriteHeader(http.StatusCreated)
 	if err = json.NewEncoder(w).Encode(token); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
 
 	}
+
+	security.RecordToken(token) //   201 code
+	w.Header().Set("content-type", "application/json")
+	w.WriteHeader(http.StatusCreated)
 
 }

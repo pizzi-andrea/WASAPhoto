@@ -91,6 +91,12 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
+	if tk.Value != likeUserId {
+		w.Header().Set("content-type", "text/plain") //  403
+		w.WriteHeader(UnauthorizedToken.StatusCode)
+
+	}
+
 	if rr, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {
 		ctx.Logger.Errorf("IsBanned::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500

@@ -1,7 +1,6 @@
 package database
 
 import (
-	"image"
 	"regexp"
 	"time"
 )
@@ -73,6 +72,7 @@ func ValidateTimeStamp(time string) bool {
 }
 
 func ValidateUsername(u string) bool {
+
 	s, err := regexp.MatchString("^.*?$", u)
 	return len(u) >= 3 && len(u) <= 16 && s && err == nil
 }
@@ -94,10 +94,6 @@ func ValidateStream(s Stream) bool {
 
 func (p *Photo) Verify() bool {
 	return true
-}
-
-func (p *Photo) GetImg() (img *image.Image) {
-	return nil
 }
 
 func (u *User) Verify() bool {

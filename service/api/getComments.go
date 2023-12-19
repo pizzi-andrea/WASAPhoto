@@ -22,6 +22,7 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	var photo *database.Photo
 	var comments []database.Comment
 	var username string
+	var sortBy string
 	limit := 0
 	offset := 0
 
@@ -53,7 +54,8 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 
 	photoId := database.Id(photoId_)
 	uid := database.Id(uid_)
-
+	sortBy = r.URL.Query().Get("sortBy")
+	_ = sortBy
 	if !(database.ValidateId(photoId) && database.ValidateId(uid)) {
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(http.StatusBadRequest)
@@ -124,7 +126,7 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	comments = comments[offset:limit]
-
+	// manca l'ordinamento secondo la data
 	w.Header().Set("content-type", "application/json")
 	if err = json.NewEncoder(w).Encode(comments); err != nil {
 		ctx.Logger.Errorf("%w", err)

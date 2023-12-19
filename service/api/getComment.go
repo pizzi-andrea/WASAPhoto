@@ -15,8 +15,8 @@ import (
 func (rt *_router) getComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	var uid_ int
 	var err error
-	var user *database.User
-	var tk *security.Token
+	var user *database.User = &database.User{}
+	var tk *security.Token = &security.Token{}
 	var isBan bool
 	var photoId_ int
 	var photo *database.Photo
@@ -73,6 +73,7 @@ func (rt *_router) getComment(w http.ResponseWriter, r *http.Request, ps httprou
 	*/
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
 		w.Header().Set("content-type", "text/plain") //  401
+		ctx.Logger.Errorln("Token missing or invalid")
 		w.WriteHeader(UnauthorizedError.StatusCode)
 		return
 	}
@@ -86,6 +87,7 @@ func (rt *_router) getComment(w http.ResponseWriter, r *http.Request, ps httprou
 
 	if isBan {
 		w.Header().Set("content-type", "text/plain") //  403
+		ctx.Logger.Errorln("no auth.")
 		w.WriteHeader(UnauthorizedToken.StatusCode)
 		return
 	}

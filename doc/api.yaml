@@ -585,7 +585,12 @@ paths:
               type: object
               properties:
                 img:
-                  $ref: "#/components/schemas/Image"
+                  type: string
+                  format: binary
+                  description: >
+                    image to update
+                  minLength: 0
+                  maxLength: 35000000
                 desc:
                   description: >
                     description on image
@@ -946,14 +951,15 @@ paths:
       parameters:
         - $ref: "#/components/parameters/QueryLimit"
         - $ref: "#/components/parameters/UsernameFilter"
-        - name: sortByData
+        - name: sortBy
           in: query
           required: false
           schema:
             description: >
               flag for sorting comments on photo by update data
-            type: boolean
-            default: true
+            type: string
+            enum: ["data"]
+            default: "data"
           description: >
             sort comments by data creation
         
@@ -1092,6 +1098,9 @@ paths:
                   $ref: "#/components/schemas/Username"
         required: true
       responses:
+        "200":
+          description: >
+            User just registred, 
         "201":
           description: >
             User log-in action successful
@@ -1375,16 +1384,6 @@ components:
           maxLength: 250
           pattern: "^.*?$"
           
-    
-    
-    Image:
-      description: >
-        this object rappresent a Image update from user
-      type: object
-      properties:
-        photoId:
-          $ref: "#/components/schemas/Id"
-  
         data:
           description: >
             binary string rappresenting the data of image

@@ -14,7 +14,7 @@ import (
 /*
 given uid then list all user banned by user associated at *uid*
 */
-func (rt *_router) listBannedUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+func (rt *_router) listBannedUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var uid_ int
 	var err error

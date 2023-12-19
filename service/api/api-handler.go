@@ -60,7 +60,7 @@ func (rt *_router) Handler() http.Handler {
 	rt.router.GET(r_myStream, rt.wrap(rt.getMyStream)) // required
 
 	//   banned users
-	rt.router.GET(r_banned, rt.wrap(rt.listBannedUsers)) // fixed
+	rt.router.GET(r_banned, rt.wrap(rt.listBannedUser)) // fixed
 
 	//   ban user identificated by *uid*
 	rt.router.PUT(r_userBanned, rt.wrap(rt.banUser)) // required

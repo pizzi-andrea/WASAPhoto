@@ -15,7 +15,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	var photo_, uid_ int
 	var err error
-	var msg *database.Comment = &database.Comment{}
+	var msg *database.Comment
 	var tk *security.Token
 	var user *database.User
 	var photo *database.Photo
@@ -46,16 +46,13 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 
 	}
-	// =========================================================
-	/*
-		if !(database.ValidateId(photoId) && database.ValidateId(uid) && msg.Verify()) {
-			ctx.Logger.Errorln("Invalid data input")
-			w.Header().Set("content-type", "text/plain") //  404
-			w.WriteHeader(http.StatusNotFound)
-			return
+	if !(database.ValidateId(photoId) && database.ValidateId(uid) && msg.Verify()) {
+		ctx.Logger.Errorln("Invalid data input")
+		w.Header().Set("content-type", "text/plain") //  404
+		w.WriteHeader(http.StatusNotFound)
+		return
 
-		}
-	*/
+	}
 
 	if user, err = rt.db.GetUserFromId(uid); err != nil {
 		ctx.Logger.Errorf("GetUserFromId::%w", err)

@@ -15,8 +15,8 @@ import (
 func (rt *_router) getComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	var uid_ int
 	var err error
-	var user *database.User = &database.User{}
-	var tk *security.Token = &security.Token{}
+	var user *database.User 
+	var tk *security.Token
 	var isBan bool
 	var photoId_ int
 	var photo *database.Photo

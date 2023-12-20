@@ -6,24 +6,23 @@ import (
 
 // endpoints path
 const (
-	r_root        = "/"                         // "/"
-	r_users       = r_root + "users/"           // "/users/"
-	r_user        = r_users + ":uid/"           // "/users/{uid}/"
-	r_followers   = r_user + "followers/"       // "/users/{uid}/followers/"
-	r_follower    = r_followers + ":followerId" // "/users/{uid}/followers/{followerId}"
-	r_login       = r_root + "session"          // "/session
-	r_banned      = r_user + "banned/"          // "/users/{uid}/banned/"
-	r_userBanned  = r_banned + ":bannedId"      // "/users/{uid}/banned/{bannedId}"
-	r_followed    = r_user + "followed"         // "/users/{uid}/followed"
-	r_myPhotos    = r_user + "myPhotos/"        // "/users/{uid}/myPhotos/"
-	r_myPhoto     = r_myPhotos + ":photoId/"    // "/users/{uid}/myPhotos/{photoId}/"
-	r_myStream    = r_user + "myStream/"        // "/users/{uid}/myStream/"
-	r_streamPhoto = r_myStream + ":photoId"     // "/users/{uid}/myStream/{photoId}"
-	r_comments    = r_myPhoto + "comments/"     // "/users/{uid}/myPhotos/{photoId}/comments/"
-	r_comment     = r_comments + ":commentId"   // "/users/{uid}/myPhotos/{photoId}/comments/{commentId}"
-	r_likes       = r_myPhoto + "likes/"        // "/users/{uid}/myPhotos/{photoId}/likes/"
-	r_like        = r_likes + ":likeUserId"     // "/users/{uid}/myPhotos/{photoId}/likes/{likeUserId}"
-	r_image       = r_root + "images/:photoId"  // "/images/{photoId}"
+	r_root       = "/"                         // "/"
+	r_users      = r_root + "users/"           // "/users/"
+	r_user       = r_users + ":uid/"           // "/users/{uid}/"
+	r_followers  = r_user + "followers/"       // "/users/{uid}/followers/"
+	r_follower   = r_followers + ":followerId" // "/users/{uid}/followers/{followerId}"
+	r_login      = r_root + "session"          // "/session
+	r_banned     = r_user + "banned/"          // "/users/{uid}/banned/"
+	r_userBanned = r_banned + ":bannedId"      // "/users/{uid}/banned/{bannedId}"
+	r_followed   = r_user + "followed"         // "/users/{uid}/followed"
+	r_myPhotos   = r_user + "myPhotos/"        // "/users/{uid}/myPhotos/"
+	r_myPhoto    = r_myPhotos + ":photoId/"    // "/users/{uid}/myPhotos/{photoId}/"
+	r_myStream   = r_user + "myStream/"        // "/users/{uid}/myStream/"
+	r_comments   = r_myPhoto + "comments/"     // "/users/{uid}/myPhotos/{photoId}/comments/"
+	r_comment    = r_comments + ":commentId"   // "/users/{uid}/myPhotos/{photoId}/comments/{commentId}"
+	r_likes      = r_myPhoto + "likes/"        // "/users/{uid}/myPhotos/{photoId}/likes/"
+	r_like       = r_likes + ":likeUserId"     // "/users/{uid}/myPhotos/{photoId}/likes/{likeUserId}"
+	r_image      = r_root + "images/:photoId"  // "/images/{photoId}"
 )
 
 // Handler returns an instance of httprouter.Router that handle APIs registered here

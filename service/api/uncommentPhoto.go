@@ -15,7 +15,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 
 	var photo_, uid_, comm_ int
 	var err error
-	var msg *database.Comment = &database.Comment{}
+	var msg *database.Comment
 	var tk *security.Token
 	var user *database.User
 	var photo *database.Photo

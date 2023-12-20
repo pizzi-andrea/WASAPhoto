@@ -105,12 +105,16 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
-
 		return
 
 	}
 
 	w.Header().Set("content-type", "application/json")
-	json.NewEncoder(w).Encode(likes)
+	if err = json.NewEncoder(w).Encode(likes); err != nil {
+		ctx.Logger.Errorf("%w", err)
+		w.Header().Set("content-type", "text/plain") //  500
+		w.WriteHeader(ServerError.StatusCode)
+		return
+	}
 
 }

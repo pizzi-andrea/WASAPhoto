@@ -1101,6 +1101,10 @@ paths:
         "200":
           description: >
             User just registred, 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
         "201":
           description: >
             User log-in action successful

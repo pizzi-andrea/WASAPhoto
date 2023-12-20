@@ -11,7 +11,10 @@ import (
 Init db schema loading sql script called createTable.sql
 */
 func initDb(db *sql.DB) (_error error) {
-	path, _ := filepath.Abs("service/database/createTable.sql")
+	var path string
+	if path, _error = filepath.Abs("service/database/createTable.sql"); _error != nil {
+		return
+	}
 
 	byteQuery, _error := os.ReadFile(path)
 	if _error != nil {

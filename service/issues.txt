@@ -1,8 +1,5 @@
-  5: Error return value of `(*encoding/json.Encoder).Encode` is not checked
-  1: put a space between `//` and comment text
-  2: The code is not following the best practices on space and indentation. See the official Go documentation, and look at `fmt` sub-command in `go` executable.
+  1: We found some dead code. If it's not an error, remove the code. OK
+  2: Error return value of `(*encoding/json.Encoder).Encode` is not checked OK
   4: We found some unnecessary type casting (casting from a type to the same type), e.g.: `var x int` and `p = int(x)`
-  1: Do not assign to a blank identifier if it's not needed. For example, when getting values from a map, the 2nd parameter (boolean indicating the presence) is not returned if not explicitly requested.
-  8: rows.Err must be checked
-  1: Check all variable assignments. Some variables receive a value but then you don't use them, or you overwrite them before using the value.
- 24: Some APIs endpoints have been defined in the OpenAPI document, but the implementation is missing.
+  1: `r_streamPhoto` is unused OK
+  3: Check all variable assignments. Some variables receive a value but then you don't use them, or you overwrite them before using the value. OK

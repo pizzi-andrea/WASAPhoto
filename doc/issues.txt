@@ -5,6 +5,6 @@
    1 (100%) : Request bodies and non-204 responses should define a content object OK
 
   warnings
-   1  (50%) : Schema should have a non-empty description
+   1  (50%) : Schema should have a non-empty description OK
    1  (50%) : Schema property should have a non-empty description
 

@@ -1128,6 +1128,8 @@ paths:
     parameters:
       - name: photoId
         schema:
+          description: >
+            identificator at 64-bit
           type: integer
           format: int64
         in: path
@@ -1370,6 +1372,8 @@ components:
           maxItems: 250 # da rivedere
         
         comments:
+          description: >
+            list of comments collected by photo
           type: array
           items:
             $ref: "#/components/schemas/Comment"

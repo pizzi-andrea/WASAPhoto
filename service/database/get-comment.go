@@ -1,6 +1,9 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+	"errors"
+)
 
 // GetComment allow to get post specificated it id
 func (db *appdbimpl) GetComment(commentId Id) (comment *Comment, err error) {
@@ -8,7 +11,7 @@ func (db *appdbimpl) GetComment(commentId Id) (comment *Comment, err error) {
 
 	err = db.c.QueryRow("SELECT * FROM Comments WHERE commentId").Scan(&c.CommentId, &c.Author, &commentId, &c.Text, &c.TimeStamp)
 
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		err = nil
 		return
 	}

@@ -13,12 +13,11 @@ import (
 
 // give *uid* and *photoId* and get photo associated
 func (rt *_router) getComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	var uid_ int
+	var uid_, photoId_ int
 	var err error
 	var user *database.User
 	var tk *security.Token
 	var isBan bool
-	var photoId_ int
 	var photo *database.Photo
 	var comment *database.Comment
 

@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"strconv"
 
@@ -55,7 +56,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 
 	// if user not exist path is invalid
 	if user == nil {
-		w.Header().Add("content-type", "text/plain") //   404
+		w.Header().Set("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusNotFound)
 
 		return
@@ -125,10 +126,16 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 
 	}
 
+	for i := range photos {
+		photos[i].Location, _, _ = strings.Cut(r_image, ":")
+		photos[i].Location += strconv.Itoa(int(photos[i].Refer))
+		ctx.Logger.Infof("%s\n", photos[i].Location)
+	}
+
 	/*
 		put in response body user profile rappresentation
 	*/
-	w.Header().Add("content-type", "application/json")
+	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusOK) //   200
 	// encode in json format the response
 	if err = json.NewEncoder(w).Encode(database.Profile{

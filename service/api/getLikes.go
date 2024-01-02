@@ -69,7 +69,7 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	if user == nil || photo == nil {
-		w.Header().Add("content-type", "text/plain") //  404
+		w.Header().Set("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
 
 		return

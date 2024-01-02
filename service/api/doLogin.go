@@ -108,6 +108,5 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	security.RecordToken(token) //   201 code
 	w.Header().Set("content-type", "application/json")
-	w.WriteHeader(http.StatusCreated)
 
 }

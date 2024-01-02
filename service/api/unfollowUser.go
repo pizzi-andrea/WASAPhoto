@@ -55,7 +55,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	if !isFollower {
-		w.Header().Add("content-type", "text/plain") //   404
+		w.Header().Set("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusNotFound)
 
 		return

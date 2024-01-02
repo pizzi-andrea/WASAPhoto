@@ -44,7 +44,7 @@ func (rt *_router) listPost(w http.ResponseWriter, r *http.Request, ps httproute
 
 	//  if user not exist the path is not valid
 	if user == nil {
-		w.Header().Add("content-type", "text/plain") //   404
+		w.Header().Set("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusNotFound)
 
 		return
@@ -84,6 +84,7 @@ func (rt *_router) listPost(w http.ResponseWriter, r *http.Request, ps httproute
 
 	for i := range stream {
 		stream[i].Location = strings.TrimRight(r_image, ":") + strconv.Itoa(int(stream[i].Refer))
+		ctx.Logger.Infof("%s\n", stream[i].Location)
 	}
 
 	if err = json.NewEncoder(w).Encode(stream); err != nil {

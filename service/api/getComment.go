@@ -15,7 +15,7 @@ import (
 func (rt *_router) getComment(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	var uid_ int
 	var err error
-	var user *database.User 
+	var user *database.User
 	var tk *security.Token
 	var isBan bool
 	var photoId_ int
@@ -62,7 +62,7 @@ func (rt *_router) getComment(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	if user == nil || photo == nil {
-		w.Header().Add("content-type", "text/plain") //  404
+		w.Header().Set("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
 		return
 

@@ -75,7 +75,7 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	if post == nil || user == nil {
-		w.Header().Add("content-type", "text/plain") //  404
+		w.Header().Set("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
 
 		return

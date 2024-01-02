@@ -76,7 +76,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	if photo == nil || user == nil || like == nil {
-		w.Header().Add("content-type", "text/plain") //  404
+		w.Header().Set("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
 
 		return

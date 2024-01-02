@@ -15,7 +15,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	var photo_, uid_ int
 	var err error
-	var msg *database.Comment
+	var msg *database.Comment = &database.Comment{}
 	var tk *security.Token
 	var user *database.User
 	var photo *database.Photo
@@ -63,6 +63,14 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	}
 
+	if user == nil {
+		ctx.Logger.Error("User not found")
+		w.Header().Set("content-type", "text/plain") //  404
+		w.WriteHeader(http.StatusNotFound)
+
+		return
+	}
+
 	if photo, err = rt.db.GetPhoto(photoId); err != nil {
 		ctx.Logger.Errorf("GetPhoto::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
@@ -73,8 +81,8 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	if photo == nil {
-		ctx.Logger.Error("Photo/user not found", err)
-		w.Header().Add("content-type", "text/plain") //  404
+		ctx.Logger.Error("Photo not found")
+		w.Header().Set("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
 
 		return
@@ -117,7 +125,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	if user == nil {
 		ctx.Logger.Error("Photo/user not found", err)
-		w.Header().Add("content-type", "text/plain") //  404
+		w.Header().Set("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
 
 		return

@@ -28,7 +28,7 @@ func (rt *_router) getImage(w http.ResponseWriter, r *http.Request, ps httproute
 	photoId := database.Id(photoId_)
 
 	if img, err = rt.db.GetPhoto(photoId); err != nil {
-		w.Header().Add("content-type", "text/plain") //   404
+		w.Header().Set("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}

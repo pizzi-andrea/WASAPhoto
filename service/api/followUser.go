@@ -48,7 +48,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		Check if value in parameters are valid values in accord to type definittiion
 	*/
 	if !(database.ValidateId(from) && database.ValidateId(to)) {
-		w.Header().Add("content-type", "text/plain") //   404
+		w.Header().Set("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusBadRequest)
 
 		return
@@ -67,7 +67,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	if user == nil {
-		w.Header().Add("content-type", "text/plain") //   404
+		w.Header().Set("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusNotFound)
 
 		return
@@ -81,7 +81,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	}
 
 	if user == nil {
-		w.Header().Add("content-type", "text/plain") //  404
+		w.Header().Set("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -145,7 +145,6 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		}
 
 		w.Header().Set("content-type", "application/json") //  201
-		w.WriteHeader(http.StatusCreated)
 
 	} else {
 		ctx.Logger.Infoln("user just follow")

@@ -13,6 +13,10 @@ func (db *appdbimpl) PostComment(from Id, text string, to Id) (com *Comment, err
 		return
 	}
 
+	if err = db.c.QueryRow("SELECT * FROM Users WHERE uid = ?", c.Author.Uid).Scan(&c.Author.Uid, &c.Author.Username); err != nil {
+		return
+	}
+
 	com = &c
 	return
 

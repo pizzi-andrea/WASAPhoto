@@ -45,7 +45,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	*/
 	if _, err = rt.db.GetUserFromId(from); err != nil {
 		ctx.Logger.Errorf("%w", err)
-		w.Header().Add("content-type", "text/plain") //   404
+		w.Header().Set("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusNotFound)
 
 		return
@@ -53,7 +53,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	if _, err = rt.db.GetUserFromId(to); err != nil {
 		ctx.Logger.Errorf("%w", err)
-		w.Header().Add("content-type", "text/plain") //   404
+		w.Header().Set("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusNotFound)
 
 		return
@@ -61,7 +61,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 
 	//   validate format value
 	if !(database.ValidateId(from) && database.ValidateId(to)) {
-		w.Header().Add("content-type", "text/plain") //   404
+		w.Header().Set("content-type", "text/plain") //   404
 		w.WriteHeader(http.StatusBadRequest)
 
 		return

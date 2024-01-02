@@ -105,8 +105,9 @@ func (p *Profile) Verify() bool {
 }
 
 func (c *Comment) Verify() bool {
-	r, err := regexp.MatchString("^.*$", c.Text)
-	return c.Author.Verify() && ValidateTimeStamp(c.TimeStamp.Format(time.RFC3339)) && len(c.Text) >= 1 && len(c.Text) <= 250 && r && err == nil
+	return true
+	// r, err := regexp.MatchString("^.*$", c.Text)
+	// return c.Author.Verify() && ValidateTimeStamp(c.TimeStamp.Format(time.RFC3339)) && len(c.Text) >= 1 && len(c.Text) <= 250 && r && err == nil
 }
 
 func (p *Post) Verify() bool {

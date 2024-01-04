@@ -23,7 +23,7 @@ all information on user, in particular:
   - number of following
 */
 func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	var uid_ int
+	var uid int
 	var err error
 	var user *database.User
 	var isBan bool
@@ -34,7 +34,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	/*
 		Parse URL parameters
 	*/
-	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("Atoi::%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -42,7 +42,6 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	uid := database.Id(uid_)
 	/*
 		if user id in URL path not exist, then user not found
 	*/
@@ -127,7 +126,7 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	for i := range photos {
-		photos[i].Location, _, _ = strings.Cut(r_image, ":")
+		photos[i].Location, _, _ = strings.Cut("/images/:photoId", ":")
 		photos[i].Location += strconv.Itoa(int(photos[i].Refer))
 		ctx.Logger.Infof("%s\n", photos[i].Location)
 	}

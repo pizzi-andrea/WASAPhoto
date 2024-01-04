@@ -13,7 +13,7 @@ import (
 
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var photo_, uid_ int
+	var photoId, uid int
 	var err error
 	var msg *database.Comment = &database.Comment{}
 	var tk *security.Token
@@ -21,7 +21,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	var photo *database.Photo
 	var rr bool
 
-	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("Atoi::%w\n", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -29,7 +29,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	if photo_, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
+	if photoId, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
 		ctx.Logger.Errorf("Atoi::%w\n", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -37,8 +37,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 	// problem ================================================
-	photoId := database.Id(photo_)
-	uid := database.Id(uid_)
+
 	if err = json.NewDecoder(r.Body).Decode(msg); err != nil {
 		ctx.Logger.Errorf("Decode::%w\n", err)
 		w.Header().Set("content-type", "text/plain") //  400

@@ -7,7 +7,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"pizzi1995517.it/WASAPhoto/service/api/reqcontext"
 	"pizzi1995517.it/WASAPhoto/service/api/security"
-	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
 /*
@@ -15,16 +14,16 @@ gived uid and *followedId* then remove follower *followerId* from user followers
 */
 func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var uid_ int
+	var uid int
 	var err error
-	var uidUnfoll_ int
+	var uidUnfoll int
 	var isFollower bool
 	var tk *security.Token
 
 	/*
 		Parse URL parameters
 	*/
-	if uid_, err = strconv.Atoi(ps.ByName("followerId")); err != nil {
+	if uid, err = strconv.Atoi(ps.ByName("followerId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -32,7 +31,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	if uidUnfoll_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uidUnfoll, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -43,8 +42,6 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	/*
 		if folow not exist path URL path not exist
 	*/
-	uid := database.Id(uid_)
-	uidUnfoll := database.Id(uidUnfoll_)
 
 	if isFollower, err = rt.db.IsFollower(uid, uidUnfoll); err != nil {
 		ctx.Logger.Errorf("%w", err)

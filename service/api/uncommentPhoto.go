@@ -13,7 +13,7 @@ import (
 // /users/{uid}/myPhotos/{photoId}/comments/
 func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var photo_, uid_, comm_ int
+	var photoId, uid, comm int
 	var err error
 	var msg *database.Comment
 	var tk *security.Token
@@ -21,7 +21,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	var photo *database.Photo
 	var rr bool
 
-	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -29,7 +29,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	if photo_, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
+	if photoId, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -37,17 +37,13 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	if comm_, err = strconv.Atoi(ps.ByName("commentId")); err != nil {
+	if comm, err = strconv.Atoi(ps.ByName("commentId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
 
 		return
 	}
-
-	comment := database.Id(comm_)
-	photoId := database.Id(photo_)
-	uid := database.Id(uid_)
 
 	if !(database.ValidateId(photoId) && database.ValidateId(uid) && msg.Verify()) {
 		w.Header().Set("content-type", "text/plain") //  400
@@ -75,7 +71,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 
 	}
 
-	if msg, err = rt.db.GetComment(comment); err != nil {
+	if msg, err = rt.db.GetComment(comm); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)

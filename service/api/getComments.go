@@ -13,7 +13,7 @@ import (
 
 // give *uid* and *photoId* and get photo associated
 func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	var uid_, photoId_ int
+	var uid, photoId int
 	var err error
 	var user *database.User
 	var tk *security.Token
@@ -25,13 +25,13 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	offset := 0
 
 	//  Parsing URL parameters
-	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if photoId_, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
+	if photoId, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(http.StatusBadRequest)
@@ -49,9 +49,6 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
-	photoId := database.Id(photoId_)
-	uid := database.Id(uid_)
 
 	if !(database.ValidateId(photoId) && database.ValidateId(uid)) {
 		w.Header().Set("content-type", "text/plain") //  400

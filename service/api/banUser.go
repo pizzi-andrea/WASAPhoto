@@ -15,14 +15,15 @@ import (
 // bans the user(BannedID)
 func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 	var result bool
-	var from_, to_ int
+	var from, to int
 	var err error
+	var u *database.User
 	var tk *security.Token
 
 	/*
 		Parse parameters in path
 	*/
-	if from_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if from, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -30,15 +31,13 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	if to_, err = strconv.Atoi(ps.ByName("bannedId")); err != nil {
+	if to, err = strconv.Atoi(ps.ByName("bannedId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
 
 		return
 	}
-
-	from, to := database.Id(from_), database.Id(to_)
 
 	/*
 		Check if path is valid
@@ -101,7 +100,7 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 	}
 
 	if result { //   check now if user follow other user
-		var u *database.User
+
 		if u, err = rt.db.GetUserFromId(to); u == nil || err != nil {
 			ctx.Logger.Errorf("%w", err)
 			w.Header().Set("content-type", "text/plain")

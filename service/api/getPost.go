@@ -16,23 +16,23 @@ import (
 give *uid* and *photoId* and get photo associated
 */
 func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	var uid_ int
+	var uid int
 	var err error
 	var user *database.User
 	var tk *security.Token
 	var isBan bool
-	var photoId_ int
+	var photoId int
 	var post *database.Post
 
 	//   Parsing URL parameters
-	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
-	if photoId_, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
+	if photoId, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(http.StatusBadRequest)
@@ -48,8 +48,6 @@ func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	uid := database.Id(uid_)
-	photoId := database.Id(photoId_)
 	//   check if path exist
 	if user, err = rt.db.GetUserFromId(uid); err != nil {
 		ctx.Logger.Errorf("%w", err)
@@ -90,7 +88,7 @@ func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	post.Location = strings.TrimRight(r_image, ":") + strconv.Itoa(int(post.Refer))
+	post.Location = strings.TrimRight("/images/:photoId", ":") + strconv.Itoa(int(post.Refer))
 	post.Location += strconv.Itoa(int(post.Refer))
 	ctx.Logger.Infof("%s\n", post.Location)
 

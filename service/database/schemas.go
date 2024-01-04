@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type Id = uint64           //   Identificator at 64-bit
+type Id = int              //   Identificator at 64-bit
 type TimeStamp = time.Time //   this components describe timestamp value conform to [RFC3339](https://  datatracker.ietf.org/doc/html/rfc3339#section-5.6) specification
 type Username = string     //   username of a user
 type Validator interface {

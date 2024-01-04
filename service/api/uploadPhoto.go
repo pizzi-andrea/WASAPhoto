@@ -21,7 +21,7 @@ and stored in db.
 */
 func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var uid_ int
+	var uid int
 	var err error
 	var user *database.User
 	var tk *security.Token
@@ -29,14 +29,13 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	var newPost *database.Post = &database.Post{}
 
 	//   Parsing URL parameters
-	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	uid := database.Id(uid_)
 	//   check if path exist
 	if user, err = rt.db.GetUserFromId(uid); err != nil {
 		ctx.Logger.Errorf("%w", err)

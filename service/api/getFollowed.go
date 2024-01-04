@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"net/http"
-	"regexp"
 
 	"strconv"
 
@@ -18,8 +17,9 @@ give a UID return a list contanings all followers user
 */
 func (rt *_router) getFollowed(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var uid_ int
+	var uid int
 	var err error
+
 	var user *database.User
 	var tk *security.Token
 	var limit int
@@ -29,19 +29,18 @@ func (rt *_router) getFollowed(w http.ResponseWriter, r *http.Request, ps httpro
 	/*
 		Parse URL parameters
 	*/
-	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
 
 		return
 	}
-	uid := database.Id(uid_)
 
 	//   validate username format
 	username = r.URL.Query().Get("username")
-	rr, err := regexp.MatchString("^.*?$", username)
-	if !(rr && err == nil && len(username) <= 16) {
+
+	if database.ValidateUsername(username) {
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
 		return

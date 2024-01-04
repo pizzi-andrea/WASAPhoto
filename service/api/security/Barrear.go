@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-var tokenRegistred map[uint64]bool = make(map[uint64]bool) //   list token registred in the system. The token is registred in login action and deleted in logout action
+var tokenRegistred map[int]bool = make(map[int]bool) //   list token registred in the system. The token is registred in login action and deleted in logout action
 
 func RecordToken(token Token) (status bool) {
 
@@ -32,7 +32,7 @@ func GetTokensRec() (t []Token) {
 	return
 }
 
-func GetToken(val uint64) *Token {
+func GetToken(val int) *Token {
 	if _, ok := tokenRegistred[val]; ok {
 		return &Token{
 			Value: val,
@@ -77,7 +77,7 @@ func BarrearAuth(r *http.Request) (tokenValid *Token) {
 	}
 
 	return &Token{
-		uint64(id),
+		int(id),
 	}
 
 }

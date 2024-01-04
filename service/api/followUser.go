@@ -17,7 +17,7 @@ gived uid and *followedId* then remove follower *followerId* from user followers
 */
 func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var from_, to_ int
+	var from, to int
 	var err error
 	var tk *security.Token
 	var isBan bool
@@ -26,23 +26,20 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 	/*
 		Parse URL parameters in path
 	*/
-	if from_, err = strconv.Atoi(ps.ByName("followerId")); err != nil {
+	if from, err = strconv.Atoi(ps.ByName("followerId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
 
 		return
 	}
-	if to_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if to, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
 
 		return
 	}
-
-	to := database.Id(to_)
-	from := database.Id(from_)
 
 	/*
 		Check if value in parameters are valid values in accord to type definittiion

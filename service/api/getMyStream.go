@@ -17,7 +17,7 @@ given *uid* of user that who wants to get all photo in his stream
 */
 func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var uid_ int
+	var uid int
 	var err error
 	var stream []database.Post
 	var user *database.User
@@ -28,14 +28,13 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	/*
 		Parse URL parameters
 	*/
-	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
 
 		return
 	}
-	uid := database.Id(uid_)
 	pLimit := r.URL.Query().Get("limit")
 	pUsername := r.URL.Query().Get("username")
 

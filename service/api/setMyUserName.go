@@ -18,7 +18,7 @@ The username to set is in the body request
 
 func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var uid_ int
+	var uid int
 	var u string
 	var err error
 	var user *database.User
@@ -28,15 +28,13 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	/*
 		Parse URL parameters
 	*/
-	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
 
 		return
 	}
-
-	uid := database.Id(uid_)
 
 	/*
 		if user id in URL path not exist, then user not found

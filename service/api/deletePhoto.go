@@ -13,15 +13,15 @@ import (
 // deletePhoto permit to photo owner to delete updated photo
 func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var uid_ int
-	var photoId_ int
+	var uid int
+	var photoId int
 	var err error
 	var user *database.User
 	var photo *database.Photo
 	var tk *security.Token
 
 	//   Parsing URL parameters in path
-	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(http.StatusBadRequest)
@@ -29,7 +29,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	if photoId_, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
+	if photoId, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(http.StatusBadRequest)
@@ -37,8 +37,6 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	uid := database.Id(uid_)
-	photoId := database.Id(photoId_)
 	//   check if path exist
 	if user, err = rt.db.GetUserFromId(uid); err != nil {
 		ctx.Logger.Errorf("%w", err)

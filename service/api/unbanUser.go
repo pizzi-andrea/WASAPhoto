@@ -7,7 +7,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"pizzi1995517.it/WASAPhoto/service/api/reqcontext"
 	"pizzi1995517.it/WASAPhoto/service/api/security"
-	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
 /*
@@ -15,7 +14,7 @@ taken uid of the user who wants unbband id of user banned and delete last one
 */
 func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var from_, to_ int
+	var from, to int
 	var err error
 	var tk *security.Token
 	var isBan bool
@@ -25,7 +24,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	*/
 
 	//   get :uid parameter in path
-	if from_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if from, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -34,7 +33,7 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	}
 
 	//   get :bannedId parameter in path
-	if to_, err = strconv.Atoi(ps.ByName("bannedId")); err != nil {
+	if to, err = strconv.Atoi(ps.ByName("bannedId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -45,9 +44,6 @@ func (rt *_router) unbanUser(w http.ResponseWriter, r *http.Request, ps httprout
 	/*
 		if user id in URL path not exist, then user not found
 	*/
-
-	to := database.Id(to_)
-	from := database.Id(from_)
 
 	if isBan, err = rt.db.IsBanned(from, to); err != nil {
 		ctx.Logger.Errorf("%w", err)

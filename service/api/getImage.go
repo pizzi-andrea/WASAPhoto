@@ -13,19 +13,17 @@ import (
 )
 
 func (rt *_router) getImage(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	var photoId_ int
+	var photoId int
 	var err error
 	var img *database.Photo
 	var buffer image.Image
 
-	if photoId_, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
+	if photoId, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
-	photoId := database.Id(photoId_)
 
 	if img, err = rt.db.GetPhoto(photoId); err != nil {
 		w.Header().Set("content-type", "text/plain") //   404

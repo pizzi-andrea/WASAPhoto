@@ -16,7 +16,7 @@ import (
 given *uid* get all photo has updated
 */
 func (rt *_router) listPost(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	var uid_ int
+	var uid int
 	var err error
 	var user *database.User
 	var tk *security.Token
@@ -24,7 +24,7 @@ func (rt *_router) listPost(w http.ResponseWriter, r *http.Request, ps httproute
 	var stream database.Stream
 
 	//   Parsing URL parameters
-	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(http.StatusBadRequest)
@@ -32,7 +32,6 @@ func (rt *_router) listPost(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	uid := database.Id(uid_)
 	//   check if path exist
 	if user, err = rt.db.GetUserFromId(uid); err != nil {
 		ctx.Logger.Errorf("%w", err)
@@ -83,7 +82,7 @@ func (rt *_router) listPost(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	for i := range stream {
-		stream[i].Location = strings.TrimRight(r_image, ":") + strconv.Itoa(int(stream[i].Refer))
+		stream[i].Location = strings.TrimRight("/images/:photoId", ":") + strconv.Itoa(int(stream[i].Refer))
 		ctx.Logger.Infof("%s\n", stream[i].Location)
 	}
 

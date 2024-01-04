@@ -16,7 +16,7 @@ given uid then list all user banned by user associated at *uid*
 */
 func (rt *_router) listBannedUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
-	var uid_ int
+	var uid int
 	var err error
 	var banned []database.User
 	var user *database.User
@@ -27,7 +27,7 @@ func (rt *_router) listBannedUser(w http.ResponseWriter, r *http.Request, ps htt
 	/*
 		Parse URL parameters
 	*/
-	if uid_, err = strconv.Atoi(ps.ByName("uid")); err != nil {
+	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -42,8 +42,6 @@ func (rt *_router) listBannedUser(w http.ResponseWriter, r *http.Request, ps htt
 
 		return
 	}
-
-	uid := database.Id(uid_)
 
 	/*
 		if user id in URL path not exist, then user not found

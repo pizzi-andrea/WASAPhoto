@@ -582,6 +582,8 @@ paths:
         content:
           multipart/form-data:
             schema:
+              description: >
+                Object rappresented photo to update and relative metadata
               type: object
               properties:
                 img:

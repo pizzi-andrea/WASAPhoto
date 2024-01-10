@@ -1,42 +1,45 @@
 <script>
+import token from "../router/index"
 export default {
 	data: function() {
 		return {
 			errormsg: null,
 			loading: false,
-			token: null,
 			username: "",
-			errorInUsername: true,
+			errorInUsername: false,
 			msgErrorData: " Errore stringa 'username' mal formattata. \n Un username valido deve avere una lunghezza compresa tra 3 e 16 caratteri di qualunque tipo."
 		}
 	},
 	methods: {
-		async refresh() {
+		refresh() {
 			this.loading = true;
 			this.errormsg = null;
+            this.errorInUsername=false
+            this.username = ""
 			
 		},
 
 		async login(){
+            this.dataValidator()
 			try {
 
 				if (this.errorInUsername) {
-					throw new TypeError("Username non valido.")
-					 
+					throw ("Username non valido.") 
 				}
 				let response = await this.$axios.post("/session", {
 					name: `'${this.username}'`
 				});
-				this.token = response.data;
-			} catch (e) {
+				token = response.data;
+			
+			this.loading = false;
+			
+			
+			this.$router.push('/users/' + this.token.Value + '/')
+			
+		} catch (e) {
 				this.errormsg = e.toString();
 				return 
 			}
-			return
-			this.loading = false;
-			await this.$router.push('#/users/' + this.token.Value + '/')
-
-			
 		},
 
 		dataValidator() { this.errorInUsername =  !( this.username.length >= 3 && this.username.length <= 16 && /^.*$/.test(this.username) )}
@@ -53,6 +56,7 @@ export default {
 </script>
 
 <template>
+	<title>WasaPhoto - login</title>
 	<div>
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -71,20 +75,15 @@ export default {
 			</div>
 		</div>
 
-		<div>
+		<div class=" align-items-center ">
 			<h5>Username</h5>
-			<input v-model="username" placeholder="write your username hear" minlength="3" maxlength="16"  @input ="dataValidator">
+			
+			<input v-model="username" placeholder="" minlength="3" maxlength="16"  @input ="dataValidator" @focus="refresh">
 
 		</div>
 
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
-		<ErrorMsg v-if="errorInUsername" :msg="msgErrorData"></ErrorMsg>
-		
-		
-
-
-
-		
+		<ErrorMsg v-if="errorInUsername" :msg="msgErrorData"></ErrorMsg>		
 	</div>
 </template>
 

@@ -7,7 +7,7 @@ WASAPhoto is web application based on RESTfull architecture to allows upload you
 ## Roadmap
 
 1. [X] define APIs using the [https://www.openapis.org/](OpenAPI) standard
-2. [ ] design and develop the server side (“backend”) in [https://go.dev/](Go)
+2. [X] design and develop the server side (“backend”) in [https://go.dev/](Go)
 3. [ ] design and develop the client side (“frontend”) in [https://developer.mozilla.org/en-US/docs/Web/JavaScript?retiredLocale=it](JavaScript)
 4. [ ] create a [https://www.docker.com/](Docker) container image for deployment
 
@@ -16,7 +16,7 @@ WASAPhoto is web application based on RESTfull architecture to allows upload you
 1. WASAPhoto users actions
     - stream of photos --> add or remove (all information on photo) own photo uploaded
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 
     - [X] followers --> list other user that follow a user
         - [X] API
@@ -26,9 +26,9 @@ WASAPhoto is web application based on RESTfull architecture to allows upload you
         - [X] API
         - [X] implementation
 
-    - [ ] likes --> user can assign like to photos from others users 
+    - [X] likes --> user can assign like to photos from others users 
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 
     - [X] banned users --> user can banned or unbanned other users
         - [X] API
@@ -38,9 +38,9 @@ WASAPhoto is web application based on RESTfull architecture to allows upload you
         - [X] API
         - [X] implementation
 
-    - [ ] comments --> user can comment or uncomment other user photo's 
+    - [X] comments --> user can comment or uncomment other user photo's 
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 
     - [X] search --> searching other users via username 
         - [X] API
@@ -51,25 +51,25 @@ WASAPhoto is web application based on RESTfull architecture to allows upload you
         - [X] implementation
 
 2. Photos datas
-    - [ ] data upload
+    - [X] data upload
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 
-    - [ ] time upload 
+    - [X] time upload 
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 
-    - [ ] likes recived
+    - [X] likes recived
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 
-    - [ ] comments recived
+    - [X] comments recived
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 
 3. System specifications
 
-    - [ ] Sort photo stream in reverse order by data  and time update value
+    - [X] Sort photo stream in reverse order by data  and time update value
         - [X] API
-        - [ ] implementation
+        - [X] implementation
 

@@ -1,9 +1,0 @@
-
-  Total number of errors   : 0
-  Total number of warnings : 1
-
-  warnings
-   1 (100%) : Schema should have a non-empty description
-
-
-

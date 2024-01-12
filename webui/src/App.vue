@@ -2,7 +2,23 @@
 import { RouterLink, RouterView } from 'vue-router'
 </script>
 <script>
-export default {}
+export default {
+	data: function() {
+		return {
+			navBarShow: false
+		}
+	},
+
+	methods: {
+		showNavBar(){
+			this.navBarShow = true 
+		},
+		hideNavBar(){
+			this.navBarShow = false
+		}
+	},
+	
+}
 </script>
 
 <template>
@@ -14,10 +30,11 @@ export default {}
 		</button>
 	</header>
 
-	<div class="container-fluid">
+	<div  class="container-fluid">
+		
 		<div class="row">
 			<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-				<div class="position-sticky pt-3 sidebar-sticky">
+				<div class="position-sticky pt-3 sidebar-sticky" v-show="false">
 					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
 						<span>General</span>
 					</h6>

@@ -1,5 +1,5 @@
 <script>
-import token from "../router/index"
+
 export default {
 	data: function() {
 		return {
@@ -16,25 +16,49 @@ export default {
 			this.errormsg = null;
             this.errorInUsername=false
             this.username = ""
+			localStorage.removeItem("token")
 			
 		},
 
 		async login(){
             this.dataValidator()
+			let response = null
+			let token
 			try {
 
 				if (this.errorInUsername) {
 					throw ("Username non valido.") 
 				}
-				let response = await this.$axios.post("/session", {
+				response = await this.$axios.post("/session", {
 					name: `'${this.username}'`
 				});
-				token = response.data;
+				
+				
+				switch(response.status) {
+					case 200:
+					case 201:
+						token = response.data.Value
+						localStorage.setItem("token", token)
+						// this.$axios.defaults.headers.Authorization = 'Bearer ' + token
+						this.$router.push('/users/' + token + '/')
+						
+						console.log('/users/' + token + '/')
+					break
+					case 400:
+						this.$route.push('/error/client')
+						break
+					case 500:
+						this.$route.push('error/server')
+						
+
+
+				}
+				this.loading = false;
+
+				
+				
 			
-			this.loading = false;
 			
-			
-			this.$router.push('/users/' + this.token.Value + '/')
 			
 		} catch (e) {
 				this.errormsg = e.toString();
@@ -56,35 +80,43 @@ export default {
 </script>
 
 <template>
+	
 	<title>WasaPhoto - login</title>
-	<div>
-		<div
-			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h1 class="h2">Login</h1>
-			<div class="btn-toolbar mb-2 mb-md-0">
-				<div class="btn-group me-2">
-					<button type="button" class="btn btn-sm btn-outline-secondary" @click="refresh">
-						Refresh
-					</button>
-				</div>
-				<div class="btn-group me-2">
-					<button type="button" class="btn btn-sm btn-outline-primary" @click="login">
-						Sig-in/Log-in
-					</button>
-				</div>
-			</div>
-		</div>
-
-		<div class=" align-items-center ">
-			<h5>Username</h5>
+	
+	<div class = "container form-group  mr-4 mt-4">
 			
-			<input v-model="username" placeholder="" minlength="3" maxlength="16"  @input ="dataValidator" @focus="refresh">
+			
 
-		</div>
+				<div class="row">
+					
+					<div class="container">
+
+						<div class="row  flex-row d-inline-flex">
+							
+							<h4>Username</h4>
+							<div class="col-sm m-1 d-sm-inline-flex">
+								
+								<input v-model="username" id="usernameField" placeholder="username" minlength="3" maxlength="16"  class =" m-1 form-control" @input ="dataValidator" @focus="refresh">
+								<button class="btn btn-primary m-4" @click="login">Login/Sigin</button>
+							</div>
+							
+						</div>
+						
+						
+					</div>
+
+				</div>
+				
+		
+	</div>
+
+		
+		<hr>
 
 		<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
+		<br>
 		<ErrorMsg v-if="errorInUsername" :msg="msgErrorData"></ErrorMsg>		
-	</div>
+	
 </template>
 
 <style>

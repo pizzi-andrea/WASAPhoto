@@ -5,7 +5,8 @@ import { RouterLink, RouterView } from 'vue-router'
 export default {
 	data: function() {
 		return {
-			navBarShow: false
+			navBarShow: true,
+			user: "" 
 		}
 	},
 
@@ -15,8 +16,16 @@ export default {
 		},
 		hideNavBar(){
 			this.navBarShow = false
+		},
+
+		async refresh(){
+			this.user =  "/users/" + localStorage.getItem('token') + "/"
 		}
 	},
+
+	mounted(){
+		this.refresh();
+	}
 	
 }
 </script>
@@ -34,27 +43,27 @@ export default {
 		
 		<div class="row">
 			<nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
-				<div class="position-sticky pt-3 sidebar-sticky" v-show="false">
+				<div class="position-sticky pt-3 sidebar-sticky" v-show="navBarShow">
 					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted text-uppercase">
 						<span>General</span>
 					</h6>
 					<ul class="nav flex-column">
-						<li class="nav-item">
-							<RouterLink to="/" class="nav-link">
+						<li class="nav-item" @mouseover="refresh">
+							<RouterLink :to=user  class="nav-link">
 								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#home"/></svg>
-								Home
+								Il tuo profilo
 							</RouterLink>
 						</li>
 						<li class="nav-item">
 							<RouterLink to="/link1" class="nav-link">
 								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#layout"/></svg>
-								Menu item 1
+								Gestione Amici
 							</RouterLink>
 						</li>
 						<li class="nav-item">
 							<RouterLink to="/link2" class="nav-link">
 								<svg class="feather"><use href="/feather-sprite-v4.29.0.svg#key"/></svg>
-								Menu item 2
+								I tuoi Post
 							</RouterLink>
 						</li>
 					</ul>

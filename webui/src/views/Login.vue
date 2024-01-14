@@ -23,14 +23,14 @@ export default {
 		async login(){
             this.dataValidator()
 			let response = null
-			let token
+			let token = 0
 			try {
 
 				if (this.errorInUsername) {
 					throw ("Username non valido.") 
 				}
 				response = await this.$axios.post("/session", {
-					name: `'${this.username}'`
+					name: `${this.username}`
 				});
 				
 				
@@ -38,28 +38,23 @@ export default {
 					case 200:
 					case 201:
 						token = response.data.Value
-						localStorage.setItem("token", token)
-						// this.$axios.defaults.headers.Authorization = 'Bearer ' + token
+						this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+						localStorage.setItem('token', token)
+						console.log( this.$axios.get('/users/' + token + '/') )
 						this.$router.push('/users/' + token + '/')
 						
-						console.log('/users/' + token + '/')
 					break
 					case 400:
-						this.$route.push('/error/client')
+						this.$router.push('/error/client')
 						break
 					case 500:
-						this.$route.push('error/server')
+						this.$router.push('error/server')
 						
 
 
 				}
 				this.loading = false;
 
-				
-				
-			
-			
-			
 		} catch (e) {
 				this.errormsg = e.toString();
 				return 

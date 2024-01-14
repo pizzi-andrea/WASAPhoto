@@ -64,6 +64,9 @@ func (rt *_router) Handler() http.Handler {
 	//   put like a photo
 	rt.router.PUT("/users/:uid/myPhotos/:photoId/likes/:likeUserId", rt.wrap(rt.likePhoto)) // required
 
+	//   check if user likeUserId has putted like on photo
+	rt.router.GET("/users/:uid/myPhotos/:photoId/likes/:likeUserId", rt.wrap(rt.checkLike)) // required
+
 	//   remove like a photo
 	rt.router.DELETE("/users/:uid/myPhotos/:photoId/likes/:likeUserId", rt.wrap(rt.unlikePhoto)) // required
 

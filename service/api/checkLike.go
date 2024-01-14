@@ -11,48 +11,39 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
-// give *uid* and *photoId* and get photo associated
-func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
-	var uid, photoId int
+/*
+give *uid* and *photoId* and get photo associated
+*/
+func (rt *_router) checkLike(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
+	var uid int
 	var err error
 	var user *database.User
 	var tk *security.Token
 	var isBan bool
+	var photoId int
 	var photo *database.Photo
-	var comments []database.Comment
-	var username string
-	limit := 0
-	offset := 0
+	var likes []database.User
 
 	//  Parsing URL parameters
 	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(http.StatusBadRequest)
+
 		return
 	}
 	if photoId, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 
-	if limit, err = strconv.Atoi(r.URL.Query().Get("limit")); err != nil && limit >= 1 {
-		ctx.Logger.Errorf("%w", err)
-		w.Header().Set("content-type", "text/plain") //  400
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	if username = r.URL.Query().Get("username"); database.ValidateUsername(username) {
-		w.Header().Set("content-type", "text/plain") //  400
-		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if !(database.ValidateId(photoId) && database.ValidateId(uid)) {
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(http.StatusBadRequest)
+
 		return
 
 	}
@@ -62,6 +53,7 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
+
 		return
 	}
 
@@ -69,12 +61,14 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
+
 		return
 	}
 
 	if user == nil || photo == nil {
 		w.Header().Set("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
+
 		return
 
 	}
@@ -85,6 +79,7 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
 		w.Header().Set("content-type", "text/plain") //  401
 		w.WriteHeader(UnauthorizedError.StatusCode)
+
 		return
 	}
 
@@ -92,16 +87,18 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
+
 		return
 	}
 
 	if isBan {
 		w.Header().Set("content-type", "text/plain") //  403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
+
 		return
 	}
 
-	if comments, err = rt.db.GetComments(photoId, username, true); err != nil {
+	if likes, err = rt.db.GetLikes(photoId); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
@@ -109,21 +106,8 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 
 	}
 
-	if limit == 0 || limit > len(comments) {
-		limit = len(comments)
-	}
-
-	if offset > len(comments) { // 500 response
-		w.Header().Set("content-type", "text/plain")
-		w.WriteHeader(ServerError.StatusCode)
-		return
-	}
-
-	comments = comments[offset:limit]
-	// manca l'ordinamento secondo la data
-
 	w.Header().Set("content-type", "application/json")
-	if err = json.NewEncoder(w).Encode(comments); err != nil {
+	if err = json.NewEncoder(w).Encode(likes); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)

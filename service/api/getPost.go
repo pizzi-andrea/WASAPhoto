@@ -88,8 +88,7 @@ func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	post.Location = strings.TrimRight("/images/:photoId", ":") + strconv.Itoa(int(post.Refer))
-	post.Location += strconv.Itoa(int(post.Refer))
+	post.Location = strings.TrimSuffix("/images/:photoId", ":photoId") + strconv.Itoa(post.Refer)
 	ctx.Logger.Infof("%s\n", post.Location)
 
 	/*

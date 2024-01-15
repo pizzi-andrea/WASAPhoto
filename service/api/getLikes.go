@@ -22,7 +22,7 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 	var isBan bool
 	var photoId int
 	var photo *database.Photo
-	var like *database.User
+	var likes []database.User
 
 	//  Parsing URL parameters
 	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
@@ -98,7 +98,7 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	if like, err = rt.db.GetLike(uid, photoId); err != nil {
+	if likes, err = rt.db.GetLikes(photoId); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
@@ -107,7 +107,7 @@ func (rt *_router) getLikes(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	w.Header().Set("content-type", "application/json")
-	if err = json.NewEncoder(w).Encode(like); err != nil {
+	if err = json.NewEncoder(w).Encode(likes); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)

@@ -111,7 +111,7 @@ func (rt *_router) unlikePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	if _, err = rt.db.DelLike(photo.PhotoId, like.Uid); err != nil {
+	if _, err = rt.db.DelLike(like.Uid, photoId); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)

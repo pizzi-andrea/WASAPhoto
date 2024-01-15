@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/julienschmidt/httprouter"
 	"pizzi1995517.it/WASAPhoto/service/api/reqcontext"
@@ -114,6 +115,11 @@ func (rt *_router) getMyStream(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	stream = stream[offset:limit]
+
+	for i := range stream {
+		stream[i].Location = strings.TrimSuffix("/images/:photoId", ":photoId") + strconv.Itoa(stream[i].Refer)
+		ctx.Logger.Infof("Path:%s\n", stream[i].Location)
+	}
 
 	if len(stream) == 0 { //   204 response
 		w.Header().Set("content-type", "text/plain")

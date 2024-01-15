@@ -73,3 +73,4 @@ WASAPhoto is web application based on RESTfull architecture to allows upload you
         - [X] API
         - [X] implementation
 
+npm run build-prod && npm run preview

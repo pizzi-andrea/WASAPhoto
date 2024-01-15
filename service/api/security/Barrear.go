@@ -77,7 +77,7 @@ func BarrearAuth(r *http.Request) (tokenValid *Token) {
 	}
 
 	return &Token{
-		int(id),
+		id,
 	}
 
 }

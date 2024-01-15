@@ -560,6 +560,7 @@ paths:
     
   
   /users/{uid}/myPhotos/: 
+    summary: photo posted by user
     description: >
       this resource rappresent the streams of photos update by user in time
     
@@ -815,10 +816,50 @@ paths:
   
   /users/{uid}/myPhotos/{photoId}/likes/{likeUserId}:
     
+    summary: likes on photos
+    description: >
+      this endpoint rappresents likes putted on photo
+    
+    
+    
     parameters:
         - $ref: "#/components/parameters/Uid"
         - $ref: "#/components/parameters/PhotoId"
         - $ref: "#/components/parameters/likeUserId"
+    
+    
+    get:
+      tags:
+        - photo
+        - like
+      summary: check if user likeUserId has putted like on photo
+      description: >
+        Check if user identified by his uid has putted like on photo.
+        If like has putted will return like otherwire return not found response
+      
+      operationId: checkLike
+      
+      security:
+        - BearerAuth: []
+      
+      responses:
+        "200":
+          description: >
+            success, like founded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: >
+            not found, like not found
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/ServerError"
+          
+        
+    
     put:
       
       tags:
@@ -890,6 +931,9 @@ paths:
       
     
   /users/{uid}/myPhotos/{photoId}/comments/:
+    description: >
+      this endpoint rappresents a set of comments on photo
+    summary: set comments on photo
     
     parameters:
       - $ref: "#/components/parameters/Uid"
@@ -1075,6 +1119,9 @@ paths:
           $ref: "#/components/responses/ServerError"
   
   /session:
+    summary: login action
+    description: >
+      endpoint that allow to perform login actions
     post:
       tags: 
         - login
@@ -1360,6 +1407,9 @@ components:
         
       type: object
       properties:
+
+        owner:
+          $ref: "#/components/schemas/Id"
         refer:
           $ref: "#/components/schemas/Id"
         location:
@@ -1393,14 +1443,6 @@ components:
           minLength: 1
           maxLength: 250
           pattern: "^.*?$"
-          
-        data:
-          description: >
-            binary string rappresenting the data of image
-          type: string
-          format: binary
-          minLength: 0
-          maxLength: 5000000
     
     URL: 
       description: >

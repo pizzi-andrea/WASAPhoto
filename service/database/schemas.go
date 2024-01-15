@@ -42,7 +42,8 @@ type Image struct {
 // this object rappresent a post.
 // A post is provided to photo and list of like and comments that recived.
 type Post struct {
-	Refer          Id
+	Owner          Id        `json:"owner"`
+	Refer          Id        `json:"refer"`
 	Location       string    `json:"location"`
 	Likes          []User    `json:"likes"`
 	Comments       []Comment `json:"comments"`

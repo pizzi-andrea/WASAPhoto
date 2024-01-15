@@ -109,13 +109,18 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
-	if _, err = rt.db.PutLike(likeUserId, photoId); err != nil {
+	if rr, err = rt.db.PutLike(likeUserId, photoId); err != nil {
 		ctx.Logger.Errorf("PutLike::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 
 		return
 
+	}
+
+	if !rr {
+		w.Header().Set("content-type", "text/plain")
+		w.WriteHeader(http.StatusNoContent)
 	}
 
 	w.Header().Set("content-type", "application/json")

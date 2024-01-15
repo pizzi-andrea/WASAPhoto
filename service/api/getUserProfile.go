@@ -126,9 +126,8 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	for i := range photos {
-		photos[i].Location, _, _ = strings.Cut("/images/:photoId", ":")
-		photos[i].Location += strconv.Itoa(int(photos[i].Refer))
-		ctx.Logger.Infof("%s\n", photos[i].Location)
+		photos[i].Location = strings.TrimSuffix("/images/:photoId", ":photoId") + strconv.Itoa(photos[i].Refer)
+		ctx.Logger.Infof("Path:%s\n", photos[i].Location)
 	}
 
 	/*

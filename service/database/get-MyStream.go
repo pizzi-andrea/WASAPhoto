@@ -81,7 +81,7 @@ func (db *appdbimpl) GetMyStream(uid Id, username Username, largeSearch bool, by
 		if rows.Err() != nil {
 			return
 		}
-		if err = rows.Scan(&post.Refer, &uid, &post.DescriptionImg, &t); err != nil {
+		if err = rows.Scan(&post.Refer, &post.Owner, &post.DescriptionImg, &t); err != nil {
 			return
 		}
 		if post.TimeUpdate, err = time.Parse(time.RFC3339, t); err != nil {

@@ -298,7 +298,7 @@ export default {
 </script>
 
 <template>
-	<div class="card m-4" style="width: 18rem;" id={{post.refer}}>
+	<div class="card m-4" style="width: 48rem;" id={{post.refer}}>
     <div class="card-header">
       <a @click=" showProfile(post.owner)"> <i>Postata da {{ username }}</i> </a>
       

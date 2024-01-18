@@ -7,7 +7,8 @@ export default {
             errormsg: null,
             loading: false,
             profile: Profile,
-			myStream: []
+			myStream: [],
+            pathUser: '/users/' + this.$route.params.id + '/',
             
         };
     },
@@ -15,7 +16,7 @@ export default {
         async refresh() {
             let response;
             try {
-                response = await this.$axios.get(this.$route.path);
+                response = await this.$axios.get( this.pathUser);
             }
             catch (e) {
                 return;
@@ -36,7 +37,7 @@ export default {
             }
 
 			try {
-                response = await this.$axios.get(this.$route.path + "myStream/");
+                response = await this.$axios.get(this.pathUser + "myPhotos/");
             }
             catch (e) {
                 return;
@@ -67,7 +68,7 @@ export default {
         async uploadUsername(username){
             
             try{
-                await this.$axios.put(this.$route.path, {
+                await this.$axios.put(this.pathUser, {
                     username: username
                 });
             }catch(e){
@@ -92,7 +93,7 @@ export default {
 	<div>
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h1 class="h2">Profile {{profile.username}} </h1>
+			<h1 class="h2">Profile di {{profile.username}} </h1>
             <div class="">
                     <p> Followers  {{profile.follower}}</p>
 					<p> Following  {{profile.following}}</p>

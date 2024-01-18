@@ -49,8 +49,8 @@ do
 	-H 'accept: application/json' \
 	-H 'Content-Type: multipart/form-data' \
 	-H "Authorization: Bearer $from " \
-	-F 'descriptionImg="Una foto spazialeeeee!" '\
-	-F 'imageData=@big.png'
+	-F 'descr="Una foto spazialeeeee!" '\
+	-F 'img=@tiny.png'
 done
 
 echo "[end post photo]"

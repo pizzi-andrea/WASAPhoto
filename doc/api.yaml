@@ -558,6 +558,43 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
     
+    get:
+      tags:
+        - user
+        - ban
+      summary: check if user had banned other user
+      description: >
+        taken uid of the user who wants check if banned. I if users had banned return it otherwise return empty response
+      security:
+        - BearerAuth: []
+        
+      operationId: isBanned # OK
+      
+      responses:
+        "200":
+          description: >
+            success, user banned
+          
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "204":
+          description: >
+            user not banned
+
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        
+        "404":
+          $ref: "#/components/responses/UserNotFound"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+        "403":
+          $ref: "#/components/responses/UnauthorizedToken"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    
   
   /users/{uid}/myPhotos/: 
     summary: photo posted by user

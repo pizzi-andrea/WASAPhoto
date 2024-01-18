@@ -84,7 +84,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	if file, _, err = r.FormFile("imageData"); err != nil {
+	if file, _, err = r.FormFile("img"); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
@@ -98,7 +98,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		w.WriteHeader(ServerError.StatusCode)
 	}
 
-	newPost.DescriptionImg = r.PostFormValue("descriptionImg")
+	newPost.DescriptionImg = r.PostFormValue("desc")
 
 	if photo.ImageData == nil || len(photo.ImageData) == 0 {
 		ctx.Logger.Errorf("photo <%v> not valid", photo)

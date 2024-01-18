@@ -57,10 +57,10 @@ export default {
             }
         },
 
-        async logout(){
+        logout(){
             this.$axios.defaults.headers.common['Authorization'] = ''
-            localStorage.removeItem('token')
-            this.$router.push("/");
+            localStorage.clear()
+            this.$router.replace("/");
 
         },
 
@@ -92,10 +92,14 @@ export default {
 	<div>
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h1 class="h2">Ciao </h1>
-            <div class="">
-                    <p> Followers  {{profile.follower}}</p>
-					<p> Following  {{profile.following}}</p>
+			<h1 class="h2">Benvenuto {{ profile.user.username }}</h1>
+            <div class="vr m-4"></div>
+            <div class="vstack gap-2 col-md-5 mx-auto">
+
+                    <h3> Followers</h3>  
+                    <h5>{{profile.follower}}</h5>
+					<h3> Following</h3> 
+                    <h5> {{profile.following}}</h5>
                 </div>
 			<div class="btn-toolbar mb-2 mb-md-0">
 

@@ -9,10 +9,7 @@ import (
 // if ban deleted with success function return true and nil error for error if ban not exist function return false and nil value
 // if occured error function return false and not-nil error value.
 func (db *appdbimpl) DelComment(commentId Id) (r bool, err error) {
-	r = false
-	var c Comment
-
-	err = db.c.QueryRow("DELETE FROM Comments WHERE commentId = ?", commentId).Scan(&c.CommentId, &c.Author.Uid, &c.Author.Username, commentId, &c.Text, &c.TimeStamp)
+	_, err = db.c.Exec("DELETE FROM Comments WHERE commentId = ?", commentId)
 
 	if err == nil {
 		r = true

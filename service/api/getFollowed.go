@@ -46,7 +46,7 @@ func (rt *_router) getFollowed(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	if limit, err = strconv.Atoi(r.URL.Query().Get("limit")); err != nil && r.URL.Query().Get("limit") != "" {
+	if limit, err = strconv.Atoi(r.URL.Query().Get("limit")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(http.StatusBadRequest)

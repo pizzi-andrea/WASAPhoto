@@ -36,21 +36,20 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 		return
 	}
-	// problem ================================================
 
+	// Decode the JSON request body into the 'msg' variable
 	if err = json.NewDecoder(r.Body).Decode(msg); err != nil {
 		ctx.Logger.Errorf("Decode::%w\n", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
 		return
-
 	}
+
 	if !(database.ValidateId(photoId) && database.ValidateId(uid)) {
 		ctx.Logger.Errorln("Invalid data input")
 		w.Header().Set("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
 		return
-
 	}
 
 	if user, err = rt.db.GetUserFromId(uid); err != nil {
@@ -59,7 +58,6 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		w.WriteHeader(ServerError.StatusCode)
 
 		return
-
 	}
 
 	if user == nil {
@@ -75,7 +73,6 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
 		return
-
 	}
 
 	if photo, err = rt.db.GetPhoto(photoId); err != nil {
@@ -84,7 +81,6 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		w.WriteHeader(ServerError.StatusCode)
 
 		return
-
 	}
 
 	if photo == nil {
@@ -112,7 +108,6 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		w.WriteHeader(ServerError.StatusCode)
 
 		return
-
 	}
 
 	if rr {
@@ -127,7 +122,6 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		w.WriteHeader(ServerError.StatusCode)
 
 		return
-
 	}
 
 	if user == nil {
@@ -136,7 +130,6 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		w.WriteHeader(http.StatusNotFound)
 
 		return
-
 	}
 
 	if msg, err = rt.db.PostComment(user.Uid, msg.Text, photo.PhotoId); err != nil {
@@ -145,7 +138,6 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return
-
 	}
 
 	if msg == nil {
@@ -162,8 +154,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		ctx.Logger.Errorf("Encode::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
-
 	}
-	ctx.Logger.Infof("New comment added ")
 
+	ctx.Logger.Infof("New comment added ")
 }

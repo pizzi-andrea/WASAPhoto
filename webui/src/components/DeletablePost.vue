@@ -13,7 +13,8 @@ export default {
       img: this.$axios.defaults.baseURL + "/images/" + this.post.refer,
       loading: false,
       comments: [],
-      i: localStorage.getItem('token')
+      i: localStorage.getItem('token'),
+      deleted: false
 
 
 
@@ -166,10 +167,9 @@ export default {
             try{
             let response = {}
             response = await this.$axios.delete("/users/" + this.post.owner + "/myPhotos/" + this.post.refer + "/");
-            console.log(response)
             switch(response.status){
               case 204:
-                document.getElementById(post.refer).remove();
+                this.deleted = true
                 break;
               case 400:
                 break;
@@ -202,7 +202,7 @@ export default {
 </script>
 
 <template>
-	<div class="card m-4" style="" :id="post.refer">
+	<div class="card m-4" style="" :id="post.refer" v-if="!deleted">
     <div class="card-header">
 
       <RouterLink :to=" '/users/' + post.owner + '/profile' ">
@@ -226,7 +226,7 @@ export default {
     
     
     <div class="list-group">
-      <RouterLink :to=  "comment.author.uid == i ? '#' : '/users/' + comment.author.uid + '/profile' " v-for="comment in comments" :id="comment.commentId">
+      <RouterLink :to=  "comment.author.uid == i ? '#' : '/users/' + comment.author.uid + '/profile' " v-for="comment in comments" :id="comment.commentId" :key="comment.commentId">
         <a @click="showProfile(comment.author.uid)"  class="list-group-item list-group-item-action flex-column align-items-start border rounded" >
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1"></h5>
@@ -248,8 +248,4 @@ export default {
     
   </div>
 </div>
-<ErrorMsg v-if="errormsg" :msg="errormsg"></ErrorMsg>
 </template>
-
-<style>
-</style>

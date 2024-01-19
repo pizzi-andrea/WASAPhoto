@@ -68,7 +68,7 @@ export default {
                 <div class="col"></div>
                 <div class="col-4">
                     <ol class="list-group">
-                        <UserEntry v-for="user in usersFound" :usr="user"></UserEntry>
+                        <UserEntry v-for="user in usersFound" :usr="user" :key="user.uid"></UserEntry>
                     </ol>
                 </div>
                 <div class="col"></div>

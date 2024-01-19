@@ -206,16 +206,11 @@ export default {
         },
 
         isFollowerUser(){
-            let t= localStorage.getItem('token');
+            let t = localStorage.getItem('token');
 
-            for (const follower of this.l_followers){
-                if(t == follower.uid){
-                    this.isFollower = true;
-                    return;
-                }
-
-            }
-            this.isFollower= false;
+           this.isFollower = this.l_followers.map((item) => {
+                return item.uid
+            }).includes(t)
 
         }
 

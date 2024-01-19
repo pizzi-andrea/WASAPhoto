@@ -14,7 +14,8 @@ export default {
 	methods: {
 		refresh() {
 			if(localStorage.getItem('token') && localStorage.getItem('token') != '0'){
-				this.$router.replace("/users" + localStorage.setItem('token', this.token) + "/")
+				this.$router.replace("/users/" + localStorage.getItem('token') + "/");
+				this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
 
 			}
 			this.loading = true;

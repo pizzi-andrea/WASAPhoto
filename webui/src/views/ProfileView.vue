@@ -1,13 +1,15 @@
 <script>
-import Profile from "../components/Profile.js"
 export default {
 	
     data: function () {
         return {
             errormsg: null,
             loading: false,
-            profile: Profile,
-			myStream: []
+            profile: null,
+			myStream: [],
+            change: false,
+            oldUsername: ""
+            
             
         };
     },
@@ -16,13 +18,15 @@ export default {
             let response;
             try {
                 response = await this.$axios.get(this.$route.path);
+                console.log(response);
             }
+            
             catch (e) {
                 return;
             }
+
             switch (response.status) {
                 case 200:
-                    this.profile = new Profile();
                     this.profile = response.data;
                     break;
                 case 404:
@@ -67,16 +71,48 @@ export default {
         async uploadUsername(username){
             
             try{
-                await this.$axios.put(this.$route.path, {
-                    username: username
-                });
+                
+                let response = await this.$axios.put(this.$route.path, "\"" + username + "\"");
+
+                switch(response.status){
+                    case 200:
+                    case 204:
+                        this.refresh();
+                        this.changeUsername();
+                        break;
+                    case 404:
+                        break;
+                    case 400:
+                        break;
+                    case 500:
+                        break;
+                }
             }catch(e){
 
             }
+        },
+        
+        changeUsername() {
+            
+            if (this.change){
+                this.change = false;
+                this.profile.user.user = this.oldUsername;
+                
+                
+            } else {
+                this.change = true;
+                this.oldUsername = this.profile.user.username
+
+            }
+
+
+
         }
     },
     mounted() {
         this.refresh();
+        
+        
     },
 
     
@@ -92,7 +128,14 @@ export default {
 	<div>
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h1 class="h2">Benvenuto {{ profile.user.username }}</h1>
+			<h1 class="h2">Benvenuto 
+                <div class="input-group">
+                    <input type="text" class="form-control" :placeholder="profile.user.username" aria-label="Recipient's username with two button addons" :disabled="!change" v-model="profile.user.username">
+                    <button class="btn btn-outline-secondary" type="button" v-show="change" @click="uploadUsername(profile.user.username)">invia</button>
+                    <button class="btn btn-outline-secondary" type="button" v-show="change" @click="changeUsername">back</button>
+                </div>
+
+                </h1>
             <div class="vr m-4"></div>
             <div class="vstack gap-2 col-md-5 mx-auto">
 
@@ -109,7 +152,7 @@ export default {
 					<button type="button" class="btn btn-sm btn-outline-primary" @click="refresh">
 						Aggiorna stream
 					</button>
-                    <button type="button" class="btn btn-sm btn-warning" @click="uploadUsername">
+                    <button type="button" class="btn btn-sm btn-warning" @click="changeUsername" :disabled="change">
 						Aggiorna username
 					</button>
 					<button type="button" class="btn btn-sm btn btn-danger" @click="logout">
@@ -126,7 +169,7 @@ export default {
 			<div class="row d-inline p-2 flex-row justify-content-start justify-content-between col-3 position-absolute top-25 start-50 translate-middle-x" id="body">
 				
                 <div class="">
-                    <div v-for="post in myStream">
+                    <div v-for="post in myStream" :key="post.refer">
                                 <Post :post="post"></Post>
                     </div>
                 </div>

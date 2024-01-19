@@ -107,7 +107,7 @@ export default {
 			<div class="row d-inline p-2 flex-row justify-content-start justify-content-between col-3 position-absolute top-25 start-50 translate-middle-x" id="body">
 				
                 <div class="">
-                    <div v-for="post in myStream">
+                    <div v-for="post in myStream" :key="post.refer">
                                 <Post :post="post"></Post>
                     </div>
                 </div>

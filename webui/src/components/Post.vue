@@ -325,7 +325,7 @@ export default {
     
     
     <div class="list-group">
-      <RouterLink :to=  "comment.author.uid == i ? '#' : '/users/' + comment.author.uid + '/profile' " v-for="comment in comments" :id="comment.commentId">
+      <RouterLink :to=  "comment.author.uid == i ? '#' : '/users/' + comment.author.uid + '/profile' " v-for="comment in comments" :id="comment.commentId" :key="comment.commentId">
         <a  class="list-group-item list-group-item-action flex-column align-items-start border rounded" >
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1"></h5>

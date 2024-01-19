@@ -91,7 +91,7 @@
 
             <div class="row d-inline p-2 flex-row justify-content-start justify-content-between col-3 position-absolute top-25 start-50 translate-middle-x" id="body">
                 <div class="">
-                    <div v-for="post in myPhotos">
+                    <div v-for="post in myPhotos" :key="post.refer">
                         <DeletablePost :post="post"></DeletablePost>
                     </div>
                 </div>

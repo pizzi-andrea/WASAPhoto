@@ -46,6 +46,9 @@ func (rt *_router) Handler() http.Handler {
 	//   unban user identificated by uid
 	rt.router.DELETE("/users/:uid/banned/:bannedId", rt.wrap(rt.unbanUser)) // required
 
+	// check if user had banned other user
+	rt.router.GET("/users/:uid/banned/:bannedId", rt.wrap(rt.isBanned))
+
 	//   update photo
 	rt.router.POST("/users/:uid/myPhotos/", rt.wrap(rt.uploadPhoto)) // required
 

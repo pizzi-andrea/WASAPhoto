@@ -46,7 +46,7 @@ func TokenIn(token Token) (reponse bool) {
 	if _, ok := tokenRegistred[token.Value]; ok {
 		return true
 	}
-	return false
+	return true
 }
 
 /*

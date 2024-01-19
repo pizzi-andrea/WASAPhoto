@@ -10,7 +10,7 @@ import (
 // if occured error function return false and not-nil error value.
 func (db *appdbimpl) DelPhoto(id Id) (r bool, err error) {
 	r = false
-	err = db.c.QueryRow("DELETE FROM Photos WHERE  photoId = ? ", id).Err()
+	_, err = db.c.Exec("DELETE FROM Photos WHERE  photoId = ? ", id)
 
 	if err == nil {
 		r = true

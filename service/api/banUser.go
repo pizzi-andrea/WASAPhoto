@@ -66,6 +66,14 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
+	if from == to {
+		ctx.Logger.Errorln("the user cannot ban himself")
+		w.Header().Set("content-type", "text/plain") //   403
+		w.WriteHeader(http.StatusForbidden)
+		return
+
+	}
+
 	/*
 		Secure Bearer Authentication, check if user wont put ban is account owner.
 	*/

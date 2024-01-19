@@ -59,6 +59,7 @@ type AppDatabase interface {
 	PutLike(uid Id, photoId Id) (r bool, err error)
 	GetLike(uid Id, photoId Id) (like *User, err error)
 	DelBan(from, to Id) (r bool, err error)
+	GetUserBanned(from, to Id) (banned *User, err error)
 	CreatePost(owner Id, img []byte, description string) (post *Post, err error)
 	PostComment(from Id, text string, to Id) (com *Comment, err error)
 	GetPost(photoId Id) (post *Post, err error)

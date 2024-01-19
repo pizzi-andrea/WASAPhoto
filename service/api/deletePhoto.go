@@ -19,6 +19,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	var user *database.User
 	var photo *database.Photo
 	var tk *security.Token
+	var s bool
 
 	//   Parsing URL parameters in path
 	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
@@ -41,14 +42,14 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	if user, err = rt.db.GetUserFromId(uid); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
-		w.WriteHeader(ServerError.StatusCode)
+		w.WriteHeader(http.StatusInternalServerError)
 
 		return
 	}
 	if photo, err = rt.db.GetPhoto(photoId); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
-		w.WriteHeader(ServerError.StatusCode)
+		w.WriteHeader(http.StatusInternalServerError)
 
 		return
 	}
@@ -82,7 +83,7 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 
 	//   delete photo
-	if _, err = rt.db.DelPhoto(photo.PhotoId); err != nil {
+	if s, err = rt.db.DelPhoto(photo.PhotoId); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)
@@ -90,7 +91,11 @@ func (rt *_router) deletePhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 
 	}
-
+	if s {
+		ctx.Logger.Debug("Photo deleted with success")
+	} else {
+		ctx.Logger.Debug("Photo not deleted")
+	}
 	w.Header().Set("content-type", "text/plain")
 	w.WriteHeader(http.StatusNoContent)
 

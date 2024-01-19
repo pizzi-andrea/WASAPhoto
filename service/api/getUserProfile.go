@@ -130,21 +130,21 @@ func (rt *_router) getUserProfile(w http.ResponseWriter, r *http.Request, ps htt
 		ctx.Logger.Infof("Path:%s\n", photos[i].Location)
 	}
 
-	/*
-		put in response body user profile rappresentation
-	*/
-	w.Header().Set("content-type", "application/json")
-	w.WriteHeader(http.StatusOK) //   200
-	// encode in json format the response
-	if err = json.NewEncoder(w).Encode(database.Profile{
-		User:      *user,
-		Stream:    photos,
-		Follower:  len(follower),
-		Following: len(following),
-	}); err != nil {
-		ctx.Logger.Errorf("Encode::%w", err)
-		w.Header().Set("content-type", "text/plain") //   500
-		return
+		/*
+			put in response body user profile rappresentation
+		*/
+		w.Header().Set("content-type", "application/json")
+		w.WriteHeader(http.StatusOK) //   200
+		// encode in json format the response
+		if err = json.NewEncoder(w).Encode(database.Profile{
+			User:      *user,
+			Stream:    photos,
+			Follower:  len(follower),
+			Following: len(following),
+		}); err != nil {
+			ctx.Logger.Errorf("Encode::%w", err)
+			w.Header().Set("content-type", "text/plain") //   500
+			return
 
 	}
 

@@ -83,6 +83,14 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
+	if from == to {
+		ctx.Logger.Errorln("the user cannot follow himself")
+		w.Header().Set("content-type", "text/plain") //   403
+		w.WriteHeader(http.StatusForbidden)
+		return
+
+	}
+
 	/*
 		Check if user that wont put follows can do it
 	*/
@@ -142,6 +150,7 @@ func (rt *_router) followUser(w http.ResponseWriter, r *http.Request, ps httprou
 		}
 
 		w.Header().Set("content-type", "application/json") //  201
+		w.WriteHeader(http.StatusCreated)
 
 	} else {
 		ctx.Logger.Infoln("user just follow")

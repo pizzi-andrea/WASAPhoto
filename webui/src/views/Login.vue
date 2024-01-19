@@ -7,23 +7,30 @@ export default {
 			loading: false,
 			username: "",
 			errorInUsername: false,
-			msgErrorData: " Errore stringa 'username' mal formattata. \n Un username valido deve avere una lunghezza compresa tra 3 e 16 caratteri di qualunque tipo."
+			msgErrorData: " Errore stringa 'username' mal formattata. \n Un username valido deve avere una lunghezza compresa tra 3 e 16 caratteri di qualunque tipo.",
+			token: 0
 		}
 	},
 	methods: {
 		refresh() {
+			if(localStorage.getItem('token') && localStorage.getItem('token') != '0'){
+				this.$router.replace("/users/" + localStorage.getItem('token') + "/");
+				this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
+
+			}
 			this.loading = true;
 			this.errormsg = null;
             this.errorInUsername=false
             this.username = ""
-			localStorage.removeItem("token")
+			this.token = 0
+			
 			
 		},
 
 		async login(){
             this.dataValidator()
 			let response = null
-			let token = 0
+			
 			try {
 
 				if (this.errorInUsername) {
@@ -37,11 +44,11 @@ export default {
 				switch(response.status) {
 					case 200:
 					case 201:
-						token = response.data.Value
-						this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
-						localStorage.setItem('token', token)
-						console.log( this.$axios.get('/users/' + token + '/') )
-						this.$router.push('/users/' + token + '/')
+						this.token = response.data.Value
+						this.$axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.token
+						localStorage.setItem('token', this.token)
+						console.log( this.$axios.get('/users/' + this.token + '/') )
+						this.$router.push('/users/' + this.token + '/')
 						
 					break
 					case 400:

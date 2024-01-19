@@ -19,7 +19,7 @@ The username to set is in the body request
 func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var uid int
-	var u string
+	var username string
 	var err error
 	var user *database.User
 
@@ -59,10 +59,10 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	/*
 		Decode values in body request *r
 	*/
-	if err = json.NewDecoder(r.Body).Decode(&u); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(&username); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
-		w.WriteHeader(BadRequest.Request.Response.StatusCode)
+		w.WriteHeader(http.StatusBadRequest)
 
 		return
 
@@ -71,9 +71,9 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	/*
 		Validate username to update
 	*/
-	if !(database.ValidateUsername(u)) {
+	if !(database.ValidateUsername(username)) {
 		w.Header().Set("content-type", "text/plain") //  400
-		w.WriteHeader(BadRequest.Request.Response.StatusCode)
+		w.WriteHeader(http.StatusBadRequest)
 
 		return
 	}
@@ -99,7 +99,7 @@ func (rt *_router) setMyUserName(w http.ResponseWriter, r *http.Request, ps http
 	/*
 		Update username
 	*/
-	if _, err = rt.db.SetUsername(uid, u); err != nil {
+	if _, err = rt.db.SetUsername(uid, username); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   500
 		w.WriteHeader(ServerError.StatusCode)

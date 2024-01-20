@@ -29,7 +29,6 @@ export default {
           this.refreshComments();
           this.getUsername();
           this.isLiked();
-          this.getImage();
           this.getMyUsername();
         },
 
@@ -73,7 +72,6 @@ export default {
           try{
             
             response = await this.$axios.delete("/users/" + this.post.owner + "/myPhotos/" + this.post.refer + "/likes/" + localStorage.getItem('token'))
-            console.log(response)
             
             switch(response.status){
               case 204:
@@ -149,38 +147,6 @@ export default {
         }
           }
 
-        },
-
-        async getImage(){
-          let response = null
-          try {
-            response = await this.$axios.get("/images/" + this.post.refer);
-            switch(response.status){
-            case 200:
-              break;
-           
-          }
-          
-          }catch(e){
-            switch (response.status) {
-          case 400:
-            $router.push("/error/400");
-            break;
-          case 401:
-            this.$router.push("/error/401");
-            break;
-          case 403:
-            this.$router.push("/error/403");
-            break;
-          case 404:
-            $router.push("error/404");
-            break;
-          case 500:
-            this.$router.push("/error/500");
-            break;
-        }
-          }
-          
         },
 
         async putComment(){
@@ -393,6 +359,47 @@ export default {
           }
 
         },
+
+        async delComment(commentId){
+          try {
+            let response = null; 
+            response = await this.$axios.delete("/users/" + this.post.owner + "/myPhotos/" + this.post.refer + "/comments/" + commentId)
+
+            switch(response.status) {
+              case 204:
+                document.getElementById(commentId).remove();
+                this.refreshComments();
+                break;
+
+            }
+          }catch(e){
+            switch (e.response.status) {
+          
+                case 400: //bad request
+                  this.errormsg = "Errore nella richiesta"
+                  break; 
+                case 401: //unauthorized    
+                  this.errormsg = "Non autorizzato"
+                  break;  
+                  case 403: //forbidden   
+                  this.errormsg = "Non hai i permessi per eseguire questa operazione"
+                  break;
+                case 404: //not found
+                  this.errormsg = "Risorsa non trovata"
+                  break;
+                
+                case 500: //server error  
+                  this.errormsg = "Errore del server"
+                  break;
+          
+          }
+
+        }
+      },
+
+        youComment(commentId){
+          return commentId == localStorage.getItem('token');
+        }
         
 
 
@@ -447,6 +454,9 @@ export default {
           </div>
           <p class="mb-1">{{comment.text}}</p>
             <small></small>
+            <div v-if="youComment(comment.author.uid)" class="align-items-end">
+              <button type="button" class="btn btn-danger" @click="delComment(comment.commentId)"> <img src="./icons/trash.svg"> </button>
+            </div>
         </a>
     </RouterLink>
     

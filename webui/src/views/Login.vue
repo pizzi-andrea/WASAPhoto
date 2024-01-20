@@ -46,7 +46,6 @@ export default {
 							"Authorization"
 						] = `Bearer ${this.token}`;
 						localStorage.setItem("token", this.token);
-						console.log(this.$axios.get("/users/" + this.token + "/"));
 						this.$router.push("/users/" + this.token + "/");
 						break;
 					

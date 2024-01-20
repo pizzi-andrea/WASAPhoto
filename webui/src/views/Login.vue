@@ -49,16 +49,28 @@ export default {
 						console.log(this.$axios.get("/users/" + this.token + "/"));
 						this.$router.push("/users/" + this.token + "/");
 						break;
-					case 400:
-						this.$router.push("/error/client");
-						break;
-					case 500:
-						this.$router.push("error/server");
+					
 				}
 				this.loading = false;
 			} catch (e) {
-				this.errormsg = e.toString();
-				return;
+				console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        this.$router.push("/error/400");
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
 			}
 		},
 

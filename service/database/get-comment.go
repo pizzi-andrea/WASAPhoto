@@ -9,7 +9,7 @@ import (
 func (db *appdbimpl) GetComment(commentId Id) (comment *Comment, err error) {
 	var c Comment
 
-	err = db.c.QueryRow("SELECT * FROM Comments WHERE commentId").Scan(&c.CommentId, &c.Author, &commentId, &c.Text, &c.TimeStamp)
+	err = db.c.QueryRow("SELECT * FROM Comments WHERE commentId = ?", commentId).Scan(&c.CommentId, &c.Author.Uid, &commentId, &c.Text, &c.TimeStamp)
 
 	if errors.Is(err, sql.ErrNoRows) {
 		err = nil

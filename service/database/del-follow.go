@@ -10,7 +10,7 @@ import (
 // if occured error function return false and not-nil error value.
 func (db *appdbimpl) DelFollow(from, to Id) (r bool, err error) {
 
-	err = db.c.QueryRow("DELETE FROM Followers WHERE from_= ? AND to_ = ? RETURNING", from, to).Scan(&from, &to)
+	err = db.c.QueryRow("DELETE FROM Followers WHERE from_= ? AND to_ = ? RETURNING *", from, to).Scan(&from, &to)
 	if err == nil {
 		r = true
 		return

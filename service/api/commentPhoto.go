@@ -16,7 +16,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	var photoId, uid int
 	var err error
-	var msg *database.Comment
+	var msg database.Comment
 	var tk *security.Token
 	var user *database.User
 	var photo *database.Photo
@@ -41,7 +41,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// Decode the JSON request body into the 'msg' variable
-	if err = json.NewDecoder(r.Body).Decode(msg); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(&msg); err != nil {
 		ctx.Logger.Errorf("Decode::%w\n", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
@@ -136,7 +136,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	if msg, err = rt.db.PostComment(user.Uid, msg.Text, photo.PhotoId); err != nil {
+	if _, err = rt.db.PostComment(user.Uid, msg.Text, photo.PhotoId); err != nil {
 		ctx.Logger.Errorf("PostComment::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(http.StatusInternalServerError)
@@ -146,7 +146,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	if err = json.NewEncoder(w).Encode(*msg); err != nil {
+	if err = json.NewEncoder(w).Encode(msg); err != nil {
 		ctx.Logger.Errorf("Encode::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)

@@ -25,6 +25,8 @@ func (rt *_router) checkLike(w http.ResponseWriter, r *http.Request, ps httprout
 	var like *database.User
 
 	//  Parsing URL parameters
+
+	// parse :uid
 	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
@@ -32,20 +34,14 @@ func (rt *_router) checkLike(w http.ResponseWriter, r *http.Request, ps httprout
 
 		return
 	}
+
+	// parse :photoId
 	if photoId, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(http.StatusBadRequest)
 
 		return
-	}
-
-	if !(database.ValidateId(photoId) && database.ValidateId(uid)) {
-		w.Header().Set("content-type", "text/plain") //  400
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-
 	}
 
 	//  check if path exist
@@ -73,9 +69,8 @@ func (rt *_router) checkLike(w http.ResponseWriter, r *http.Request, ps httprout
 
 	}
 
-	/*
-		Applay barrear authentication. A user can see photos of another user as long as they have not been banned
-	*/
+	//	Applay barrear authentication. A user can see photos of another user as long as they have not been banned
+
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
 		w.Header().Set("content-type", "text/plain") //  401
 		w.WriteHeader(UnauthorizedError.StatusCode)
@@ -83,6 +78,7 @@ func (rt *_router) checkLike(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
+	// check if user is banned
 	if isBan, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
@@ -91,6 +87,7 @@ func (rt *_router) checkLike(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
+	// if user is banned can't check like
 	if isBan {
 		w.Header().Set("content-type", "text/plain") //  403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
@@ -98,14 +95,17 @@ func (rt *_router) checkLike(w http.ResponseWriter, r *http.Request, ps httprout
 		return
 	}
 
+	// check if user have like photo
 	if like, err = rt.db.GetLike(tk.Value, photoId); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
+
 		return
 
 	}
 
+	// if like is nil photo is not liked
 	if like == nil {
 		w.Header().Set("content-type", "text/plain") //  204
 		w.WriteHeader(http.StatusNoContent)
@@ -113,7 +113,9 @@ func (rt *_router) checkLike(w http.ResponseWriter, r *http.Request, ps httprout
 
 	}
 
+	// write like into body response
 	w.Header().Set("content-type", "application/json")
+
 	if err = json.NewEncoder(w).Encode(like); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500

@@ -129,9 +129,12 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		w.Header().Set("content-type", "text/plain")
 		w.WriteHeader(http.StatusNoContent)
 		ctx.Logger.Infof("User %d uncommented photo %d", user.Uid, photo.PhotoId)
-
-	} else {
+		return
 
 	}
+
+	w.Header().Set("content-type", "text/plain")
+	w.WriteHeader(http.StatusNotFound)
+	ctx.Logger.Errorln("Comment not found")
 
 }

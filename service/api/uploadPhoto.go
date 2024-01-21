@@ -52,9 +52,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	}
 
-	/*
-		Applay barrear authentication. only owner can post photo in his account
-	*/
+	//	Applay barrear authentication. only owner can post photo in his account
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
 		ctx.Logger.Error("token missing\n")
 		w.Header().Set("content-type", "text/plain") //   401
@@ -62,9 +60,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	/*
-		checks if the user who wants post photo is account owner
-	*/
+	//	checks if the user who wants post photo is account owner
 	if tk.Value != uid {
 		ctx.Logger.Error("User not author.\n")
 		w.Header().Set("content-type", "text/plain") //   403
@@ -73,10 +69,11 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 	}
 	//  parsing body values (image upload operation)
 	var photo *database.Photo = &database.Photo{
-		ImageData: make([]byte, MaxBytePhoto),
+		ImageData: make([]byte, database.MaxBytePhoto),
 	}
 
-	if err = r.ParseMultipartForm(MaxByteFormData); err != nil {
+	// max byte for photo is 5MB
+	if err = r.ParseMultipartForm(database.MaxByteFormData); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
 		w.WriteHeader(http.StatusBadRequest)
@@ -84,6 +81,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
+	// read photo from form
 	if file, _, err = r.FormFile("img"); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
@@ -92,6 +90,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	}
 
+	// parse photo
 	if photo.ImageData, err = io.ReadAll(file); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
@@ -100,6 +99,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 	newPost.DescriptionImg = r.PostFormValue("desc")
 
+	// check if post is valid
 	if photo.ImageData == nil || len(photo.ImageData) == 0 {
 		ctx.Logger.Errorf("photo <%v> not valid", photo)
 		w.Header().Set("content-type", "text/plain") //   400
@@ -108,7 +108,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
-	//  check if format photo in conform to APIs specifications */
+	//  check if format photo in conform to APIs specifications
 
 	if newPost, err = rt.db.CreatePost(user.Uid, photo.ImageData, newPost.DescriptionImg); err != nil {
 		ctx.Logger.Errorf("CreatePost::%w", err)
@@ -117,8 +117,8 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 
 		return
 	}
-	/*TODO: missing validate methods*/
 
+	// check if post is created
 	if newPost == nil {
 		ctx.Logger.Errorf("photo <%v> not updated", photo)
 		w.Header().Set("content-type", "text/plain") //   500
@@ -127,6 +127,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 
+	// write post created in response message
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 	photo.ImageData = nil //   discard img data

@@ -75,14 +75,15 @@ func ValidateTimeStamp(time string) bool {
 func ValidateUsername(u string) bool {
 
 	s, err := regexp.MatchString("^.*?$", u)
-	return len(u) >= 3 && len(u) <= 16 && s && err == nil
+	return len(u) >= 3 && len(u) <= MaxByteUsername && s && err == nil
 }
 
 func ValidateStream(s Stream) bool {
 
-	r := len(s) <= 100
+	r := len(s) <= MaxSizeStream
 	if r {
 		for _, p := range s {
+
 			if !p.Verify() {
 				return false
 			}
@@ -108,7 +109,7 @@ func (p *Profile) Verify() bool {
 func (c *Comment) Verify() bool {
 
 	r, err := regexp.MatchString("^.*?$", c.Text)
-	return c.Author.Verify() && len(c.Text) >= 1 && len(c.Text) <= 250 && r && err == nil
+	return c.Author.Verify() && len(c.Text) >= 1 && len(c.Text) <= MaxByteDescription && r && err == nil
 }
 
 func (p *Post) Verify() bool {

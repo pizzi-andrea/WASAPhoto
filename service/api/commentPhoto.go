@@ -11,16 +11,18 @@ import (
 	"pizzi1995517.it/WASAPhoto/service/database"
 )
 
+// commentPhoto is a handler that allow to add comment a photo in post
 func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httprouter.Params, ctx reqcontext.RequestContext) {
 
 	var photoId, uid int
 	var err error
-	var msg database.Comment
+	var msg *database.Comment
 	var tk *security.Token
 	var user *database.User
 	var photo *database.Photo
 	var rr bool
 
+	//  Parsing URL parameters
 	if uid, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("Atoi::%w\n", err)
 		w.Header().Set("content-type", "text/plain") //  400
@@ -29,6 +31,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
+	// parse :photoId
 	if photoId, err = strconv.Atoi(ps.ByName("photoId")); err != nil {
 		ctx.Logger.Errorf("Atoi::%w\n", err)
 		w.Header().Set("content-type", "text/plain") //  400
@@ -38,13 +41,14 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	// Decode the JSON request body into the 'msg' variable
-	if err = json.NewDecoder(r.Body).Decode(&msg); err != nil {
+	if err = json.NewDecoder(r.Body).Decode(msg); err != nil {
 		ctx.Logger.Errorf("Decode::%w\n", err)
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
 		return
 	}
 
+	//  check if path exist
 	if !(database.ValidateId(photoId) && database.ValidateId(uid)) {
 		ctx.Logger.Errorln("Invalid data input")
 		w.Header().Set("content-type", "text/plain") //  404
@@ -69,12 +73,13 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	}
 
 	if !msg.Verify() {
-		ctx.Logger.Errorln("text must have one o more characters")
+		ctx.Logger.Errorln("image not vilid or text must have one o more characters")
 		w.Header().Set("content-type", "text/plain") //  400
 		w.WriteHeader(BadRequest.StatusCode)
 		return
 	}
 
+	// check if path exist
 	if photo, err = rt.db.GetPhoto(photoId); err != nil {
 		ctx.Logger.Errorf("GetPhoto::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
@@ -91,9 +96,8 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	/*
-		Check if user that wont put follows can do it
-	*/
+	//	Check if user that wont put follows can do it
+
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
 		ctx.Logger.Errorln("Token missing or invalid")
 		w.Header().Set("content-type", "text/plain") //  401
@@ -132,7 +136,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	if _, err = rt.db.PostComment(user.Uid, msg.Text, photo.PhotoId); err != nil {
+	if msg, err = rt.db.PostComment(user.Uid, msg.Text, photo.PhotoId); err != nil {
 		ctx.Logger.Errorf("PostComment::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(http.StatusInternalServerError)
@@ -142,7 +146,7 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	if err = json.NewEncoder(w).Encode(msg); err != nil {
+	if err = json.NewEncoder(w).Encode(*msg); err != nil {
 		ctx.Logger.Errorf("Encode::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)

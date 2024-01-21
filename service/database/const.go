@@ -1,4 +1,4 @@
-package api
+package database
 
 const (
 	MaxByteFormData    = MaxBytePhoto + MaxByteDescription //   byte

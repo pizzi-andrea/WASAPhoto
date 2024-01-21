@@ -15,5 +15,6 @@ EXPOSE 3000
 WORKDIR /app/
 
 COPY --from=builder /app/webapi ./
+COPY ./service/database/createTable.sql /app/service/database/
 # Set the default program to our Go backend
 CMD ["/app/webapi"]

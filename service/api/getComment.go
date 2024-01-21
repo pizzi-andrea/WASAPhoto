@@ -35,13 +35,6 @@ func (rt *_router) getComment(w http.ResponseWriter, r *http.Request, ps httprou
 		return
 	}
 
-	if !(database.ValidateId(photoId) && database.ValidateId(uid)) {
-		w.Header().Set("content-type", "text/plain") //  400
-		w.WriteHeader(http.StatusBadRequest)
-		return
-
-	}
-
 	//  check if path exist
 	if user, err = rt.db.GetUserFromId(uid); err != nil {
 		ctx.Logger.Errorf("%w", err)

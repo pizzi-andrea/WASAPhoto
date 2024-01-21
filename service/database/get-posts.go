@@ -30,10 +30,10 @@ func (db *appdbimpl) GetPosts(uid Id, by []OrderBy, ord ...Ordering) (posts Stre
 	var ordy string
 	var oord string
 	if len(by) == 0 {
-		by = append(by, OrderBy(timeUpdate))
+		by = append(by, timeUpdate)
 	}
 	if len(ord) == 0 {
-		ord = append(ord, Ordering(desc))
+		ord = append(ord, desc)
 	}
 
 	switch ord[0] {

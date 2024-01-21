@@ -20,8 +20,11 @@ func (db *appdbimpl) GetPost(photoId Id) (post *Post, err error) {
 	}
 
 	err = db.c.QueryRow("SELECT photoId, owner, descriptionImg, timeUpdate  FROM Photos WHERE photoId = ?", photoId).Scan(&p.Refer, &p.Owner, &p.DescriptionImg, &p.TimeUpdate)
+
 	if errors.Is(err, sql.ErrNoRows) {
 		err = nil
+	} else if err != nil {
+		return nil, err
 	}
 
 	post = &p

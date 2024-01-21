@@ -44,18 +44,8 @@ func (rt *_router) getComments(w http.ResponseWriter, r *http.Request, ps httpro
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	if username = r.URL.Query().Get("username"); database.ValidateUsername(username) {
-		w.Header().Set("content-type", "text/plain") //  400
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 
-	if !(database.ValidateId(photoId) && database.ValidateId(uid)) {
-		w.Header().Set("content-type", "text/plain") //  400
-		w.WriteHeader(http.StatusBadRequest)
-		return
-
-	}
+	username = r.URL.Query().Get("username")
 
 	//  check if path exist
 	if user, err = rt.db.GetUserFromId(uid); err != nil {

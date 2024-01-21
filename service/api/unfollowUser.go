@@ -20,9 +20,9 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 	var isFollower bool
 	var tk *security.Token
 
-	/*
-		Parse URL parameters
-	*/
+	//	Parse URL parameters
+
+	// parse :uid
 	if uid, err = strconv.Atoi(ps.ByName("followerId")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
@@ -30,7 +30,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 
 		return
 	}
-
+	// parse :uidUnfoll
 	if uidUnfoll, err = strconv.Atoi(ps.ByName("uid")); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400
@@ -39,9 +39,7 @@ func (rt *_router) unfollowUser(w http.ResponseWriter, r *http.Request, ps httpr
 		return
 	}
 
-	/*
-		if folow not exist path URL path not exist
-	*/
+	//	if folow not exist path URL path not exist
 
 	if isFollower, err = rt.db.IsFollower(uid, uidUnfoll); err != nil {
 		ctx.Logger.Errorf("%w", err)

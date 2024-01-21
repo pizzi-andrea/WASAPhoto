@@ -58,14 +58,6 @@ func (rt *_router) banUser(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	//   validate format value
-	if !(database.ValidateId(from) && database.ValidateId(to)) {
-		w.Header().Set("content-type", "text/plain") //   404
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
-
 	if from == to {
 		ctx.Logger.Errorln("the user cannot ban himself")
 		w.Header().Set("content-type", "text/plain") //   403

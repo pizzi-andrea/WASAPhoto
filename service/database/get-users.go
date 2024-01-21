@@ -14,7 +14,6 @@ To return all users of the system set username="" and largeSearch=true
 func (db *appdbimpl) GetUsers(username Username, largeSearch bool) (users []User, err error) {
 	var rows *sql.Rows
 	var uid Id
-	var name Username
 
 	if largeSearch {
 		rows, err = db.c.Query("SELECT * FROM Users WHERE username LIKE '%" + username + "%'")
@@ -32,12 +31,12 @@ func (db *appdbimpl) GetUsers(username Username, largeSearch bool) (users []User
 		if rows.Err() != nil {
 			return
 		}
-		if err = rows.Scan(&uid, &name); err != nil {
+		if err = rows.Scan(&uid, &username); err != nil {
 			return users, err
 		}
 		users = append(users, User{
 			Uid:      uid,
-			Username: name,
+			Username: username,
 		})
 	}
 

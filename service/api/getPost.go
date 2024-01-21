@@ -65,14 +65,6 @@ func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
-	if user == nil || post == nil {
-		w.Header().Set("content-type", "text/plain") //   404
-		w.WriteHeader(http.StatusNotFound)
-
-		return
-
-	}
-
 	if isBan {
 		w.Header().Set("content-type", "text/plain") //   403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
@@ -88,8 +80,15 @@ func (rt *_router) getPost(w http.ResponseWriter, r *http.Request, ps httprouter
 		return
 	}
 
+	if user == nil || post == nil {
+		w.Header().Set("content-type", "text/plain") //   404
+		w.WriteHeader(http.StatusNotFound)
+
+		return
+
+	}
+
 	post.Location = strings.TrimSuffix("/images/:photoId", ":photoId") + strconv.Itoa(post.Refer)
-	ctx.Logger.Infof("%s\n", post.Location)
 
 	/*
 		Applay barrear authentication. A user can see photos of another user as long as they have not been banned

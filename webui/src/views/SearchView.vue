@@ -1,20 +1,25 @@
 <script>
+import { ref } from 'vue';
+
 export default {
 	
     data: function () {
         return {
+            errormsg: null,
             usernameSrc: "",
             usersFound: [],  
         };
     },
     methods: {
         async refresh() {
+            this.errormsg = null;
             
         },
 
         async getUsers(){
+            this.refresh();
             try{
-                let response = {}
+                let response = null
                 response = await this.$axios.get("/users/", {
                     params: {
                         limit: 120,
@@ -24,17 +29,37 @@ export default {
                 switch(response.status){
                     case 200:
                         this.usersFound = response.data;
+                        this.usersFound = this.usersFound.filter(user => user.uid != localStorage.getItem('token'));
                         break;
                     default:
                         this.usersFound = []
                 }
             }catch(e){
+                console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        this.errormsg = "Errore nella richiesta";
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        this.errormsg = "Nessun utente trovato";
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
                 
 
             }
         },
     },
     mounted(){
+        this.refresh();
         
     }
 

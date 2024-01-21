@@ -1,7 +1,8 @@
 <script>
 import { RouterLink, RouterView } from 'vue-router'
+
 export default {
-	props: ['usr'],
+    props: ['usr'],
 
     data: function() {
         return {
@@ -17,248 +18,274 @@ export default {
     },
 
     methods: {
-        async putBan(){
-            
+        async putBan() {
             if (this.isBanned) {
                 return
             }
-
-            try{
-                let response = {}
-                response = await this.$axios.put("/users/" + localStorage.getItem('token')  + "/banned/" + this.id);
-                switch(response.status){
+            let response = null
+            try {
+                response = await this.$axios.put("/users/" + localStorage.getItem('token') + "/banned/" + this.id);
+                switch (response.status) {
                     case 201:
                         this.isBanned = true;
                         this.refresh();
                         break;
-                    case 404:
-                    
-                    case 400:
-                    
-                    case 500:
-                    
-                    default:
-                        console.log(response)
                 }
-            }catch(e){
-                
-
+            } catch (e) {
+                console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        $router.push("/error/400");
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
             }
-
-
         },
-        async refresh(){
+
+        async refresh() {
+            this.errormsg = null;
             this.isBannedUser();
             this.getFollowers();
-
+            this.isFollowerUser();
         },
-        async putFollow(){
-            if (this.isFollower){
+
+        async putFollow() {
+            if (this.isFollower) {
                 return
             }
-            try{
-                let response = {}
-                response = await this.$axios.put("/users/" +  this.id + "/followers/" + localStorage.getItem('token'));
-                switch(response.status){
+
+            let response = null
+            try {
+                response = await this.$axios.put("/users/" + this.id + "/followers/" + localStorage.getItem('token'));
+                switch (response.status) {
+                    case 204:
+                        break;
                     case 201:
                         this.isFollower = true;
                         this.refresh();
                         break;
-                        
-                    case 404:
-                    
-                    case 400:
-                    
-                    case 500:
-                    
-                    default:
-                        console.log(response)
                 }
-            }catch(e){
-                
-
+            } catch (e) {
+                console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        $router.push("/error/400");
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
             }
-
             this.getFollowers()
-
         },
 
-        async deleteFollow(){
-            if( !this.isFollower){
+        async deleteFollow() {
+            if (!this.isFollower) {
                 return
             }
-            try{
-                let response = {}
-                response = await this.$axios.delete("/users/" +  this.id + "/followers/" + localStorage.getItem('token'));
-                switch(response.status){
+            let response = null
+            try {
+                response = await this.$axios.delete("/users/" + this.id + "/followers/" + localStorage.getItem('token'));
+                switch (response.status) {
                     case 204:
-                        this.isFollower =false;
+                        this.isFollower = false;
                         this.refresh();
                         break;
-                        case 404:
-                    
-                    case 400:
-                    
-                    case 500:
-                    
-                    default:
-                        console.log(response)
                 }
-            }catch(e){
-                
-
+            } catch (e) {
+                console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        $router.push("/error/400");
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
             }
-
         },
 
-        async deleteBan(){
+        async deleteBan() {
             if (!this.isBanned) {
                 return
             }
-
-            try{
-                let response = {}
-                response = await this.$axios.delete("/users/" + localStorage.getItem('token')  + "/banned/" + this.id);
-                switch(response.status){
+            let response = null
+            try {
+                response = await this.$axios.delete("/users/" + localStorage.getItem('token') + "/banned/" + this.id);
+                switch (response.status) {
                     case 204:
                         this.isBanned = false;
                         this.refresh();
                         break;
-                    case 404:
-                    
-                    case 400:
-                    
-                    case 500:
-                    
-                    default:
-                        console.log(response)
                 }
-            }catch(e){
-                
-
+            } catch (e) {
+                console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        $router.push("/error/400");
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
             }
-
         },
 
-        async isBannedUser(){
-            try{
-                let response = {}
-                response = await this.$axios.get("/users/" + localStorage.getItem('token')  + "/banned/" + this.id);
-                switch(response.status){
+        async isBannedUser() {
+            let response = null
+            try {
+                response = await this.$axios.get("/users/" + localStorage.getItem('token') + "/banned/" + this.id);
+                switch (response.status) {
                     case 200:
                         this.isBanned = true;
                         this.followAllow = true;
                         break;
-                    
                     case 204:
                         this.isBanned = false;
                         this.followAllow = false;
                         break;
-                    case 404:
-                    
-                    case 400:
-                    
-                    case 500:
-                    
-                    default:
-                        console.log(response)
                 }
-            }catch(e){
-                
-
+            } catch (e) {
+                console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        this.errormsg = "Errore generico nella richiesta";
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
             }
-
         },
 
-        async getFollowers(){
-            try{
-                let response = {}
-                response = await this.$axios.get("/users/" +  this.id + "/followers/");
-                switch(response.status){
+        async getFollowers() {
+            let response = null;
+            try {
+                response = await this.$axios.get("/users/" + this.id + "/followers/");
+                switch (response.status) {
                     case 200:
                         this.l_followers = response.data;
-                        this.followers =  this.l_followers.length
+                        this.followers = this.l_followers.length
                         break;
-                    
                     case 204:
                         this.isFollower = false;
                         break;
-                    case 404:
-                    
-                    case 403:
-                        this.followers = "?";
-                        break;
-                    
-                    case 400:
-                    
-                    case 500:
-                    
-                    default:
-                        console.log(response)
                 }
-            }catch(e){
-                
-
+            } catch (e) {
+                console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        $router.push("/error/400");
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
             }
-
             this.isFollowerUser();
-
         },
 
-        isFollowerUser(){
+        isFollowerUser() {
             let t = localStorage.getItem('token');
-
-           this.isFollower = this.l_followers.map((item) => {
-                return item.uid
-            }).includes(t)
-
+           this.isFollower = false;
+            for (let i = 0; i < this.l_followers.length; i++) {
+                if (this.l_followers[i].uid == t) {
+                    this.isFollower = true;
+                    break;
+                }
+            }
         }
-
-
-
-
     },
+
     mounted() {
         this.refresh();
-
     },
-    
-    
 }
 </script>
 
 <template>
-	<li class="list-group-item d-flex justify-content-between align-items-start rounded m-2 ">
+    <li class="list-group-item d-flex justify-content-between align-items-start rounded m-2 ">
         <div class="ms-2 me-auto">
-        
-        <RouterLink :to= " '/users/' + this.id + '/profile'">
-            <div class="fw-bold">{{username}}</div>  
-        </RouterLink>
-                               
+            <RouterLink :to="'/users/' + this.id + '/profile'">
+                <div class="fw-bold">{{username}}</div>
+            </RouterLink>
         </div>
         <div class="btn-group ms-1 me-auto" role="group">
             <button type="button" class="btn btn-danger" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" v-if="isFollower" @click="deleteFollow">
                 Non seguire
                 <span class="badge text-bg-primary rounded-pill">{{followers}}</span>
             </button>
-            <button type="button" class="btn btn-primary" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" v-else @click="putFollow" :disabled="followAllow" >
+            <button type="button" class="btn btn-primary" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" v-else @click="putFollow" :disabled="followAllow">
                 Segui
                 <span class="badge text-bg-primary rounded-pill">{{followers}}</span>
-            </button>  
+            </button>
             <button type="button" class="btn btn-warning" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" v-if="isBanned" @click="deleteBan">
                 Sblocca
             </button>
             <button type="button" class="btn btn-danger" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" v-else @click="putBan">
                 Blocca
-            </button>  
-            </div>        
-            
-                                
+            </button>
+        </div>
     </li>
+
+    <ErrorMeg :msg="errormsg" v-if="errormsg"></ErrorMeg>
 </template>
 
 <style>
 </style>
-
-
-

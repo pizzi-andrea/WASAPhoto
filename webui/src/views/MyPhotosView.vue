@@ -1,5 +1,5 @@
 <script>
-    export default {
+export default {
     data: function () {
         return {
             errormsg: null,
@@ -9,9 +9,11 @@
     },
     methods: {
         async refresh() {
+            let response = null;
             try {
-                let response = null;
-                response = await this.$axios.get("/users/" + localStorage.getItem("token") + "/" + "myPhotos/");
+                response = await this.$axios.get(
+                    "/users/" + localStorage.getItem("token") + "/" + "myPhotos/"
+                );
                 switch (response.status) {
                     case 200:
                         this.myPhotos = response.data;
@@ -19,53 +21,72 @@
                     case 204:
                         this.myPhotos = [];
                         break;
+                }
+            } catch (e) {
+                console.log(e);
+                switch (e.response.status) {
                     case 400:
+                        this.$router.push("/error/400");
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
                         break;
                     case 404:
+                        $router.push("error/404");
                         break;
                     case 500:
+                        this.$router.push("/error/500");
                         break;
-                    default:
-                        console.log(response);
                 }
-            }
-            catch (e) {
-                console.log(e);
             }
         },
         async uploadPost() {
             const form = new FormData();
-            this.img = document.getElementById('photo').files;
+            this.img = document.getElementById("photo").files;
             if (this.img == null || this.img.length == 0) {
                 return;
             }
             console.log(this.img);
             form.append("img", this.img[0]);
             form.append("desc", this.description);
+            let response = null;
             try {
-                let response = null;
-                response = await this.$axios.post("/users/" + localStorage.getItem("token") + "/" + "myPhotos/", form, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-                console.log(response);
+                response = await this.$axios.post(
+                    "/users/" + localStorage.getItem("token") + "/" + "myPhotos/",
+                    form,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
+                );
                 switch (response.status) {
                     case 201:
                         this.refresh();
                         break;
+                }
+            } catch (e) {
+                console.log(e);
+                switch (e.response.status) {
                     case 400:
+                        $router.push("/error/400");
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
                         break;
                     case 404:
+                        $router.push("error/404");
                         break;
                     case 500:
+                        this.$router.push("/error/500");
                         break;
-                    default:
-                        console.log(response);
                 }
-            }
-            catch (e) {
-                console.log(e);
             }
         },
     },
@@ -89,7 +110,10 @@
         <div class="container float-start">
             <div class="row" id="top"></div>
 
-            <div class="row d-inline p-2 flex-row justify-content-start justify-content-between col-3 position-absolute top-25 start-50 translate-middle-x" id="body">
+            <div
+                class="row d-inline p-2 flex-row justify-content-start justify-content-between col-3 position-absolute top-25 start-50 translate-middle-x"
+                id="body"
+            >
                 <div class="">
                     <div v-for="post in myPhotos" :key="post.refer">
                         <DeletablePost :post="post"></DeletablePost>
@@ -100,27 +124,26 @@
                     <div class="card-header">
                         <small>Postato da</small>
                     </div>
-                    
-                        <div class="card-img-top img-fluid object-fit-xxl-contain border rounded"></div>
 
-                        <div class="card-body">
-                            <div class="input-group mb-3">
-                                <span class="input-group-text mb-3">descrizione</span>
-                                <textarea class="form-control" aria-label="descrizione" name="desc" v-model="description"></textarea>
-                            </div>
+                    <div class="card-img-top img-fluid object-fit-xxl-contain border rounded"></div>
 
-                            <div class="input-group mb-3">
-                                <input type="file" class="form-control"  aria-describedby="inputGroupFileAddon04" aria-label="Upload" accept="image/png" id="photo" name="img"/>
-                                <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon04" @click="uploadPost">Button</button>
-                            </div>
-
-                            <p class="card-text"><small class="text-muted">Aggiunta il </small></p>
-
-                            <div class="list-group">
-                                <small><i>commenti</i></small>
-                            </div>
+                    <div class="card-body">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text mb-3">descrizione</span>
+                            <textarea class="form-control" aria-label="descrizione" name="desc" v-model="description"></textarea>
                         </div>
-                    
+
+                        <div class="input-group mb-3">
+                            <input type="file" class="form-control" aria-describedby="inputGroupFileAddon04" aria-label="Upload" accept="image/png" id="photo" name="img" />
+                            <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon04" @click="uploadPost">Button</button>
+                        </div>
+
+                        <p class="card-text"><small class="text-muted">Aggiunta il </small></p>
+
+                        <div class="list-group">
+                            <small><i>commenti</i></small>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

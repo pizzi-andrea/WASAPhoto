@@ -17,48 +17,70 @@ export default {
             let response;
             try {
                 response = await this.$axios.get( this.pathUser);
-            }
-            catch (e) {
-                return;
-            }
-            switch (response.status) {
+                switch (response.status) {
                 case 200:
                     this.profile = new Profile();
                     this.profile = response.data;
                     break;
-                case 404:
-                    this.$router.push("error/NotFound");
-                    break
-                case 500:
-                    this.$router.push("error/ServerError");
-                    break
-                default:
-                    this.$router.push("error/ServerError");
+                }
+            
+            }catch (e) {
+                console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        this.$router.push("/error/400");
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
             }
+            
+               
 
 			try {
                 response = await this.$axios.get(this.pathUser + "myPhotos/");
-            }
-            catch (e) {
-                return;
-            }
-            switch (response.status) {
+                switch (response.status) {
                 case 200:
 				case 204:
                     this.myStream = response.data;
                     break;
-                case 404:
-                    this.$router.push("error/NotFound");
-                    break
-                case 500:
-                    this.$router.push("error/server");
-                    break
-                default:
-                    this.$router.push("error/server");
+                }
+              
+            }catch (e) {
+                console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        this.$router.push("/error/400");
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
             }
+            
+            
         },
 
-        async logout(){
+        logout(){
             this.$axios.defaults.headers.common['Authorization'] = ''
             localStorage.removeItem('token')
             this.$router.push("/");
@@ -72,6 +94,24 @@ export default {
                     username: username
                 });
             }catch(e){
+                console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        this.$router.push("/error/400");
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
 
             }
         }
@@ -93,7 +133,7 @@ export default {
 	<div>
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-			<h1 class="h2">Profile di {{profile.username}} </h1>
+			<h1 class="h2">Profile di {{profile.user.username}} </h1>
             <div class="">
                     <p> Followers  {{profile.follower}}</p>
 					<p> Following  {{profile.following}}</p>

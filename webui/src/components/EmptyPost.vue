@@ -21,25 +21,35 @@ export default {
           const form =  new FormData();
           form.append("img", this.img);
           form.append("desc", this.description);
-
+          let response = null 
           try{
-            let response = null 
+            
             response = await this.$axios.post("/users/" + localStorage.getItem('token') + "/" + "myPhotos/", form);
 
             switch(response.status){
               case 201:
                 break;
-              case 400:
-                break;
-              case 404:
-                break;
-              case 500:
-                break;
-              default:
-                console.log(response);
+              
             }
           }catch(e){
             console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        $router.push("/error/400");
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
           }
         },
 

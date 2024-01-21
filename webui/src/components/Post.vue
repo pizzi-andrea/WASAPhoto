@@ -29,37 +29,49 @@ export default {
           this.refreshComments();
           this.getUsername();
           this.isLiked();
-          this.getImage();
           this.getMyUsername();
         },
 
         async getMyUsername(){
-          let response = {}
+          let response = null;
           try {
             response = await this.$axios.get("/users/" + localStorage.getItem('token') + "/")
+            switch(response.status){
+              case 200:
+                this.myUsername = response.data.user.username
+                break;
+            }
           }catch(e){
-            this.errormsg = e.toString()
+            console.log(e);
+        switch (e.response.status) {
+          case 400:
+            $router.push("/error/400");
+            break;
+          case 401:
+            this.$router.push("/error/401");
+            break;
+          case 403:
+            this.$router.push("/error/403");
+            break;
+          case 404:
+            this.$router.push("error/404");
+            break;
+          case 500:
+            this.$router.push("/error/500");
+            break;
+        }
           }
 
-          switch(response.status){
-            case 200:
-              this.myUsername =  response.data.user.username
-              break;
-            case 400:
-              this.$router.push("/error/client");
-              break;
-            case 500:
-              this.$router.push("/error/server");
-              break;
+          
             
-          }
+          },
 
-        },
+        
         async delLike(){
+          let response = null
           try{
-            let response = {}
+            
             response = await this.$axios.delete("/users/" + this.post.owner + "/myPhotos/" + this.post.refer + "/likes/" + localStorage.getItem('token'))
-            console.log(response)
             
             switch(response.status){
               case 204:
@@ -80,14 +92,31 @@ export default {
                 
             }
           }catch(e){
-            this.errormsg = e.toString()
+            switch (e.response.status) {
+          case 400:
+            $router.push("/error/400");
+            break;
+          case 401:
+            this.$router.push("/error/401");
+            break;
+          case 403:
+            this.$router.push("/error/403");
+            break;
+          case 404:
+            $router.push("error/404");
+            break;
+          case 500:
+            this.$router.push("/error/500");
+            break;
+        }
 
           }
         
         },
         async putLike(){
+          let response = null
           try{
-            let response = {}
+            
             response = await this.$axios.put("/users/" + this.post.owner + "/myPhotos/" + this.post.refer + "/likes/" + localStorage.getItem('token'))
             switch(response.status){
               case 201:
@@ -96,48 +125,34 @@ export default {
                 break;
               case 204:
                 break;
-              case 404:
-                //TODO
-                break;
-              case 400:
-                //todo
-                break;
-              case 500:
-                //todo
-                break;
-              default:
-                //todo
                 
             }
           }catch(e){
-            this.errormsg = e.toString()
+            switch (e.response.status) {
+          case 400:
+            $router.push("/error/400");
+            break;
+          case 401:
+            this.$router.push("/error/401");
+            break;
+          case 403:
+            this.$router.push("/error/403");
+            break;
+          case 404:
+            $router.push("error/404");
+            break;
+          case 500:
+            this.$router.push("/error/500");
+            break;
+        }
           }
 
-        },
-
-        async getImage(){
-          let response = {}
-          try {
-            response = await this.$axios.get("/images/" + this.post.refer);
-          
-          }catch(e){
-            this.errormsg = e.toString()
-          }
-          switch(response.status){
-            case 200:
-              break;
-            case 400:
-              this.$router.push("/error/client");
-              break;
-            case 500:
-              this.$router.push("/error/server");
-              break;
-          }
         },
 
         async putComment(){
+          let response = null
           try{
-            let response = {}
+            
             response = await this.$axios.post("/users/" + this.post.owner + "/myPhotos/" + this.post.refer + "/comments/", {
               author: {
                 username: this.myUsername
@@ -150,21 +165,26 @@ export default {
                 this.disableComment();
                 this.refreshComments();
                 break;
-              case 404:
-                //TODO
-                break;
-              case 400:
-                //todo
-                break;
-              case 500:
-                //todo
-                break;
-              default:
-                //todo
                 
             }
           }catch(e){
-            this.errormsg = e.toString()
+            switch (e.response.status) {
+          case 400:
+            $router.push("/error/400");
+            break;
+          case 401:
+            this.$router.push("/error/401");
+            break;
+          case 403:
+            this.$router.push("/error/403");
+            break;
+          case 404:
+            $router.push("error/404");
+            break;
+          case 500:
+            this.$router.push("/error/500");
+            break;
+        }
           }
         },
 
@@ -182,10 +202,11 @@ export default {
         },
 
         async getLikes(){
+          let response = null;
           try{
-            let response = {}
+            
             response = await this.$axios.get("/users/" + this.post.owner + "/myPhotos/" + this.post.refer + "/likes/")
-            console.log(response)
+           
             
             switch(response.status){
               case 200:
@@ -194,37 +215,39 @@ export default {
               case 204:
                 this.users_likes = [];
                 break;
-              case 404:
-                //TODO
-                break;
-              case 400:
-                //todo
-                break;
-              case 500:
-                //todo
-                break;
-              default:
-                //todo
+              
                 
             }
 
             
 
           }catch(e){
-            this.errormsg = e.toString()
+            switch (e.response.status) {
+          case 400:
+            $router.push("/error/400");
+            break;
+          case 401:
+            this.$router.push("/error/401");
+            break;
+          case 403:
+            this.$router.push("/error/403");
+            break;
+          case 404:
+            $router.push("error/404");
+            break;
+          case 500:
+            this.$router.push("/error/500");
+            break;
+        }
           }
         },
 
         
         async getUsername(){
-          let response = {}
+          let response = null
           try {
             response = await this.$axios.get("/users/" + this.post.owner + "/")
-          }catch(e){
-            this.errormsg = e.toString()
-          }
-
-          switch(response.status){
+            switch(response.status){
             case 200:
               this.username =  response.data.user.username
               break;
@@ -236,6 +259,27 @@ export default {
               break;
             
           }
+          }catch(e){
+            switch (e.response.status) {
+          case 400:
+            $router.push("/error/400");
+            break;
+          case 401:
+            this.$router.push("/error/401");
+            break;
+          case 403:
+            this.$router.push("/error/403");
+            break;
+          case 404:
+            $router.push("error/404");
+            break;
+          case 500:
+            this.$router.push("/error/500");
+            break;
+        }
+          }
+
+          
         },
 
         async countLikes(){
@@ -245,8 +289,9 @@ export default {
         },
 
         async isLiked(){
+          let response = null
           try{
-            let response = {}
+            
             response = await this.$axios.get("/users/" + this.post.owner + "/myPhotos/" + this.post.refer + "/likes/" + localStorage.getItem('token'));
             
             switch(response.status){
@@ -255,17 +300,33 @@ export default {
                 break;
               case 204:
                 this.like = false;
-              default:
-                //todo
             }
           }catch(e){
+            switch (e.response.status) {
+          case 400:
+            $router.push("/error/400");
+            break;
+          case 401:
+            this.$router.push("/error/401");
+            break;
+          case 403:
+            this.$router.push("/error/403");
+            break;
+          case 404:
+            $router.push("error/404");
+            break;
+          case 500:
+            this.$router.push("/error/500");
+            break;
+        }
 
           }
         },
 
         async refreshComments(){
+          let response = null
           try{
-            let response = {}
+            
             response = await this.$axios.get("/users/" + this.post.owner + "/myPhotos/" + this.post.refer + "/comments/");
             
             switch(response.status){
@@ -274,20 +335,79 @@ export default {
                 break;
               case 204:
                 this.comments = []
-              default:
-                //todo
+    
             }
           }catch(e){
+            switch (e.response.status) {
+          case 400:
+            $router.push("/error/400");
+            break;
+          case 401:
+            this.$router.push("/error/401");
+            break;
+          case 403:
+            this.$router.push("/error/403");
+            break;
+          case 404:
+            $router.push("error/404");
+            break;
+          case 500:
+            this.$router.push("/error/500");
+            break;
+        }
 
           }
 
+        },
+
+        async delComment(commentId){
+          try {
+            let response = null; 
+            response = await this.$axios.delete("/users/" + this.post.owner + "/myPhotos/" + this.post.refer + "/comments/" + commentId)
+
+            switch(response.status) {
+              case 204:
+                document.getElementById(commentId).remove();
+                this.refreshComments();
+                break;
+
+            }
+          }catch(e){
+            switch (e.response.status) {
+          
+                case 400: //bad request
+                  this.errormsg = "Errore nella richiesta"
+                  break; 
+                case 401: //unauthorized    
+                  this.errormsg = "Non autorizzato"
+                  break;  
+                  case 403: //forbidden   
+                  this.errormsg = "Non hai i permessi per eseguire questa operazione"
+                  break;
+                case 404: //not found
+                  this.errormsg = "Risorsa non trovata"
+                  break;
+                
+                case 500: //server error  
+                  this.errormsg = "Errore del server"
+                  break;
+          
+          }
+
         }
+      },
+
+        youComment(commentId){
+          return commentId == localStorage.getItem('token');
+        }
+        
 
 
         
       
         
-    },
+   
+  },
     mounted(){
         this.refresh();
 
@@ -334,6 +454,9 @@ export default {
           </div>
           <p class="mb-1">{{comment.text}}</p>
             <small></small>
+            <div v-if="youComment(comment.author.uid)" class="align-items-end">
+              <button type="button" class="btn btn-danger" @click="delComment(comment.commentId)"> <img src="./icons/trash.svg"> </button>
+            </div>
         </a>
     </RouterLink>
     

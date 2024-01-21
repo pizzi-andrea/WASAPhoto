@@ -8,7 +8,8 @@ export default {
             profile: null,
 			myStream: [],
             change: false,
-            oldUsername: ""
+            oldUsername: "",
+            badUsername: false,
             
             
         };
@@ -18,48 +19,71 @@ export default {
             let response;
             try {
                 response = await this.$axios.get(this.$route.path);
-                console.log(response);
-            }
-            
-            catch (e) {
-                return;
-            }
-
-            switch (response.status) {
+                switch (response.status) {
                 case 200:
                     this.profile = response.data;
                     break;
-                case 404:
-                    this.$router.push("error/NotFound");
-                    break
-                case 500:
-                    this.$router.push("error/ServerError");
-                    break
-                default:
-                    this.$router.push("error/ServerError");
+                }
+               
+            }catch (e) {
+                console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        this.$router.push("/error/400");
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
             }
+
+            
+        
 
 			try {
                 response = await this.$axios.get(this.$route.path + "myStream/");
-            }
-            catch (e) {
-                return;
-            }
-            switch (response.status) {
+                switch (response.status) {
                 case 200:
 				case 204:
                     this.myStream = response.data;
                     break;
-                case 404:
-                    this.$router.push("error/NotFound");
-                    break
-                case 500:
-                    this.$router.push("error/server");
-                    break
-                default:
-                    this.$router.push("error/server");
+                }
+            
+            }catch (e) {
+                console.log(e);
+                
+                switch (e.response.status) {
+                    case 400:
+                        this.$router.push("/error/400");
+                        break;
+                    case 401:
+                        
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
             }
+            
+               
         },
+        
 
         logout(){
             this.$axios.defaults.headers.common['Authorization'] = ''
@@ -73,21 +97,32 @@ export default {
             try{
                 
                 let response = await this.$axios.put(this.$route.path, "\"" + username + "\"");
-
                 switch(response.status){
                     case 200:
                     case 204:
                         this.refresh();
                         this.changeUsername();
                         break;
-                    case 404:
-                        break;
-                    case 400:
-                        break;
-                    case 500:
-                        break;
                 }
             }catch(e){
+                console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        this.badUsername = true;
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        $router.push("error/404");
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
 
             }
         },
@@ -104,6 +139,8 @@ export default {
                 this.oldUsername = this.profile.user.username
 
             }
+
+            this.badUsername = false;
 
 
 
@@ -133,7 +170,11 @@ export default {
                     <input type="text" class="form-control" :placeholder="profile.user.username" aria-label="Recipient's username with two button addons" :disabled="!change" v-model="profile.user.username">
                     <button class="btn btn-outline-secondary" type="button" v-show="change" @click="uploadUsername(profile.user.username)">invia</button>
                     <button class="btn btn-outline-secondary" type="button" v-show="change" @click="changeUsername">back</button>
+                    
                 </div>
+                <ErrorMsg v-if="badUsername" class="m-2" :msg="'Username non valido,\
+                    un username valido contiene una qualsiasi sequenza di caratteri di lunghezza minima 3 e massima 16'">
+                    </ErrorMsg>
 
                 </h1>
             <div class="vr m-4"></div>

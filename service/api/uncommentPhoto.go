@@ -45,14 +45,6 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		return
 	}
 
-	if !(database.ValidateId(photoId) && database.ValidateId(uid) && msg.Verify()) {
-		w.Header().Set("content-type", "text/plain") //  400
-		w.WriteHeader(BadRequest.StatusCode)
-
-		return
-
-	}
-
 	if user, err = rt.db.GetUserFromId(uid); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
@@ -63,7 +55,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	if photo, err = rt.db.GetPhoto(photoId); err != nil {
-		ctx.Logger.Errorf("%w", err)
+		ctx.Logger.Errorf("GetPhoto::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 
@@ -72,7 +64,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	if msg, err = rt.db.GetComment(comm); err != nil {
-		ctx.Logger.Errorf("%w", err)
+		ctx.Logger.Errorf("GetComment::%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
 
@@ -81,6 +73,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	if photo == nil || user == nil || msg == nil {
+		ctx.Logger.Errorf("path::%w", err)
 		w.Header().Set("content-type", "text/plain") //  404
 		w.WriteHeader(http.StatusNotFound)
 
@@ -91,6 +84,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 		Check if user that wont put follows can do it
 	*/
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
+		ctx.Logger.Errorf("NoToken::%w", err)
 		w.Header().Set("content-type", "text/plain") //  401
 		w.WriteHeader(UnauthorizedError.StatusCode)
 
@@ -107,6 +101,7 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	if rr {
+		ctx.Logger.Errorf("Banned\n")
 		w.Header().Set("content-type", "text/plain") //  403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
 
@@ -114,13 +109,14 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 	}
 
 	if msg.Author.Uid != tk.Value {
+		ctx.Logger.Errorf("Not Author:: (%d != %d)\n", msg.Author.Uid, tk.Value)
 		w.Header().Set("content-type", "text/plain") //  403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
 
 		return
 	}
 
-	if _, err = rt.db.DelComment(msg.Author.Uid); err != nil {
+	if rr, err = rt.db.DelComment(msg.CommentId); err != nil {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //  500
 		w.WriteHeader(ServerError.StatusCode)
@@ -129,7 +125,13 @@ func (rt *_router) uncommentPhoto(w http.ResponseWriter, r *http.Request, ps htt
 
 	}
 
-	w.Header().Set("content-type", "text/plain")
-	w.WriteHeader(http.StatusNoContent)
+	if rr {
+		w.Header().Set("content-type", "text/plain")
+		w.WriteHeader(http.StatusNoContent)
+		ctx.Logger.Infof("User %d uncommented photo %d", user.Uid, photo.PhotoId)
+
+	} else {
+
+	}
 
 }

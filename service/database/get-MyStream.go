@@ -16,10 +16,10 @@ func (db *appdbimpl) GetMyStream(uid Id, username Username, largeSearch bool, by
 	var oord string
 	var t string
 	if len(by) == 0 {
-		by = append(by, OrderBy(timeUpdate))
+		by = append(by, timeUpdate)
 	}
 	if len(ord) == 0 {
-		ord = append(ord, Ordering(desc))
+		ord = append(ord, desc)
 	}
 
 	switch ord[0] {

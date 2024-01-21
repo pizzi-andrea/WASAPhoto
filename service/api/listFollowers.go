@@ -40,13 +40,6 @@ func (rt *_router) listFollowers(w http.ResponseWriter, r *http.Request, ps http
 	//   validate username format
 	username = r.URL.Query().Get("username")
 
-	if database.ValidateUsername(username) {
-		w.Header().Set("content-type", "text/plain") //   400
-		w.WriteHeader(BadRequest.StatusCode)
-
-		return
-	}
-
 	if limit, err = strconv.Atoi(r.URL.Query().Get("limit")); err != nil && r.URL.Query().Get("limit") != "" {
 		ctx.Logger.Errorf("%w", err)
 		w.Header().Set("content-type", "text/plain") //   400

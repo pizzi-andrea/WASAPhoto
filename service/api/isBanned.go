@@ -36,14 +36,6 @@ func (rt *_router) isBanned(w http.ResponseWriter, r *http.Request, ps httproute
 		return
 	}
 
-	//   validate format value
-	if !(database.ValidateId(from) && database.ValidateId(to)) {
-		w.Header().Set("content-type", "text/plain") //   404
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
-
 	/*
 		Secure Bearer Authentication, check if user wont put ban is account owner.
 	*/

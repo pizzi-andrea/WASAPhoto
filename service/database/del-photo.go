@@ -18,6 +18,8 @@ func (db *appdbimpl) DelPhoto(id Id) (r bool, err error) {
 	if errors.Is(err, sql.ErrNoRows) {
 		err = nil
 		r = false
+	} else {
+		r = false
 	}
 	return
 }

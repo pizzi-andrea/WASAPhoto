@@ -69,7 +69,7 @@ func (rt *_router) doLogin(w http.ResponseWriter, r *http.Request, ps httprouter
 
 		}
 		w.Header().Set("content-type", "application/json") //  200 code
-		//  w.WriteHeader(http.StatusCreated)
+
 		return
 
 	}

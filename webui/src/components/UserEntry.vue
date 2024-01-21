@@ -13,7 +13,6 @@ export default {
             followers: 0,
             isBanned: false,
             isFollower: false,
-            followAllow: false,
         }
     },
 
@@ -22,13 +21,45 @@ export default {
             if (this.isBanned) {
                 return
             }
+
             let response = null
             try {
                 response = await this.$axios.put("/users/" + localStorage.getItem('token') + "/banned/" + this.id);
+                this.isBanned = true;
+                this.isFollower = false;
+            } catch (e) {
+                console.log(e);
+                switch (e.response.status) {
+                    case 400:
+                        this.errormsg = "Errore generico nella richiesta";
+                        break;
+                    case 401:
+                        this.$router.push("/error/401");
+                        break;
+                    case 403:
+                        this.$router.push("/error/403");
+                        break;
+                    case 404:
+                        errormsg = "Utente non trovato";
+                        break;
+                    case 500:
+                        this.$router.push("/error/500");
+                        break;
+                }
+            }
+        },
+
+        async deleteBan() {
+            if (!this.isBanned) {
+                return
+            }
+            let response = null
+            try {
+                response = await this.$axios.delete("/users/" + localStorage.getItem('token') + "/banned/" + this.id);
                 switch (response.status) {
-                    case 201:
-                        this.isBanned = true;
-                        this.refresh();
+                    case 204:
+                        this.isBanned = false;
+                        this.isFollower = false;
                         break;
                 }
             } catch (e) {
@@ -70,10 +101,10 @@ export default {
                 response = await this.$axios.put("/users/" + this.id + "/followers/" + localStorage.getItem('token'));
                 switch (response.status) {
                     case 204:
+                        this.refresh()
                         break;
                     case 201:
                         this.isFollower = true;
-                        this.refresh();
                         break;
                 }
             } catch (e) {
@@ -109,42 +140,6 @@ export default {
                 switch (response.status) {
                     case 204:
                         this.isFollower = false;
-                        this.refresh();
-                        break;
-                }
-            } catch (e) {
-                console.log(e);
-                switch (e.response.status) {
-                    case 400:
-                        $router.push("/error/400");
-                        break;
-                    case 401:
-                        this.$router.push("/error/401");
-                        break;
-                    case 403:
-                        this.$router.push("/error/403");
-                        break;
-                    case 404:
-                        $router.push("error/404");
-                        break;
-                    case 500:
-                        this.$router.push("/error/500");
-                        break;
-                }
-            }
-        },
-
-        async deleteBan() {
-            if (!this.isBanned) {
-                return
-            }
-            let response = null
-            try {
-                response = await this.$axios.delete("/users/" + localStorage.getItem('token') + "/banned/" + this.id);
-                switch (response.status) {
-                    case 204:
-                        this.isBanned = false;
-                        this.refresh();
                         break;
                 }
             } catch (e) {
@@ -176,11 +171,9 @@ export default {
                 switch (response.status) {
                     case 200:
                         this.isBanned = true;
-                        this.followAllow = true;
                         break;
                     case 204:
                         this.isBanned = false;
-                        this.followAllow = false;
                         break;
                 }
             } catch (e) {
@@ -243,7 +236,7 @@ export default {
 
         isFollowerUser() {
             let t = localStorage.getItem('token');
-           this.isFollower = false;
+            this.isFollower = false;
             for (let i = 0; i < this.l_followers.length; i++) {
                 if (this.l_followers[i].uid == t) {
                     this.isFollower = true;
@@ -271,7 +264,7 @@ export default {
                 Non seguire
                 <span class="badge text-bg-primary rounded-pill">{{followers}}</span>
             </button>
-            <button type="button" class="btn btn-primary" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" v-else @click="putFollow" :disabled="followAllow">
+            <button type="button" class="btn btn-primary" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;" v-else @click="putFollow" :disabled="isBanned">
                 Segui
                 <span class="badge text-bg-primary rounded-pill">{{followers}}</span>
             </button>

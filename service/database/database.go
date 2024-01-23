@@ -38,8 +38,8 @@ import (
 
 // AppDatabase is the high level interface for the DB
 type AppDatabase interface {
-	GetUserFromId(uid Id) (usr *User, err error) //
-	GetUserFromUser(Username Username) (usr *User, err error)
+	GetUserFromId(uid Id) (usr *User, err error)              //   give user id and put user associated to uid
+	GetUserFromUser(Username Username) (usr *User, err error) //   give username and put user associated to username
 	GetUsers(username Username, largeSearch bool) (users []User, err error)
 	PostUser(username Username) (usr *User, err error)
 	GetFollowers(uid Id, username Username, largeSearch bool) (followers []User, err error)
@@ -47,7 +47,6 @@ type AppDatabase interface {
 	GetMyStream(uid Id, username Username, largeSearch bool, by []OrderBy, ord ...Ordering) (photos []Post, err error)
 	GetLikes(photoId Id) (likes []User, err error)
 	GetPhotoStream(uid, photoId Id) (img *Post, err error)
-	GetBanned(uid Id) (banned []User, err error)
 	SetUsername(uid Id, username string) (usr *User, err error)               //   update username of user associted to uid
 	GetPosts(uid Id, by []OrderBy, ord ...Ordering) (posts Stream, err error) //   give user id and put all photos posted by user associated to uid
 	IsBanned(from Id, to Id) (r bool, err error)

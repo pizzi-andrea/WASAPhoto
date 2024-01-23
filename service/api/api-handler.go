@@ -31,14 +31,8 @@ func (rt *_router) Handler() http.Handler {
 	//  follow user
 	rt.router.PUT("/users/:uid/followers/:followerId", rt.wrap(rt.followUser)) // required
 
-	//   get followed user
-	rt.router.GET("/users/:uid/followed", rt.wrap(rt.getFollowed))
-
 	//   list personal stream photos
 	rt.router.GET("/users/:uid/myStream/", rt.wrap(rt.getMyStream)) // required
-
-	//   banned users
-	rt.router.GET("/users/:uid/banned/", rt.wrap(rt.listBannedUser)) // fixed
 
 	//   ban user identificated by *uid*
 	rt.router.PUT("/users/:uid/banned/:bannedId", rt.wrap(rt.banUser)) // required
@@ -57,9 +51,6 @@ func (rt *_router) Handler() http.Handler {
 
 	//   delete photo updated
 	rt.router.DELETE("/users/:uid/myPhotos/:photoId/", rt.wrap(rt.deletePhoto)) // required
-
-	//   get photo
-	rt.router.GET("/users/:uid/myPhotos/:photoId/", rt.wrap(rt.getPost))
 
 	//   get likes collected by photo
 	rt.router.GET("/users/:uid/myPhotos/:photoId/likes/", rt.wrap(rt.getLikes))
@@ -81,9 +72,6 @@ func (rt *_router) Handler() http.Handler {
 
 	//  delete comment on photo
 	rt.router.DELETE("/users/:uid/myPhotos/:photoId/comments/:commentId", rt.wrap(rt.uncommentPhoto)) // required
-
-	//  get comment on photo
-	rt.router.GET("/users/:uid/myPhotos/:photoId/comments/:commentId", rt.wrap(rt.getComment))
 
 	// specific endpoint used for get photo data
 	rt.router.GET("/images/:photoId", rt.wrap(rt.getImage))

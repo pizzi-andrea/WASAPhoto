@@ -57,6 +57,9 @@ export default {
         },
     },
     mounted(){
+        this.$axios.defaults.headers.common[
+							"Authorization"
+						] = `Bearer ${localStorage.getItem("token")}`;
         this.refresh();
         
     }

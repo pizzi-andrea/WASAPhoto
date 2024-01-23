@@ -18,7 +18,7 @@ export default {
         async refresh() {
             let response;
             try {
-                response = await this.$axios.get(this.$route.path);
+                response = await this.$axios.get("/users/" + localStorage.getItem("token") + "/");
                 switch (response.status) {
                 case 200:
                     this.profile = response.data;
@@ -50,7 +50,7 @@ export default {
         
 
 			try {
-                response = await this.$axios.get(this.$route.path + "myStream/");
+                response = await this.$axios.get("/users/" + localStorage.getItem('token') + "/myStream/");
                 switch (response.status) {
                 case 200:
 				case 204:
@@ -96,7 +96,7 @@ export default {
             
             try{
                 
-                let response = await this.$axios.put(this.$route.path, "\"" + username + "\"");
+                let response = await this.$axios.put("/users/" + localStorage.getItem('token') + "/", "\"" + username + "\"");
                 switch(response.status){
                     case 200:
                     case 204:
@@ -147,6 +147,9 @@ export default {
         }
     },
     mounted() {
+        this.$axios.defaults.headers.common[
+							"Authorization"
+						] = `Bearer ${localStorage.getItem("token")}`;
         this.refresh();
         
         

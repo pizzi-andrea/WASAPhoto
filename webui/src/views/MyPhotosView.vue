@@ -12,7 +12,7 @@ export default {
             let response = null;
             try {
                 response = await this.$axios.get(
-                    "/users/" + localStorage.getItem("token") + "/" + "myPhotos/"
+                    "/users/" + localStorage.getItem("token") + "/myPhotos/"
                 );
                 switch (response.status) {
                     case 200:

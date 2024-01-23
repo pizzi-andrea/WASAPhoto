@@ -24,7 +24,7 @@ export default {
           let response = null 
           try{
             
-            response = await this.$axios.post("/users/" + localStorage.getItem('token') + "/" + "myPhotos/", form);
+            response = await this.$axios.post("/users/" + localStorage.getItem('token')  + "/myPhotos/", form);
 
             switch(response.status){
               case 201:

@@ -28,8 +28,8 @@ export default {
 			}
 			else
 			{
-				this.user  = "/session/";
-				this.photo = "/session/";
+				this.user  = "/session";
+				this.photo = "/session";
 				this.users = "/session";
 			}
 			

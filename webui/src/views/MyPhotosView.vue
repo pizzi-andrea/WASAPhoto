@@ -133,12 +133,12 @@ export default {
                     <div class="card-body">
                         <div class="input-group mb-3">
                             <span class="input-group-text mb-3">descrizione</span>
-                            <textarea class="form-control" aria-label="descrizione" name="desc" v-model="description"></textarea>
+                            <textarea class="form-control" aria-label="descrizione" name="desc" v-model="testo"></textarea>
                         </div>
 
                         <div class="input-group mb-3">
                             <input type="file" class="form-control" aria-describedby="inputGroupFileAddon04" aria-label="Upload" accept="image/png" id="photo" name="img" />
-                            <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon04" @click="uploadPost">Button</button>
+                            <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon04" @click="uploadPost">Carica</button>
                         </div>
 
                         <p class="card-text"><small class="text-muted">Aggiunta il </small></p>

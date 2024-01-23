@@ -1,2 +1,1 @@
-  9: We found some unnecessary type casting (casting from a type to the same type), e.g.: `var x int` and `p = int(x)`
   1: Check all variable assignments. Some variables receive a value but then you don't use them, or you overwrite them before using the value.

@@ -43,7 +43,7 @@ paths:
         - $ref: "#/components/parameters/UsernameFilter"
           
           
-      operationId: listUsers
+      operationId: listUsers # used
       
       responses:
         "200":
@@ -103,7 +103,7 @@ paths:
       security:
         - BearerAuth: []
         
-      operationId: getUserProfile # required
+      operationId: getUserProfile # required - used
       
       responses:
         "200":
@@ -143,7 +143,7 @@ paths:
           new username
         required: true
       
-      operationId: setMyUserName # required
+      operationId: setMyUserName # required - used
       
       security:
         - BearerAuth: []
@@ -184,7 +184,7 @@ paths:
         - $ref: "#/components/parameters/QueryLimit"
         - $ref: "#/components/parameters/UsernameFilter"
           
-      operationId: listFollowers # OK
+      operationId: listFollowers # OK - used
       
       responses:
         "200":
@@ -234,7 +234,7 @@ paths:
       security:
         - BearerAuth: []
         
-      operationId: unfollowUser # required
+      operationId: unfollowUser # required - used
       
       responses:
         "204":
@@ -265,7 +265,7 @@ paths:
       security:
         - BearerAuth: []
       
-      operationId: followUser # required
+      operationId: followUser # required - used
       
       responses:
         "201": 
@@ -289,62 +289,6 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
   
-  /users/{uid}/followed:
-    summary: users following by specific user
-    description: > 
-      this resource rappresent all users followed by user
-    
-    parameters:
-      - $ref: "#/components/parameters/Uid"
-            
-    get:
-      tags:
-        - user
-        - following
-      summary: get following users
-      description: >
-        given the *id* of the user who wants to see the users he follows he will get the list of followed users
-      
-      parameters:
-        - $ref: "#/components/parameters/QueryLimit"
-        - $ref: "#/components/parameters/UsernameFilter"
-      security:
-      - BearerAuth: []
-  
-      operationId: getFollowed # OK
-      
-      responses:
-        "200":
-          description: >
-            success, get users followed
-          content:
-            application/json:
-              schema:
-                type: array
-                description: >
-                  list of followed
-                items:
-                  $ref: "#/components/schemas/User"
-                minItems: 1
-                maxItems: 1000
-        "404":
-          $ref: "#/components/responses/UserNotFound"
-          
-        "204":
-          description: >
-            empty body, found nothing
-        
-        "400":
-          $ref: "#/components/responses/BadRequest"
-          
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-        "403":
-          $ref: "#/components/responses/UnauthorizedToken"
-        "500":
-          $ref: "#/components/responses/ServerError"
-  
-    
   /users/{uid}/myStream/:
     summary: user stream photos
     description: >
@@ -393,7 +337,7 @@ paths:
         
       security:
         - BearerAuth: []
-      operationId: getMyStream # required
+      operationId: getMyStream # required - used
       
       responses:
         "200":
@@ -424,66 +368,7 @@ paths:
             empty body, found nothing
         "500":
           $ref: "#/components/responses/ServerError"
-    
-  /users/{uid}/banned/:
-    summary: banned users
-    description: >
-      this resource rappresent user banned by uid user
-    
-    parameters:
-        - $ref: "#/components/parameters/Uid"
-    
-    get:
-      security:
-        - BearerAuth: []
-        
-      tags:
-        - user
-        - ban
-      summary: users banned
-      description: >
-        given *uid* then list all user banned by user associated at *uid* 
-    
-      parameters:
 
-        - $ref: "#/components/parameters/QueryLimit"
-        - $ref: "#/components/parameters/UsernameFilter"
-      
-      operationId: listBannedUser
-      
-      responses:
-        "200":
-          description: >
-            success, getted all user banned
-          
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/User"
-                minItems: 1
-                maxItems: 100
-                description: >
-                  list  of banned users
-
-          
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        
-        "404":
-          $ref: "#/components/responses/UserNotFound"
-        
-        "204":
-          description: >
-            empty body, found nothing
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-        "403":
-          $ref: "#/components/responses/UnauthorizedToken"
-        "500":
-          $ref: "#/components/responses/ServerError"
-  
   /users/{uid}/banned/{bannedId}:
     summary: users banned
     description: >
@@ -505,7 +390,7 @@ paths:
       security:
         - BearerAuth: []
       
-      operationId: banUser # required
+      operationId: banUser # required - used
       
       responses:
         "201":
@@ -540,7 +425,7 @@ paths:
       security:
         - BearerAuth: []
         
-      operationId: unbanUser # required
+      operationId: unbanUser # required - used
       
       responses:
         "204":
@@ -568,7 +453,7 @@ paths:
       security:
         - BearerAuth: []
         
-      operationId: isBanned # OK
+      operationId: isBanned # OK - used
       
       responses:
         "200":
@@ -640,7 +525,7 @@ paths:
                   maxLength: 250
                   pattern: "^.*?$"
       
-      operationId: uploadPhoto # required
+      operationId: uploadPhoto # required - used
       
       responses:
         "201":
@@ -694,7 +579,7 @@ paths:
             enum: ["asc", "desc"]
             default: "desc"
 
-      operationId: listPost
+      operationId: listPost # used
       
       responses:
         "200":
@@ -718,7 +603,7 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
   
-  /users/{uid}/myPhotos/{photoId}/: #
+  /users/{uid}/myPhotos/{photoId}/: 
     summary: photo updated by user
     description: >
       this resource rappresent single post of photo
@@ -734,7 +619,7 @@ paths:
       description: >
         provide uid and photoID and delete the photo corresponding to photoID
     
-      operationId: deletePhoto # required
+      operationId: deletePhoto # required - used
       security:
         - BearerAuth: []
         
@@ -753,48 +638,6 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
-        "500":
-          $ref: "#/components/responses/ServerError"
-    
-    get:
-      tags:
-        - photo
-      security:
-        - BearerAuth: []
-      summary: get photo
-      description: >
-        get the photo uploaded by the user. The photo will not be returned but
-        the post associated with the photo. the post will contain all comments
-        the photo and the list of users liked it.
-        
-      operationId: getPost
-      
-      responses:
-        "200": 
-          description: >
-            success, photo founded
-          
-          content:
-            application/json:
-              schema: 
-                $ref: "#/components/schemas/Post"
-          
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        
-        "404":
-          description: >
-            Not found, photo or user not found
-        
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-        
-        "403":
-          $ref: "#/components/responses/UnauthorizedToken"
-        
-        "204":
-          description: >
-            empty body, found nothing
         "500":
           $ref: "#/components/responses/ServerError"
   
@@ -818,7 +661,7 @@ paths:
         provide a photo ID and receive all the likes the photo receives. The elements of the list
         will be the user ID and username of the user who put as.
       
-      operationId: getLikes
+      operationId: getLikes # used
       
       responses:
         "200":
@@ -874,7 +717,7 @@ paths:
         Check if user identified by his uid has putted like on photo.
         If like has putted will return like otherwire return not found response
       
-      operationId: checkLike
+      operationId: checkLike # used
       
       security:
         - BearerAuth: []
@@ -907,7 +750,7 @@ paths:
         provide photo id and owner id. 
         The like is identified by the *uid* of the user who likes it.
       
-      operationId: likePhoto # required
+      operationId: likePhoto # required - used
       
       security:
         - BearerAuth: []
@@ -947,7 +790,7 @@ paths:
         and remove like given user identificated by
         *likeUserId*
         
-      operationId: unlikePhoto # required
+      operationId: unlikePhoto # required - used
       security:
         - BearerAuth: []
       responses:
@@ -997,7 +840,7 @@ paths:
       
       security:
         - BearerAuth: []
-      operationId: commentPhoto # required
+      operationId: commentPhoto # required - used
       
       responses:
         "201":
@@ -1047,7 +890,7 @@ paths:
             sort comments by data creation
         
       
-      operationId: getComments
+      operationId: getComments # used
       responses:
         "200":
           description: >
@@ -1098,7 +941,7 @@ paths:
       security:
         - BearerAuth: []
         
-      operationId: uncommentPhoto # required
+      operationId: uncommentPhoto # required - used
       responses:
         "204":
           description: >
@@ -1112,46 +955,6 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
         "403":
           $ref: "#/components/responses/UnauthorizedToken"
-        "500":
-          $ref: "#/components/responses/ServerError"
-    
-    get:
-      tags:
-        - comment
-        - photo
-      
-      security:
-        - BearerAuth: []
-      
-      summary: get comment on photo
-      description: >
-        give user id photo owner, photo id and id of comment on photo and get it
-      
-      operationId: getComment
-      
-      responses:
-        "200":
-          description: >
-            get comment
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Comment"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-          
-        "404":
-          $ref: "#/components/responses/UserNotFound"
-        
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
-        
-        "403":
-          $ref: "#/components/responses/UnauthorizedToken"
-        
-        "204":
-          description: >
-            empty body, found nothing
         "500":
           $ref: "#/components/responses/ServerError"
   
@@ -1168,7 +971,7 @@ paths:
         and an identifier is returned.
         If the user exists, the user identifier is returned.
       
-      operationId: doLogin # required
+      operationId: doLogin # required - used
      
       requestBody:
         description: >
@@ -1234,7 +1037,7 @@ paths:
       
       security:
         - BearerAuth: []
-      operationId: getImage
+      operationId: getImage # - used
       responses:
         "200":
           description: "Photo founded, get it"
@@ -1572,9 +1375,6 @@ tags:
   - name: comment
     description: >
       Manage comments gived to photos
-  - name: following
-    description: >
-      Manage user that followings
   - name: login
     description: >
       log-in function for users

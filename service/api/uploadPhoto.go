@@ -68,9 +68,7 @@ func (rt *_router) uploadPhoto(w http.ResponseWriter, r *http.Request, ps httpro
 		return
 	}
 	//  parsing body values (image upload operation)
-	var photo *database.Photo = &database.Photo{
-		ImageData: make([]byte, database.MaxBytePhoto),
-	}
+	var photo *database.Photo = &database.Photo{}
 
 	// max byte for photo is 5MB
 	if err = r.ParseMultipartForm(database.MaxByteFormData); err != nil {

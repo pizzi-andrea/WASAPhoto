@@ -233,8 +233,14 @@ export default {
       <p class="card-text">{{ post.descriptionImg }}</p>
       <button type="button" @click="deletePhoto" class="btn btn-danger">
         <span class="badge badge-light"><img src="./icons/trash.svg"></span>
-        <span class="badge badge-light">{{ likes }}</span>
+        
       </button>
+      <div class="btn btn-light m-3">
+      Like: {{ likes }}
+    </div>
+      <div class="btn btn-light m-3">
+      Commenti: {{ comments ? comments.length : 0  }}
+    </div>
       <p class="card-text"><small class="text-muted">Aggiunta il: {{ post.timeUpdate }}</small></p>
       <div class="list-group">
         <RouterLink :to="comment.author.uid == i ? '#' : '/users/' + comment.author.uid + '/profile'" v-for="comment in comments" :id="comment.commentId" :key="comment.commentId">

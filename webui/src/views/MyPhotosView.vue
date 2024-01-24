@@ -49,7 +49,7 @@ export default {
             if (this.img == null || this.img.length == 0) {
                 return;
             }
-            console.log(this.img);
+           
             form.append("img", this.img[0]);
             form.append("desc", this.description);
             let response = null;
@@ -133,7 +133,7 @@ export default {
                     <div class="card-body">
                         <div class="input-group mb-3">
                             <span class="input-group-text mb-3">descrizione</span>
-                            <textarea class="form-control" aria-label="descrizione" name="desc" v-model="testo"></textarea>
+                            <textarea class="form-control" aria-label="descrizione" name="desc" v-model="description"></textarea>
                         </div>
 
                         <div class="input-group mb-3">

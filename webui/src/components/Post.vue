@@ -16,7 +16,8 @@ export default {
       commentPerform: false,
       loading: false,
       comments: [],
-      i: localStorage.getItem('token')
+      i: localStorage.getItem('token'),
+      is_owner: false
 
 
 
@@ -410,7 +411,7 @@ export default {
   },
     mounted(){
         this.refresh();
-
+      this.is_owner = this.post.owner == localStorage.getItem('token');
         this.users_likes = this.post.likes;
         this.likes = this.users_likes ? this.users_likes.length : 0;
         this.comments = this.post.comments;
@@ -433,12 +434,16 @@ export default {
     <p class="card-text"> {{post.descriptionImg}} </p>
     
     <!-- -->
-    <button type="button" @click="delLike" class="btn btn-danger" v-if="like">
+    <button type="button" @click="delLike" class="btn btn-danger" :disabled=is_owner v-if="like">
       <span class="badge badge-light"> <img src="./icons/lost-like.svg"> </span>  <span class="badge badge-light">{{likes}}</span>
     </button>
-    <button type="button" @click="putLike" class="btn btn-primary" v-else>
+    <button type="button" @click="putLike" class="btn btn-primary" :disabled=is_owner v-else >
       <span class="badge badge-light"> <img src="./icons/need-like.svg"> </span> <span class="badge badge-light">{{likes}}</span>
     </button>
+
+    <div class="btn btn-light m-3">
+      Commenti: {{ comments ? comments.length : 0  }}
+    </div>
 
 
     <p class="card-text"><small class="text-muted">Aggiunta il: {{ post.timeUpdate }}</small></p>
@@ -471,7 +476,7 @@ export default {
         </div>
 
       </div>
-      <button type="button" @click="enableComment"  class="btn btn-light m-2" v-else>
+      <button type="button" @click="enableComment" :disabled=is_owner  class="btn btn-light m-2" v-else>
         <small> commenta </small> <span class="badge badge-light"><img src="./icons/write.svg"> </span>
       </button>
      

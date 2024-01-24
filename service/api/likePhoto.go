@@ -90,6 +90,15 @@ func (rt *_router) likePhoto(w http.ResponseWriter, r *http.Request, ps httprout
 	if tk.Value != likeUserId {
 		w.Header().Set("content-type", "text/plain") //  403
 		w.WriteHeader(UnauthorizedToken.StatusCode)
+		return
+
+	}
+
+	if likeUserId == uid {
+		ctx.Logger.Errorln("User can not put like on its photo")
+		w.Header().Set("content-type", "text/plain") //  403
+		w.WriteHeader(http.StatusForbidden)
+		return
 
 	}
 

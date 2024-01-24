@@ -101,9 +101,17 @@ func (rt *_router) commentPhoto(w http.ResponseWriter, r *http.Request, ps httpr
 	if tk = security.BarrearAuth(r); tk == nil || !security.TokenIn(*tk) {
 		ctx.Logger.Errorln("Token missing or invalid")
 		w.Header().Set("content-type", "text/plain") //  401
-		w.WriteHeader(UnauthorizedError.StatusCode)
+		w.WriteHeader(http.StatusForbidden)
 
 		return
+	}
+
+	if tk.Value == uid {
+		ctx.Logger.Errorln("User can not comment photos updates by themself")
+		w.Header().Set("content-type", "text/plain") //  401
+		w.WriteHeader(http.StatusForbidden)
+		return
+
 	}
 
 	if rr, err = rt.db.IsBanned(user.Uid, tk.Value); err != nil {

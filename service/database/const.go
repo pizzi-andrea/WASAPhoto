@@ -6,5 +6,4 @@ const (
 	MaxByteDescription = 250
 	MaxBytePhoto       = 5000000
 	MaxByteUsername    = 16
-	MaxByteStream      = MaxSizeStream * MaxBytePhoto
 )

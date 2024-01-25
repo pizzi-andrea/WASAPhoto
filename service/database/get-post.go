@@ -9,7 +9,7 @@ import (
 // null post pointer and nil error value. If post exist will return it. If occurend an error will return nil pointer and
 // error value
 func (db *appdbimpl) GetPost(photoId Id) (post *Post, err error) {
-	p := Post{}
+	var p Post
 
 	if p.Comments, err = db.GetComments(photoId, "", false); err != nil {
 		return nil, err
